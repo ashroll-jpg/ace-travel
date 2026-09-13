@@ -301,6 +301,16 @@
   .seat-chip:active{transform:scale(.94)}
   .seat-chip.copied{background:linear-gradient(160deg,var(--olive),var(--olive-deep)); box-shadow:0 3px 8px rgba(58,66,49,.3)}
   .seat-chip svg{opacity:.9}
+  .lodg-pill{display:flex;align-items:center;gap:8px;margin:0 18px;padding:8px 12px;border-radius:10px;background:var(--type-soft,rgba(138,109,59,.12));border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 22%,transparent)}
+  .lodg-pill .lp-ic{width:18px;height:18px;color:var(--type-color,#8a6d3b);display:flex;flex-shrink:0}
+  .lodg-pill .lp-ic svg{width:18px;height:18px}
+  .lodg-pill .lp-name{flex:1;min-width:0;font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lodg-pill .lp-room{flex-shrink:0;font-family:var(--sans);font-size:11px;font-weight:600;color:var(--type-color,#8a6d3b);background:rgba(255,255,255,.5);padding:3px 8px;border-radius:8px}
+  .lodg-section{margin-bottom:20px}
+  .lodg-section-label{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.13em;color:var(--sage);margin-bottom:10px}
+  .lodg-card{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:10px;border-radius:16px;background:var(--card-grad);border:1px solid var(--line-soft);border-left:3px solid var(--type-color,#8a6d3b);box-shadow:var(--shadow-sm)}
+  .lodg-card .lodg-dates{font-family:var(--sans);font-size:12.5px;color:var(--sage);margin-top:2px}
+  .lodg-card .lodg-conf{font-family:var(--sans);font-size:11.5px;color:var(--ink-soft);margin-top:2px}
   .lodging-banner{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:2px 0 14px;border-radius:14px;background:var(--type-soft,rgba(138,109,59,.12));border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 25%,transparent)}
   .lodg-icon{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--type-color,#8a6d3b);color:#fff}
   .lodg-icon svg{width:18px;height:18px}
@@ -469,6 +479,7 @@
       <div class="magic-status" id="magicStatus"></div>
       <div class="no-key-note" id="noKeyNote">Add your API key in settings (⚙) to turn this on. You can always add items by hand below.</div>
     </div>
+    <div id="lodgingSection"></div>
     <div id="days"></div>
     <button class="add-btn" onclick="addDay()">Add a day</button>
   </section>
@@ -551,7 +562,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-d</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-e</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -860,11 +871,17 @@ function renderDays(){
     if(!filler){const chev=document.createElement('span');chev.className='chev';chev.textContent='⌄';head.appendChild(hleft);head.appendChild(chev);}
     else{head.appendChild(hleft);}
     e.appendChild(head);
+    // compact lodging pill — visible even when the day is collapsed
+    if(Lday){
+      const pill=document.createElement('div');pill.className='lodg-pill';
+      pill.style.setProperty('--type-color',TYPES.hotel.color);pill.style.setProperty('--type-soft',TYPES.hotel.soft);
+      pill.innerHTML='<span class="lp-ic">'+TYPES.hotel.icon+'</span><span class="lp-name">'+esc(Lday.name)+'</span>'+(Lday.room?'<span class="lp-room">Rm '+esc(Lday.room)+'</span>':'');
+      e.appendChild(pill);
+    }
     // expandable body
     const body=document.createElement('div');body.className='day-body';
-    // lodging banner (spans nights)
-    const L=lodgingForDay(d.date);
-    if(L)body.appendChild(lodgingBanner(L,d.date));
+    // full lodging banner (with editable room #)
+    if(Lday)body.appendChild(lodgingBanner(Lday,d.date));
     body.appendChild(inp(d.date,'entry-sub','Date',v=>{d.date=v;save();renderDays()}));
     const ta=document.createElement('textarea');ta.className='entry-body';ta.value=d.plan||'';ta.placeholder='Plans, timings, notes…';
     ta.oninput=ev=>{d.plan=ev.target.value;grow(ta);save()};body.appendChild(ta);
@@ -874,6 +891,36 @@ function renderDays(){
     c.appendChild(e);grow(ta);
   });counts();
   loadWeather();
+  renderLodgingSection();
+}
+function renderLodgingSection(){
+  const c=document.getElementById('lodgingSection'); if(!c)return; c.innerHTML='';
+  const lodg=(D.lodging||[]);
+  if(!lodg.length)return;
+  const t=TYPES.hotel;
+  const wrap=document.createElement('div');wrap.className='lodg-section';
+  const lbl=document.createElement('div');lbl.className='lodg-section-label';lbl.textContent='WHERE YOU\u2019RE STAYING';wrap.appendChild(lbl);
+  lodg.forEach(L=>{
+    const card=document.createElement('div');card.className='lodg-card';
+    card.style.setProperty('--type-color',t.color);card.style.setProperty('--type-soft',t.soft);
+    const icon=document.createElement('div');icon.className='lodg-icon';icon.innerHTML=t.icon;card.appendChild(icon);
+    const mid=document.createElement('div');mid.className='lodg-mid';
+    const dates=[L.checkIn,L.checkOut].filter(Boolean).join(' → ');
+    mid.innerHTML='<div class="lodg-name">'+esc(L.name)+'</div>'+(dates?'<div class="lodg-dates">'+esc(dates)+'</div>':'')+(L.confirmation?'<div class="lodg-conf">Conf '+esc(L.confirmation)+'</div>':'');
+    card.appendChild(mid);
+    // room field
+    const roomWrap=document.createElement('div');roomWrap.className='lodg-room';
+    roomWrap.innerHTML='<div class="lodg-room-label">ROOM</div>';
+    const rin=document.createElement('input');rin.className='lodg-room-input';rin.value=L.room||'';rin.placeholder='—';rin.maxLength=6;
+    rin.oninput=e=>{L.room=e.target.value;save();renderDays();};
+    roomWrap.appendChild(rin);card.appendChild(roomWrap);
+    // delete
+    const del=document.createElement('button');del.className='del';del.textContent='×';del.style.flexShrink='0';
+    del.onclick=()=>{ if(confirm('Remove this lodging?')){D.lodging=D.lodging.filter(x=>x.id!==L.id);save();renderDays();} };
+    card.appendChild(del);
+    wrap.appendChild(card);
+  });
+  c.appendChild(wrap);
 }
 function addDay(d){D.days.push(Object.assign({id:uid(),title:'',date:'',plan:''},d||{}));save();renderDays();if(typeof updateCountdown==='function')updateCountdown();if(typeof loadHero==='function')loadHero();}
 
@@ -1257,7 +1304,7 @@ function applyResult(r){
   const t=TYPES[cat]||TYPES.booking;
 
   if(cat==='hotel'){
-    // create spanning lodging instead of a standalone booking
+    // create spanning lodging
     D.lodging=D.lodging||[];
     D.lodging.push({
       id:uid(), name:r.title||'Hotel',
@@ -1265,8 +1312,16 @@ function applyResult(r){
       room:'', roomType:r.room||'', confirmation:r.confirmation||'',
       address:r.address||'', phone:r.phone||''
     });
+    // ALSO add to Bookings as a backup/reference
+    addBooking({
+      kind:'Hotel', cat:'hotel', title:r.title||'Hotel',
+      when:[r.checkIn,r.checkOut].filter(Boolean).join(' → ')||r.when||'',
+      confirmation:r.confirmation||'', address:r.address||'', phone:r.phone||'',
+      details:(r.room?('Room: '+r.room):'')
+    });
     save(); renderDays();
-    return 'Added lodging — it now spans your nights. ✓';
+    const span=[r.checkIn,r.checkOut].filter(Boolean).join(' → ');
+    return 'Hotel added'+(span?(' — '+span):'')+', spanning your nights. ✓';
   }
 
   // other bookings: keep in Bookings, and also drop an event onto the matching day
