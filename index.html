@@ -302,6 +302,14 @@
   .seat-chip.copied{background:linear-gradient(160deg,var(--olive),var(--olive-deep)); box-shadow:0 3px 8px rgba(58,66,49,.3)}
   .seat-chip svg{opacity:.9}
   .seat-lbl{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--type-color,var(--sage));margin-bottom:8px}
+  .seatmap{display:inline-flex;flex-direction:column;gap:4px;padding:12px;background:var(--type-soft,rgba(47,111,176,.08));border-radius:12px;margin-bottom:12px}
+  .sm-row{display:flex;align-items:center;gap:4px}
+  .sm-hdr{margin-bottom:2px}
+  .sm-rownum{width:22px;text-align:center;font-family:var(--sans);font-size:11px;font-weight:600;color:var(--sage)}
+  .sm-letter{width:24px;text-align:center;font-family:var(--sans);font-size:10px;font-weight:600;color:var(--sage)}
+  .sm-seat{width:24px;height:24px;border-radius:5px;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:10px;font-weight:600;color:var(--ink-soft)}
+  .sm-seat.mine{background:var(--type-color,var(--seat));color:#fff;border-color:var(--type-color,var(--seat));box-shadow:0 2px 5px rgba(43,49,37,.25)}
+  .sm-aisle{width:12px}
 
   /* ---------- Expandable bookings ---------- */
   .entry.booking{padding:0; overflow:hidden; border-left:3px solid var(--type-color,var(--sage))}
@@ -833,7 +841,15 @@ function seatBlock(seatsStr, cat){
   const wrap=document.createElement('div');wrap.className='seat-block';
   const lbl=document.createElement('div');lbl.className='seat-lbl';
   const isEvent=(cat==='event');
+  const isFlight=(cat==='flight');
   lbl.textContent=isEvent?'YOUR SEATS / SECTION':'YOUR SEATS';wrap.appendChild(lbl);
+
+  // Visual cabin map for flights (drawn from the seat codes)
+  if(isFlight){
+    const map=buildSeatMap(seatsStr);
+    if(map)wrap.appendChild(map);
+  }
+
   const row=document.createElement('div');row.className='seat-chips';
   const seatSvg=isEvent
     ? '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M4 9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 1.5 1.5 0 0 0 0 3 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 1.5 1.5 0 0 0 0-3z"/></svg>'
@@ -845,6 +861,47 @@ function seatBlock(seatsStr, cat){
     row.appendChild(chip);
   });
   wrap.appendChild(row);return wrap;
+}
+
+// Build a small cabin diagram: rows containing the user's seats, seats highlighted.
+function buildSeatMap(seatsStr){
+  // parse "35A, 35B" -> [{row:35,letter:'A'},...]
+  const seats=[];
+  seatsStr.split(/[,/]| and /i).map(s=>s.trim().toUpperCase()).filter(Boolean).forEach(s=>{
+    const mm=s.match(/^(\d{1,3})\s*([A-K])$/);
+    if(mm)seats.push({row:+mm[1],letter:mm[2]});
+  });
+  if(!seats.length)return null;
+  const mine=new Set(seats.map(s=>s.row+s.letter));
+  const rows=[...new Set(seats.map(s=>s.row))].sort((a,b)=>a-b);
+  // choose layout by the highest seat letter present: A-F => 3-3; A-J/K => 3-3-3 (wide-body)
+  const maxLetter=seats.reduce((m,s)=>s.letter>m?s.letter:m,'A');
+  const layout = (maxLetter>='G') ? [['A','B','C'],['D','E','F'],['G','H','J']] : [['A','B','C'],['D','E','F']];
+  const wrap=document.createElement('div');wrap.className='seatmap';
+  rows.forEach(r=>{
+    const rowEl=document.createElement('div');rowEl.className='sm-row';
+    const num=document.createElement('div');num.className='sm-rownum';num.textContent=r;rowEl.appendChild(num);
+    layout.forEach((block,bi)=>{
+      block.forEach(letter=>{
+        const seat=document.createElement('div');
+        const isMine=mine.has(r+letter);
+        seat.className='sm-seat'+(isMine?' mine':'');
+        seat.textContent=letter;
+        rowEl.appendChild(seat);
+      });
+      if(bi<layout.length-1){const aisle=document.createElement('div');aisle.className='sm-aisle';rowEl.appendChild(aisle);}
+    });
+    wrap.appendChild(rowEl);
+  });
+  // header letters
+  const hdr=document.createElement('div');hdr.className='sm-row sm-hdr';
+  const spacer=document.createElement('div');spacer.className='sm-rownum';hdr.appendChild(spacer);
+  layout.forEach((block,bi)=>{
+    block.forEach(letter=>{const h=document.createElement('div');h.className='sm-letter';h.textContent=letter;hdr.appendChild(h);});
+    if(bi<layout.length-1){const aisle=document.createElement('div');aisle.className='sm-aisle';hdr.appendChild(aisle);}
+  });
+  wrap.insertBefore(hdr, wrap.firstChild);
+  return wrap;
 }
 function fieldRows(b){
   const rows=[];
