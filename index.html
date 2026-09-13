@@ -301,15 +301,27 @@
   .seat-chip:active{transform:scale(.94)}
   .seat-chip.copied{background:linear-gradient(160deg,var(--olive),var(--olive-deep)); box-shadow:0 3px 8px rgba(58,66,49,.3)}
   .seat-chip svg{opacity:.9}
-  .seat-lbl{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--type-color,var(--sage));margin-bottom:8px}
-  .seatmap{display:inline-flex;flex-direction:column;gap:4px;padding:12px;background:var(--type-soft,rgba(47,111,176,.08));border-radius:12px;margin-bottom:12px}
-  .sm-row{display:flex;align-items:center;gap:4px}
-  .sm-hdr{margin-bottom:2px}
-  .sm-rownum{width:22px;text-align:center;font-family:var(--sans);font-size:11px;font-weight:600;color:var(--sage)}
-  .sm-letter{width:24px;text-align:center;font-family:var(--sans);font-size:10px;font-weight:600;color:var(--sage)}
-  .sm-seat{width:24px;height:24px;border-radius:5px;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-family:var(--sans);font-size:10px;font-weight:600;color:var(--ink-soft)}
-  .sm-seat.mine{background:var(--type-color,var(--seat));color:#fff;border-color:var(--type-color,var(--seat));box-shadow:0 2px 5px rgba(43,49,37,.25)}
-  .sm-aisle{width:12px}
+  .lodging-banner{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:2px 0 14px;border-radius:14px;background:var(--type-soft,rgba(138,109,59,.12));border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 25%,transparent)}
+  .lodg-icon{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--type-color,#8a6d3b);color:#fff}
+  .lodg-icon svg{width:18px;height:18px}
+  .lodg-mid{flex:1;min-width:0}
+  .lodg-label{font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--type-color,#8a6d3b)}
+  .lodg-name{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:1.15;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lodg-room{flex-shrink:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;padding-left:10px;border-left:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 20%,transparent)}
+  .lodg-room-label{font-family:var(--sans);font-size:8.5px;font-weight:700;letter-spacing:.1em;color:var(--type-color,#8a6d3b)}
+  .lodg-room-input{width:52px;text-align:center;border:none;background:transparent;font-family:var(--serif);font-size:19px;font-weight:500;color:var(--ink)}
+  .lodg-room-input::placeholder{color:#c3bba6}
+  .seat-tiles{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:12px}
+  .seat-tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:58px;height:62px;padding:6px 12px;border:none;border-radius:14px;
+    background:var(--type-color,var(--seat));
+    background:linear-gradient(155deg,var(--type-color,var(--seat)) 0%,color-mix(in srgb,var(--type-color,var(--seat)) 78%,#000) 100%);
+    color:#fff;box-shadow:0 4px 12px rgba(43,49,37,.28),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .12s ease}
+  .seat-tile:active{transform:scale(.93)}
+  .seat-tile .st-row{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.02em;opacity:.85;line-height:1}
+  .seat-tile .st-letter{font-family:var(--serif);font-size:26px;font-weight:500;line-height:1.05}
+  .seat-tile .st-single{font-family:var(--serif);font-size:20px;font-weight:500}
+  .seat-tile.copied{background:linear-gradient(155deg,var(--olive),var(--olive-deep))}
+  .seat-tile.copied::after{content:"Copied";position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-family:var(--sans);font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--olive);white-space:nowrap}
 
   /* ---------- Expandable bookings ---------- */
   .entry.booking{padding:0; overflow:hidden; border-left:3px solid var(--type-color,var(--sage))}
@@ -539,7 +551,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-b</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-d</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -560,7 +572,7 @@ const STORE_KEY='ace_trips_v1';       // {trips:[...], activeId}
 const LEGACY_KEY='trip_data_v2';      // old single-trip
 const uid=()=>Math.random().toString(36).slice(2,9);
 function getKey(){return localStorage.getItem('trip_api_key')||''}
-function fresh(name){return {id:uid(),name:name||'',dates:'',cur:'€',cover:'',days:[],bookings:[],packing:[],phrases:[],numbers:[],addresses:[],budget:[],docs:[]}}
+function fresh(name){return {id:uid(),name:name||'',dates:'',cur:'€',cover:'',days:[],lodging:[],bookings:[],packing:[],phrases:[],numbers:[],addresses:[],budget:[],docs:[]}}
 
 function loadStore(){
   let store;
@@ -609,7 +621,7 @@ function bindHeader(){
   const nameEl=document.getElementById('tripName'), datesEl=document.getElementById('tripDates');
   nameEl.value=D.name||''; datesEl.value=D.dates||'';
   nameEl.oninput=e=>{D.name=e.target.value;save();};
-  datesEl.oninput=e=>{D.dates=e.target.value;save();updateCountdown();};
+  datesEl.oninput=e=>{D.dates=e.target.value;D.datesManual=(e.target.value.trim()!=='');save();updateCountdown();};
   updateCountdown();
   loadHero();
 }
@@ -723,10 +735,22 @@ function reflowDays(){
   const dated=withKey.filter(x=>x.key!==Infinity);
   const undated=withKey.filter(x=>x.key===Infinity).map(x=>x.d);
 
+  // include lodging date range so hotel nights always get a day, even with no other plans
+  const lodgKeys=[];
+  (D.lodging||[]).forEach(L=>{
+    const ci=parseLoose(L.checkIn), co=parseLoose(L.checkOut);
+    if(ci)lodgKeys.push(normDay(toSortable(ci,by)));
+    if(co)lodgKeys.push(normDay(toSortable(co,by)-86400000)); // last night = checkout - 1
+  });
+
   let out=[];
-  if(dated.length<2){ out=dated.map(x=>x.d); }
+  const datedKeys=dated.map(x=>normDay(x.key));
+  const allKeys=datedKeys.concat(lodgKeys);
+  if(allKeys.length<2 && dated.length<2){ out=dated.map(x=>x.d); }
   else{
-    const start=normDay(dated[0].key), end=normDay(dated[dated.length-1].key), dayMs=86400000;
+    const start=Math.min.apply(null,allKeys.length?allKeys:datedKeys);
+    const end=Math.max.apply(null,allKeys.length?allKeys:datedKeys);
+    const dayMs=86400000;
     const buckets={}; dated.forEach(x=>{const k=normDay(x.key);(buckets[k]=buckets[k]||[]).push(x.d)});
     for(let t=start;t<=end;t+=dayMs){
       if(buckets[t])out.push(...buckets[t]);
@@ -734,7 +758,25 @@ function reflowDays(){
     }
   }
   D.days=out.concat(undated);
+  autoDates();
   save();
+}
+
+// Auto-fill the trip date range from the itinerary, unless the user typed their own.
+function autoDates(){
+  if(D.datesManual)return; // don't override a manually-entered range
+  const by=baseYear();
+  const dated=D.days.map(d=>parseLoose(d.date)).filter(Boolean);
+  if(dated.length<1)return;
+  const keys=dated.map(p=>toSortable(p,by)).sort((a,b)=>a-b);
+  const MON3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const fmt=ts=>{const d=new Date(ts);return MON3[d.getMonth()]+' '+d.getDate();};
+  const start=keys[0], end=keys[keys.length-1];
+  const range = (start===end)? fmt(start) : (fmt(start)+' – '+fmt(end));
+  if(D.dates!==range){
+    D.dates=range;
+    const el=document.getElementById('tripDates'); if(el)el.value=range;
+  }
 }
 
 // Which day index is "today" (or null if trip not underway)
@@ -763,13 +805,47 @@ function dayType(d){
   if(/\bcar|rental|drive\b/.test(t))return TYPES.car;
   return null;
 }
+// Which lodging (if any) covers a given day's date — a night is covered if checkIn <= day < checkOut
+function lodgingForDay(dateStr){
+  if(!D.lodging||!D.lodging.length)return null;
+  const by=baseYear();
+  const dp=parseLoose(dateStr); if(!dp)return null;
+  const dk=toSortable(dp,by);
+  for(const L of D.lodging){
+    const ci=parseLoose(L.checkIn), co=parseLoose(L.checkOut);
+    if(!ci)continue;
+    const ciK=toSortable(ci,by);
+    const coK=co?toSortable(co,by):ciK+86400000; // if no checkout, assume 1 night
+    if(dk>=ciK && dk<coK) return L;
+  }
+  return null;
+}
+function lodgingBanner(L, dateStr){
+  const t=TYPES.hotel;
+  const el=document.createElement('div');el.className='lodging-banner';
+  el.style.setProperty('--type-color',t.color);el.style.setProperty('--type-soft',t.soft);
+  const icon=document.createElement('div');icon.className='lodg-icon';icon.innerHTML=t.icon;el.appendChild(icon);
+  const mid=document.createElement('div');mid.className='lodg-mid';
+  const isCheckin = parseLoose(L.checkIn) && parseLoose(dateStr) && toSortable(parseLoose(L.checkIn),baseYear())===toSortable(parseLoose(dateStr),baseYear());
+  mid.innerHTML='<div class="lodg-label">'+(isCheckin?'CHECK IN · STAYING AT':'STAYING AT')+'</div><div class="lodg-name">'+esc(L.name)+'</div>';
+  el.appendChild(mid);
+  // room number field (one per stay)
+  const roomWrap=document.createElement('div');roomWrap.className='lodg-room';
+  const rlabel=document.createElement('div');rlabel.className='lodg-room-label';rlabel.textContent='ROOM';roomWrap.appendChild(rlabel);
+  const rin=document.createElement('input');rin.className='lodg-room-input';rin.value=L.room||'';rin.placeholder='—';rin.maxLength=6;
+  rin.oninput=e=>{L.room=e.target.value;save()};
+  roomWrap.appendChild(rin);
+  el.appendChild(roomWrap);
+  return el;
+}
 function renderDays(){
   reflowDays();
   const c=document.getElementById('days');c.innerHTML='';
   if(!D.days.length){c.innerHTML='<div class="empty"><div class="mark">Your days will appear here, in order.</div></div>';counts();return}
   const ti=todayIndex();
   D.days.forEach((d,i)=>{
-    const filler=!d.title&&!d.plan;
+    const Lday=lodgingForDay(d.date);
+    const filler=!d.title&&!d.plan&&!Lday;
     const dt=dayType(d);
     const e=document.createElement('div');e.className='entry day'+(filler?' filler':'')+(i===ti?' is-today':'')+(d._open?' open':'')+(dt?' type-'+Object.keys(TYPES).find(k=>TYPES[k]===dt):'');
     if(dt){e.style.setProperty('--type-color',dt.color);e.style.setProperty('--type-soft',dt.soft);}
@@ -786,6 +862,9 @@ function renderDays(){
     e.appendChild(head);
     // expandable body
     const body=document.createElement('div');body.className='day-body';
+    // lodging banner (spans nights)
+    const L=lodgingForDay(d.date);
+    if(L)body.appendChild(lodgingBanner(L,d.date));
     body.appendChild(inp(d.date,'entry-sub','Date',v=>{d.date=v;save();renderDays()}));
     const ta=document.createElement('textarea');ta.className='entry-body';ta.value=d.plan||'';ta.placeholder='Plans, timings, notes…';
     ta.oninput=ev=>{d.plan=ev.target.value;grow(ta);save()};body.appendChild(ta);
@@ -844,63 +923,21 @@ function seatBlock(seatsStr, cat){
   const isFlight=(cat==='flight');
   lbl.textContent=isEvent?'YOUR SEATS / SECTION':'YOUR SEATS';wrap.appendChild(lbl);
 
-  // Visual cabin map for flights (drawn from the seat codes)
-  if(isFlight){
-    const map=buildSeatMap(seatsStr);
-    if(map)wrap.appendChild(map);
-  }
-
-  const row=document.createElement('div');row.className='seat-chips';
-  const seatSvg=isEvent
-    ? '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M4 9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 1.5 1.5 0 0 0 0 3 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 1.5 1.5 0 0 0 0-3z"/></svg>'
-    : '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M7 4a2 2 0 0 1 2 2v6h6a3 3 0 0 1 3 3v4a1 1 0 0 1-2 0v-2H8a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2z"/></svg>';
+  const row=document.createElement('div');row.className='seat-tiles';
   seatsStr.split(/[,/]| and /i).map(s=>s.trim()).filter(Boolean).forEach(s=>{
-    const chip=document.createElement('button');chip.className='seat-chip';
-    chip.innerHTML=seatSvg+'<span>'+esc(s)+'</span>';
-    chip.onclick=()=>copyText(s,chip);
-    row.appendChild(chip);
+    const tile=document.createElement('button');tile.className='seat-tile';
+    // split "35A" into number + letter for the stacked premium look
+    const mm=s.toUpperCase().match(/^(\d{1,3})\s*([A-K])$/);
+    if(mm){
+      tile.innerHTML='<span class="st-row">'+mm[1]+'</span><span class="st-letter">'+mm[2]+'</span>';
+    } else {
+      tile.innerHTML='<span class="st-single">'+esc(s)+'</span>';
+    }
+    tile.title='Tap to copy';
+    tile.onclick=()=>copyText(s,tile);
+    row.appendChild(tile);
   });
-  wrap.appendChild(row);return wrap;
-}
-
-// Build a small cabin diagram: rows containing the user's seats, seats highlighted.
-function buildSeatMap(seatsStr){
-  // parse "35A, 35B" -> [{row:35,letter:'A'},...]
-  const seats=[];
-  seatsStr.split(/[,/]| and /i).map(s=>s.trim().toUpperCase()).filter(Boolean).forEach(s=>{
-    const mm=s.match(/^(\d{1,3})\s*([A-K])$/);
-    if(mm)seats.push({row:+mm[1],letter:mm[2]});
-  });
-  if(!seats.length)return null;
-  const mine=new Set(seats.map(s=>s.row+s.letter));
-  const rows=[...new Set(seats.map(s=>s.row))].sort((a,b)=>a-b);
-  // choose layout by the highest seat letter present: A-F => 3-3; A-J/K => 3-3-3 (wide-body)
-  const maxLetter=seats.reduce((m,s)=>s.letter>m?s.letter:m,'A');
-  const layout = (maxLetter>='G') ? [['A','B','C'],['D','E','F'],['G','H','J']] : [['A','B','C'],['D','E','F']];
-  const wrap=document.createElement('div');wrap.className='seatmap';
-  rows.forEach(r=>{
-    const rowEl=document.createElement('div');rowEl.className='sm-row';
-    const num=document.createElement('div');num.className='sm-rownum';num.textContent=r;rowEl.appendChild(num);
-    layout.forEach((block,bi)=>{
-      block.forEach(letter=>{
-        const seat=document.createElement('div');
-        const isMine=mine.has(r+letter);
-        seat.className='sm-seat'+(isMine?' mine':'');
-        seat.textContent=letter;
-        rowEl.appendChild(seat);
-      });
-      if(bi<layout.length-1){const aisle=document.createElement('div');aisle.className='sm-aisle';rowEl.appendChild(aisle);}
-    });
-    wrap.appendChild(rowEl);
-  });
-  // header letters
-  const hdr=document.createElement('div');hdr.className='sm-row sm-hdr';
-  const spacer=document.createElement('div');spacer.className='sm-rownum';hdr.appendChild(spacer);
-  layout.forEach((block,bi)=>{
-    block.forEach(letter=>{const h=document.createElement('div');h.className='sm-letter';h.textContent=letter;hdr.appendChild(h);});
-    if(bi<layout.length-1){const aisle=document.createElement('div');aisle.className='sm-aisle';hdr.appendChild(aisle);}
-  });
-  wrap.insertBefore(hdr, wrap.firstChild);
+  wrap.appendChild(row);
   return wrap;
 }
 function fieldRows(b){
@@ -1149,8 +1186,8 @@ If it is a FLIGHT, use this schema exactly:
 CRITICAL: look for a next-day arrival marker (a second date near the arrival time). If arrival is a later day than departure you MUST fill arrDate. If seats are unassigned (shown as "--") set seats to "".
 
 For any OTHER booking/reservation/ticket, use:
-{"type":"booking","cat":"<one of: hotel, restaurant, event, spa, car, train, museum, coffee, shopping, activity>","title":"short label (e.g. 'Hôtel Caron' or 'Dinner at Le Comptoir' or 'Chelsea vs Arsenal')","when":"date and time","confirmation":"conf/booking code if any","seats":"seat/section/row if any (events, trains)","address":"street address if any","phone":"phone if any","party":"party size or guests if any","details":"anything else useful, newline-separated","destCity":"city if applicable"}
-Pick "cat" by what it is: a match/concert/show/game ticket = event; a table booking = restaurant; a massage/treatment = spa; a rental car = car; a rail ticket = train; a gallery/exhibit = museum; a café = coffee; a store/retail = shopping; anything else = activity.
+{"type":"booking","cat":"<one of: hotel, restaurant, event, spa, car, train, museum, coffee, shopping, activity>","title":"short label (e.g. 'Hôtel Caron' or 'Dinner at Le Comptoir' or 'Chelsea vs Arsenal')","when":"date and time","checkIn":"for hotels: check-in date e.g. 'Fri, 26 Dec'","checkOut":"for hotels: check-out date e.g. 'Mon, 29 Dec'","confirmation":"conf/booking code if any","seats":"seat/section/row if any (events, trains)","room":"room type or room number if shown","address":"street address if any","phone":"phone if any","party":"party size or guests if any","details":"anything else useful, newline-separated","destCity":"city if applicable"}
+Pick "cat" by what it is: a match/concert/show/game ticket = event; a table booking = restaurant; a massage/treatment = spa; a rental car = car; a rail ticket = train; a gallery/exhibit = museum; a café = coffee; a store/retail = shopping; anything else = activity. For HOTELS always fill checkIn and checkOut with the stay dates.
 
 For a day-by-day ITINERARY use {"type":"day","title":"place","when":"date","details":"plan"}.
 For an ADDRESS use {"type":"address","title":"place","details":"address"}.
@@ -1215,9 +1252,24 @@ function applyResult(r){
   if(r.type==='day'){addDay({title:r.title||'',date:r.when||'',plan:r.details||''});return 'Added a day to your itinerary. ✓'}
   if(r.type==='address'){addAddress({title:r.title||'',body:r.details||''});return 'Saved to addresses. ✓'}
 
-  // typed booking (hotel, restaurant, event, spa, car, train, museum, coffee, shopping, activity)
+  // typed booking
   const cat=(r.cat||'').toLowerCase();
   const t=TYPES[cat]||TYPES.booking;
+
+  if(cat==='hotel'){
+    // create spanning lodging instead of a standalone booking
+    D.lodging=D.lodging||[];
+    D.lodging.push({
+      id:uid(), name:r.title||'Hotel',
+      checkIn:r.checkIn||r.when||'', checkOut:r.checkOut||'',
+      room:'', roomType:r.room||'', confirmation:r.confirmation||'',
+      address:r.address||'', phone:r.phone||''
+    });
+    save(); renderDays();
+    return 'Added lodging — it now spans your nights. ✓';
+  }
+
+  // other bookings: keep in Bookings, and also drop an event onto the matching day
   addBooking({
     kind:t.label, cat:cat||'booking', title:r.title||'', when:r.when||'',
     confirmation:r.confirmation||'', seats:r.seats||'', address:r.address||'',
