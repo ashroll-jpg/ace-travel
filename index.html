@@ -137,6 +137,16 @@
   .entry-sub{font-family:var(--sans); font-size:13.5px; color:var(--sage); background:transparent; border:none; width:100%; margin-top:4px; padding:0; font-weight:500}
   .entry-body{font-family:var(--sans); font-size:14.5px; color:var(--ink-soft); line-height:1.6; background:transparent; border:none; width:100%; resize:none; margin-top:10px; padding:0; overflow:hidden}
   .entry-title::placeholder,.entry-sub::placeholder,.entry-body::placeholder{color:#b8af99}
+  .entry.day{position:relative}
+  .entry.is-today{border-color:var(--terra); box-shadow:0 0 0 1.5px var(--terra), var(--shadow-md)}
+  .today-badge{position:absolute; top:-9px; left:16px; background:var(--terra); color:#fff; font-family:var(--sans); font-size:9px; font-weight:700; letter-spacing:.14em; padding:3px 9px; border-radius:20px; box-shadow:0 2px 5px rgba(176,89,47,.4)}
+  .day-wx{margin-top:10px; font-family:var(--sans); font-size:13px; color:var(--sage); font-weight:500; display:flex; align-items:center; gap:4px}
+  .day-wx:empty{display:none}
+  .day-wx .wx-ic{font-size:15px}
+  .day-wx .wx-lo{color:#b3ab97}
+  .doc-row{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--card-grad);border:1px solid var(--line-soft);border-radius:12px;margin-bottom:9px;box-shadow:var(--shadow-sm)}
+  .doc-ic{font-size:19px}
+  .doc-name{font-size:15px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .entry.filler{opacity:.7; box-shadow:none; background:linear-gradient(160deg,#f9f4ea 0%,#f3ecdc 100%); border-style:dashed}
   .entry.filler .entry-index{color:var(--sage)}
   .entry.filler .entry-title::placeholder{color:#c3bba6; font-style:italic}
@@ -235,7 +245,14 @@
   .map-empty .mark{font-family:var(--serif); font-style:italic; font-size:15px; color:var(--sage-soft); line-height:1.55}
   .map-note{font-size:12px; color:var(--sage); font-style:italic; font-family:var(--serif); margin-bottom:16px; text-align:center; min-height:16px}
   .stop-list{list-style:none; margin:0; padding:0; counter-reset:stop}
-  .stop-list li{position:relative; padding:13px 0 13px 40px; border-bottom:1px solid var(--line-soft); counter-increment:stop}
+  .stop-list li{position:relative; padding:13px 0 13px 40px; border-bottom:1px solid var(--line-soft); counter-increment:stop; display:flex; align-items:center; gap:12px}
+  .offline-tip{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:16px;position:relative;overflow:hidden}
+  .offline-tip::before{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--terra),var(--gold))}
+  .offline-tip-text{font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+  .offline-tip-text b{color:var(--ink);font-family:var(--serif);font-weight:500}
+  .maps-btn{flex-shrink:0;border:1px solid var(--sage-soft);background:rgba(255,255,255,.5);color:var(--olive);font-size:12px;font-weight:600;letter-spacing:.03em;padding:8px 13px;border-radius:10px;display:flex;align-items:center;gap:5px}
+  .maps-btn:active{background:var(--olive);color:var(--cream);border-color:var(--olive)}
+  .maps-btn span{font-size:13px}
   .stop-list li:last-child{border-bottom:none}
   .stop-list li::before{content:counter(stop); position:absolute; left:0; top:11px; width:26px; height:26px; border-radius:50%; background:var(--olive); color:var(--cream); font-family:var(--serif); font-size:13px; font-weight:500; display:flex; align-items:center; justify-content:center}
   .stop-list .city{font-family:var(--serif); font-size:17px; font-weight:500; color:var(--ink)}
@@ -395,6 +412,9 @@
       </div>
     </div>
     <div class="map-note" id="mapNote"></div>
+    <div class="offline-tip" id="offlineTip">
+      <div class="offline-tip-text"><b>Traveling without signal?</b> Download these areas in Maps before you go — tap a city below, then use the Maps app's offline download.</div>
+    </div>
     <ol class="stop-list" id="stopList"></ol>
   </section>
 
@@ -421,6 +441,11 @@
     <div class="view-lead">Addresses & notes</div>
     <div id="addresses"></div>
     <button class="add-btn" onclick="addAddress()">Add an address</button>
+    <div class="view-lead">Documents</div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;line-height:1.5">Passports, boarding passes, vouchers — stored on this device for offline access.</p>
+    <div id="docs"></div>
+    <button class="add-btn" onclick="pickDoc()">Add a document</button>
+    <input type="file" id="docInput" accept="image/*,application/pdf" style="display:none" onchange="handleDoc(event)">
   </section>
 
   <section class="view" id="view-budget">
@@ -474,7 +499,7 @@ const STORE_KEY='ace_trips_v1';       // {trips:[...], activeId}
 const LEGACY_KEY='trip_data_v2';      // old single-trip
 const uid=()=>Math.random().toString(36).slice(2,9);
 function getKey(){return localStorage.getItem('trip_api_key')||''}
-function fresh(name){return {id:uid(),name:name||'',dates:'',cur:'€',cover:'',days:[],bookings:[],packing:[],phrases:[],numbers:[],addresses:[],budget:[]}}
+function fresh(name){return {id:uid(),name:name||'',dates:'',cur:'€',cover:'',days:[],bookings:[],packing:[],phrases:[],numbers:[],addresses:[],budget:[],docs:[]}}
 
 function loadStore(){
   let store;
@@ -503,9 +528,11 @@ function openTrip(id){
   STORE.activeId=id; persist();
   document.body.classList.remove('on-home');
   bindHeader();
-  renderDays();renderBookings();renderPacking();renderPhrases();renderNumbers();renderAddresses();renderBudget();
+  renderDays();renderBookings();renderPacking();renderPhrases();renderNumbers();renderAddresses();renderBudget();renderDocs();
   refreshKeyNote();
   showView('itinerary',document.querySelectorAll('nav button')[0]);
+  // if the trip is underway, scroll to today's card
+  setTimeout(()=>{const t=document.querySelector('.entry.is-today');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},400);
 }
 function goHome(){ D=null; document.body.classList.add('on-home'); renderHome(); }
 function createTrip(){
@@ -640,21 +667,37 @@ function reflowDays(){
   save();
 }
 
+// Which day index is "today" (or null if trip not underway)
+function todayIndex(){
+  const by=baseYear();
+  const now=new Date(); const t0=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  for(let i=0;i<D.days.length;i++){
+    const p=parseLoose(D.days[i].date); if(!p)continue;
+    const y=p.year||(p.mon<=5?by+1:by);
+    if(new Date(y,p.mon,p.day).getTime()===t0)return i;
+  }
+  return null;
+}
 function renderDays(){
   reflowDays();
   const c=document.getElementById('days');c.innerHTML='';
   if(!D.days.length){c.innerHTML='<div class="empty"><div class="mark">Your days will appear here, in order.</div></div>';counts();return}
+  const ti=todayIndex();
   D.days.forEach((d,i)=>{
     const filler=!d.title&&!d.plan;
-    const e=document.createElement('div');e.className='entry day'+(filler?' filler':'');
+    const e=document.createElement('div');e.className='entry day'+(filler?' filler':'')+(i===ti?' is-today':'');
+    if(i===ti){const badge=document.createElement('div');badge.className='today-badge';badge.textContent='TODAY';e.appendChild(badge);}
     const idx=document.createElement('div');idx.className='entry-index';idx.textContent='Day '+(i+1)+(d.date?' — '+d.date:'');e.appendChild(idx);
     e.appendChild(inp(d.title,'entry-title','Open day — add a plan',v=>{d.title=v;save()}));
     e.appendChild(inp(d.date,'entry-sub','Date',v=>{d.date=v;save();renderDays()}));
     const ta=document.createElement('textarea');ta.className='entry-body';ta.value=d.plan||'';ta.placeholder='Plans, timings, notes…';
     ta.oninput=ev=>{d.plan=ev.target.value;grow(ta);save()};e.appendChild(ta);
+    // weather slot
+    const wx=document.createElement('div');wx.className='day-wx';wx.id='wx-'+d.id;e.appendChild(wx);
     e.appendChild(cardCtrls(e,d,()=>{D.days=D.days.filter(x=>x.id!==d.id);save();renderDays()}));
     c.appendChild(e);grow(ta);
   });counts();
+  loadWeather();
 }
 function addDay(d){D.days.push(Object.assign({id:uid(),title:'',date:'',plan:''},d||{}));save();renderDays();if(typeof updateCountdown==='function')updateCountdown();if(typeof loadHero==='function')loadHero();}
 
@@ -879,19 +922,20 @@ function setStatus(html,show=true){const s=document.getElementById('magicStatus'
 async function handleImage(ev){
   const files=Array.from(ev.target.files||[]);ev.target.value='';if(!files.length)return;
   const btns=document.querySelectorAll('.magic-btn');btns.forEach(b=>b.disabled=true);
-  let added=0, failed=0;
+  let added=0, failed=0, lastErr='';
   for(let i=0;i<files.length;i++){
     setStatus('<span class="spinner"></span>Reading '+(files.length>1?('screenshot '+(i+1)+' of '+files.length):'your screenshot')+'…');
     try{
       const b64=await toB64(files[i]);
       const result=await parseContent([{type:'image',source:{type:'base64',media_type:files[i].type||'image/jpeg',data:b64}}]);
       applyResult(result); added++;
-    }catch(err){ failed++; }
+    }catch(err){ failed++; lastErr=err.message||String(err); }
   }
-  let msg = added? ('Added '+added+(added>1?' items':' item')+'. ✓') : 'Couldn\'t read that one. Try another, or add by hand.';
-  if(failed&&added)msg+=' ('+failed+' skipped)';
+  let msg;
+  if(added){ msg='Added '+added+(added>1?' items':' item')+'. ✓'; if(failed)msg+=' ('+failed+' failed: '+lastErr+')'; }
+  else { msg='Failed: '+lastErr; }
   setStatus(msg);
-  setTimeout(()=>setStatus('',false),4500);
+  setTimeout(()=>setStatus('',false),12000);
   btns.forEach(b=>b.disabled=false);
 }
 function toB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('read failed'));r.readAsDataURL(file)})}
@@ -923,25 +967,32 @@ Otherwise use:
 For a day-by-day itinerary use type "day" (title=place, when=date, details=plan). For an address use type "address". Extract real values only; leave a field empty if absent. Return JSON only.`;
 
 async function parseContent(contentBlocks){
-  const resp=await fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "x-api-key":getKey(),
-      "anthropic-version":"2023-06-01",
-      "anthropic-dangerous-direct-browser-access":"true"
-    },
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:contentBlocks.concat([{type:'text',text:PARSE_PROMPT}])}]})
-  });
+  let resp;
+  try{
+    resp=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":getKey(),
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body:JSON.stringify({model:"claude-3-5-sonnet-latest",max_tokens:1000,messages:[{role:"user",content:contentBlocks.concat([{type:'text',text:PARSE_PROMPT}])}]})
+    });
+  }catch(netErr){
+    throw new Error('Network/CORS blocked ('+(netErr.message||'fetch failed')+')');
+  }
   if(!resp.ok){
-    let m='API error '+resp.status;
-    try{const e=await resp.json();if(e.error&&e.error.message)m=e.error.message}catch(_){}
-    if(resp.status===401)m='API key rejected — check it in settings.';
+    let m='HTTP '+resp.status;
+    try{const e=await resp.json();if(e.error&&e.error.message)m=resp.status+': '+e.error.message}catch(_){}
+    if(resp.status===401)m='401: API key rejected — check it in Settings';
+    if(resp.status===400)m='400: '+m+' (often a model or request issue)';
     throw new Error(m);
   }
   const data=await resp.json();
   const text=(data.content||[]).map(i=>i.type==='text'?i.text:'').join('').trim();
-  return JSON.parse(text.replace(/```json|```/g,'').trim());
+  try{ return JSON.parse(text.replace(/```json|```/g,'').trim()); }
+  catch(parseErr){ throw new Error('Got a reply but could not parse it'); }
 }
 
 async function readScreenshot(b64,media){
@@ -1018,6 +1069,12 @@ function getStops(){
   return stops;
 }
 let leafletInstance=null, geocodeCache={};
+function openInMaps(place){
+  const q=encodeURIComponent(place);
+  const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  // Apple Maps on iOS, Google Maps elsewhere. Both apps offer offline area download.
+  window.open(isiOS?('https://maps.apple.com/?q='+q):('https://www.google.com/maps/search/?api=1&query='+q),'_blank');
+}
 async function renderMap(){
   const stops=getStops();
   document.getElementById('cnt-map').textContent = stops.length? stops.length+(stops.length>1?' places':' place') : '';
@@ -1028,9 +1085,15 @@ async function renderMap(){
   const ol=document.getElementById('stopList'); ol.innerHTML='';
   stops.forEach(s=>{
     const li=document.createElement('li');
-    li.innerHTML='<div class="city">'+esc(s.name)+'</div>'+(s.date?'<div class="meta">'+esc(s.date)+'</div>':'');
+    const info=document.createElement('div');info.style.flex='1';info.style.minWidth='0';
+    info.innerHTML='<div class="city">'+esc(s.name)+'</div>'+(s.date?'<div class="meta">'+esc(s.date)+'</div>':'');
+    li.appendChild(info);
+    const mapsBtn=document.createElement('button');mapsBtn.className='maps-btn';mapsBtn.innerHTML='<span>◎</span> Maps';
+    mapsBtn.onclick=()=>openInMaps(s.name);
+    li.appendChild(mapsBtn);
     ol.appendChild(li);
   });
+  document.getElementById('offlineTip').style.display = stops.length? 'block':'none';
   if(!stops.length){ empty.style.display='flex'; lmap.style.display='none'; diag.style.display='none'; note.textContent=''; return; }
   empty.style.display='none';
   const online = (typeof L!=='undefined') && navigator.onLine;
@@ -1156,7 +1219,95 @@ function renderHome(){
   });
 }
 
-/* ---------- Photos (Wikipedia, key-free, offline-safe) ---------- */
+/* ---------- Documents vault (IndexedDB, offline file storage) ---------- */
+let _db=null;
+function db(){return new Promise((res,rej)=>{
+  if(_db)return res(_db);
+  const r=indexedDB.open('ace_docs',1);
+  r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('files'))d.createObjectStore('files',{keyPath:'id'});};
+  r.onsuccess=e=>{_db=e.target.result;res(_db);};
+  r.onerror=e=>rej(e);
+});}
+async function dbPut(rec){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('files','readwrite');t.objectStore('files').put(rec);t.oncomplete=()=>res();t.onerror=rej;});}
+async function dbGet(id){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('files','readonly');const rq=t.objectStore('files').get(id);rq.onsuccess=()=>res(rq.result);rq.onerror=rej;});}
+async function dbDel(id){const d=await db();return new Promise((res,rej)=>{const t=d.transaction('files','readwrite');t.objectStore('files').delete(id);t.oncomplete=()=>res();t.onerror=rej;});}
+
+function pickDoc(){document.getElementById('docInput').click();}
+async function handleDoc(ev){
+  const file=ev.target.files[0];ev.target.value='';if(!file)return;
+  const id=uid();
+  const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+  try{
+    await dbPut({id:id,data:b64,type:file.type,name:file.name});
+    D.docs=D.docs||[];D.docs.push({id:id,name:file.name,type:file.type});save();renderDocs();
+  }catch(e){ alert('Could not save document: '+(e.message||'storage error')); }
+}
+function renderDocs(){
+  const c=document.getElementById('docs');if(!c)return;c.innerHTML='';
+  const docs=(D&&D.docs)||[];
+  if(!docs.length){c.innerHTML='<div class="empty" style="padding:20px"><div class="mark">No documents yet.</div></div>';return;}
+  docs.forEach(doc=>{
+    const row=document.createElement('div');row.className='doc-row';
+    const isPdf=(doc.type||'').includes('pdf');
+    row.innerHTML='<span class="doc-ic">'+(isPdf?'📄':'🖼')+'</span><span class="doc-name">'+esc(doc.name||'Document')+'</span>';
+    row.onclick=()=>openDoc(doc.id);
+    const del=document.createElement('button');del.className='del';del.textContent='×';del.style.marginLeft='auto';
+    del.onclick=(e)=>{e.stopPropagation();if(confirm('Remove this document?')){dbDel(doc.id);D.docs=D.docs.filter(x=>x.id!==doc.id);save();renderDocs();}};
+    row.appendChild(del);c.appendChild(row);
+  });
+}
+async function openDoc(id){
+  const rec=await dbGet(id);if(!rec)return alert('Document not found.');
+  const w=window.open();
+  if(w){ if((rec.type||'').includes('pdf')){w.document.write('<iframe src="'+rec.data+'" style="width:100%;height:100%;border:none"></iframe>');} else {w.document.write('<img src="'+rec.data+'" style="max-width:100%">');} }
+}
+
+/* ---------- Weather per day (Open-Meteo, key-free) ---------- */
+const wxCache={};
+const WX_ICON={0:'☀',1:'🌤',2:'⛅',3:'☁',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'🌨',75:'❄',80:'🌦',81:'🌧',82:'⛈',95:'⛈',96:'⛈',99:'⛈'};
+function isUS(){ return (D&&D.cur==='$'); }
+async function loadWeather(){
+  if(!navigator.onLine)return;
+  const by=baseYear();
+  for(const d of D.days){
+    if(!d.title&&!d.plan)continue;
+    const city=extractCity(d.title); const p=parseLoose(d.date);
+    if(!city||!p)continue;
+    const y=p.year||(p.mon<=5?by+1:by);
+    const dateStr=y+'-'+String(p.mon+1).padStart(2,'0')+'-'+String(p.day).padStart(2,'0');
+    // only fetch for dates within ~16 days (forecast horizon); else skip silently
+    const target=new Date(y,p.mon,p.day); const now=new Date();
+    const daysOut=(target-now)/86400000;
+    if(daysOut<-1||daysOut>16)continue;
+    const key=city.name.toLowerCase()+'|'+dateStr;
+    const slot=document.getElementById('wx-'+d.id); if(!slot)continue;
+    if(wxCache[key]){ slot.innerHTML=wxCache[key]; continue; }
+    try{
+      let coords=city.coords;
+      if(!coords){ coords=await geocodeCity(city.name); }
+      if(!coords)continue;
+      const unit=isUS()?'fahrenheit':'celsius';
+      const url='https://api.open-meteo.com/v1/forecast?latitude='+coords[0]+'&longitude='+coords[1]+'&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit='+unit+'&start_date='+dateStr+'&end_date='+dateStr;
+      const r=await fetch(url); const j=await r.json();
+      if(j&&j.daily&&j.daily.time&&j.daily.time.length){
+        const code=j.daily.weather_code[0], hi=Math.round(j.daily.temperature_2m_max[0]), lo=Math.round(j.daily.temperature_2m_min[0]);
+        const deg=isUS()?'°F':'°C';
+        const html='<span class="wx-ic">'+(WX_ICON[code]||'·')+'</span> '+hi+deg+' <span class="wx-lo">/ '+lo+deg+'</span>';
+        wxCache[key]=html; slot.innerHTML=html;
+      }
+    }catch(e){}
+  }
+}
+async function geocodeCity(name){
+  const key=name.toLowerCase();
+  if(geocodeCache[key])return geocodeCache[key];
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(name));
+    const j=await r.json();
+    if(j&&j[0]){const co=[+j[0].lat,+j[0].lon];geocodeCache[key]=co;return co;}
+  }catch(e){}
+  return null;
+}
 const photoCache={};
 async function fetchCityPhoto(name){
   if(!name)return null;
