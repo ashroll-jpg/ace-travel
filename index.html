@@ -98,9 +98,9 @@
 
   /* ---------- Hero + floating trip card ---------- */
   .hero{position:relative; padding:0 14px; margin-top:16px; margin-bottom:22px}
-  .hero-photo{height:170px; border-radius:var(--radius-lg); background:linear-gradient(135deg,var(--olive) 0%,var(--sage) 100%); background-size:cover; background-position:center; margin:0}
-  .hero-scrim{position:absolute; top:0; left:14px; right:14px; height:170px; border-radius:var(--radius-lg); background:linear-gradient(180deg,rgba(43,49,37,.05) 0%,rgba(43,49,37,.45) 100%); pointer-events:none}
-  .trip-card{position:relative; margin:-78px 4px 0; background:var(--card-grad-hi); border:1px solid var(--line-soft); border-radius:var(--radius); box-shadow:var(--shadow-lg); padding:22px 22px 20px; text-align:center}
+  .hero-photo{height:230px; border-radius:var(--radius-lg); background:linear-gradient(135deg,var(--olive) 0%,var(--sage) 100%); background-size:cover; background-position:center 35%; margin:0}
+  .hero-scrim{position:absolute; top:0; left:14px; right:14px; height:230px; border-radius:var(--radius-lg); background:linear-gradient(180deg,rgba(43,49,37,.03) 0%,rgba(43,49,37,.35) 100%); pointer-events:none}
+  .trip-card{position:relative; margin:-46px 4px 0; background:var(--card-grad-hi); border:1px solid var(--line-soft); border-radius:var(--radius); box-shadow:var(--shadow-lg); padding:22px 22px 20px; text-align:center}
   .trip-name{font-family:var(--serif); font-size:30px; font-weight:500; line-height:1.08; letter-spacing:-.02em; background:transparent; border:none; color:var(--ink); width:100%; padding:0; text-align:center; font-optical-sizing:auto}
   .trip-name::placeholder{color:#b8af99; font-style:italic}
   .trip-dates{font-family:var(--serif); font-style:italic; font-size:15px; color:var(--sage); background:transparent; border:none; width:100%; margin-top:7px; padding:0; text-align:center}
@@ -269,15 +269,29 @@
   .seat-lbl{font-family:var(--sans); font-size:11px; font-weight:600; letter-spacing:.12em; color:var(--sage); margin-bottom:8px}
   .seat-chips{display:flex; flex-wrap:wrap; gap:9px}
   .seat-chip{display:flex; align-items:center; gap:7px; padding:9px 14px 9px 11px; border:none; border-radius:12px;
-    background:linear-gradient(160deg,var(--seat) 0%,var(--seat-deep) 100%); color:#fff;
+    background:var(--type-color,var(--seat)); color:#fff;
     font-family:var(--sans); font-size:15px; font-weight:600; letter-spacing:.02em;
-    box-shadow:0 3px 8px rgba(47,111,176,.32); transition:transform .12s ease}
+    box-shadow:0 3px 8px rgba(43,49,37,.22); transition:transform .12s ease}
   .seat-chip:active{transform:scale(.94)}
   .seat-chip.copied{background:linear-gradient(160deg,var(--olive),var(--olive-deep)); box-shadow:0 3px 8px rgba(58,66,49,.3)}
   .seat-chip svg{opacity:.9}
+  .seat-lbl{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.12em;color:var(--type-color,var(--sage));margin-bottom:8px}
 
   /* ---------- Expandable bookings ---------- */
-  .entry.booking{padding:0; overflow:hidden}
+  .entry.booking{padding:0; overflow:hidden; border-left:3px solid var(--type-color,var(--sage))}
+  .type-badge{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--type-soft,rgba(107,115,85,.13));color:var(--type-color,var(--olive));margin-top:2px}
+  .type-badge svg{width:20px;height:20px}
+  .entry.booking .entry-index{color:var(--type-color,var(--terra))}
+  /* flight badge gets a gentle takeoff drift */
+  .entry.type-flight.open .type-badge svg{animation:takeoff 1.6s ease-in-out infinite}
+  @keyframes takeoff{0%{transform:translate(0,0)}50%{transform:translate(2px,-2px)}100%{transform:translate(0,0)}}
+  @media(prefers-reduced-motion:reduce){.entry.type-flight.open .type-badge svg{animation:none}}
+  /* spa badge softly pulses */
+  .entry.type-spa.open .type-badge svg{animation:spapulse 2.4s ease-in-out infinite}
+  @keyframes spapulse{0%,100%{opacity:1}50%{opacity:.55}}
+  /* event badge shimmer */
+  .entry.type-event.open .type-badge{animation:eventglow 2s ease-in-out infinite}
+  @keyframes eventglow{0%,100%{box-shadow:0 0 0 0 var(--type-soft)}50%{box-shadow:0 0 0 4px var(--type-soft)}}
   .entry.booking .bk-head{display:flex; align-items:flex-start; gap:10px; padding:18px 18px 18px 18px; cursor:pointer}
   .entry.booking .bk-head .entry-title{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .entry.booking.open .bk-head .entry-title{white-space:normal; overflow:visible}
@@ -486,6 +500,8 @@
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
     <label>Currency symbol</label>
     <input type="text" id="curInput" placeholder="€" maxlength="3">
+    <label>Hero photo city</label>
+    <select id="heroCitySel" style="width:100%;padding:13px;border:1px solid var(--line);background:var(--paper-hi);font-size:15px;color:var(--ink);border-radius:8px;margin-bottom:18px;font-family:var(--sans)"></select>
     <div class="sheet-actions">
       <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
       <button class="btn-save" onclick="saveSettings()">Save</button>
@@ -584,9 +600,18 @@ async function loadHero(){
   ph.style.backgroundImage='';
   const stops=getStops();
   if(stops.length && navigator.onLine){
-    const url=await fetchCityPhoto(stops[0].name);
+    // use chosen hero city if set, else first stop
+    const chosen = D.heroCity && stops.find(s=>s.name===D.heroCity);
+    const cityName = chosen? D.heroCity : stops[0].name;
+    const url=await fetchCityPhoto(cityName);
     if(url){ D.cover=url; save(); ph.style.backgroundImage='url('+url+')'; }
   }
+}
+// Re-fetch hero when the user picks a different city
+async function setHeroCity(name){
+  D.heroCity=name; D.cover=''; save();
+  const ph=document.getElementById('heroPhoto'); if(ph)ph.style.backgroundImage='';
+  await loadHero();
 }
 
 function showView(v,btn){
@@ -703,14 +728,18 @@ function addDay(d){D.days.push(Object.assign({id:uid(),title:'',date:'',plan:''}
 
 function renderBookings(){
   const c=document.getElementById('bookings');c.innerHTML='';
-  if(!D.bookings.length){c.innerHTML='<div class="empty"><div class="mark">Flights, trains, hotels — upload a screenshot or add one below.</div></div>';counts();return}
+  if(!D.bookings.length){c.innerHTML='<div class="empty"><div class="mark">Flights, trains, hotels, tickets — upload a screenshot or add one below.</div></div>';counts();return}
   D.bookings.forEach(b=>{
-    const e=document.createElement('div');e.className='entry booking'+(b._open?' open':'');
-    // header (tap to expand; ignores taps on controls / inputs)
+    const t=typeOf(b);
+    const e=document.createElement('div');e.className='entry booking type-'+(b.cat||'booking')+(b._open?' open':'');
+    e.style.setProperty('--type-color',t.color);
+    e.style.setProperty('--type-soft',t.soft);
     const head=document.createElement('div');head.className='bk-head';
     head.onclick=(ev)=>{ if(ev.target.closest('.card-ctrls')||ev.target.closest('input')||e.classList.contains('editing'))return; b._open=!b._open; renderBookings(); };
+    // type icon badge
+    const badge=document.createElement('div');badge.className='type-badge';badge.innerHTML=t.icon;head.appendChild(badge);
     const hleft=document.createElement('div');hleft.style.flex='1';hleft.style.minWidth='0';
-    const idx=document.createElement('div');idx.className='entry-index';idx.textContent=b.kind||'Booking';
+    const idx=document.createElement('div');idx.className='entry-index';idx.textContent=t.label;
     hleft.appendChild(idx);
     hleft.appendChild(inp(b.title,'entry-title','What is it?',v=>{b.title=v;save()}));
     hleft.appendChild(inp(b.when,'entry-sub','When',v=>{b.when=v;save()}));
@@ -720,8 +749,8 @@ function renderBookings(){
     e.appendChild(cardCtrls(e,b,()=>{D.bookings=D.bookings.filter(x=>x.id!==b.id);save();renderBookings()}));
 
     const body=document.createElement('div');body.className='bk-body';
-    // Seats get special chip treatment
-    if(b.seats){ body.appendChild(seatBlock(b.seats)); }
+    // seats as chips (flights + events/trains)
+    if(b.seats){ body.appendChild(seatBlock(b.seats, b.cat)); }
     const rows=fieldRows(b);
     if(rows.length){ rows.forEach(r=>body.appendChild(fieldRow(r.label,r.value,r.copy))); }
     if(b.details){ const d=document.createElement('div');d.className='bk-detail';d.textContent=b.details;body.appendChild(d); }
@@ -735,12 +764,16 @@ function renderBookings(){
   });counts();
 }
 
-// Delta-style seat chips with a little seat icon
-function seatBlock(seatsStr){
+// Seat chips — seat icon for flights/trains, ticket icon for events
+function seatBlock(seatsStr, cat){
   const wrap=document.createElement('div');wrap.className='seat-block';
-  const lbl=document.createElement('div');lbl.className='seat-lbl';lbl.textContent='YOUR SEATS';wrap.appendChild(lbl);
+  const lbl=document.createElement('div');lbl.className='seat-lbl';
+  const isEvent=(cat==='event');
+  lbl.textContent=isEvent?'YOUR SEATS / SECTION':'YOUR SEATS';wrap.appendChild(lbl);
   const row=document.createElement('div');row.className='seat-chips';
-  const seatSvg='<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M7 4a2 2 0 0 1 2 2v6h6a3 3 0 0 1 3 3v4a1 1 0 0 1-2 0v-2H8a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2Zm-1 2v8a1 1 0 0 0 1 1h9a1 1 0 0 0-1-1H8a1 1 0 0 1-1-1V6a.999.999 0 0 0-1 0Z"/></svg>';
+  const seatSvg=isEvent
+    ? '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M4 9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 1.5 1.5 0 0 0 0 3 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 1.5 1.5 0 0 0 0-3z"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M7 4a2 2 0 0 1 2 2v6h6a3 3 0 0 1 3 3v4a1 1 0 0 1-2 0v-2H8a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2z"/></svg>';
   seatsStr.split(/[,/]| and /i).map(s=>s.trim()).filter(Boolean).forEach(s=>{
     const chip=document.createElement('button');chip.className='seat-chip';
     chip.innerHTML=seatSvg+'<span>'+esc(s)+'</span>';
@@ -754,6 +787,7 @@ function fieldRows(b){
   const add=(label,value,copy)=>{ if(value)rows.push({label,value,copy:!!copy}); };
   add('Flight', b.flightNo, true);
   add('Confirmation', b.confirmation, true);
+  add('Party', b.party, false);
   add('Cabin', b.cabin, false);
   add('Aircraft', b.aircraft, false);
   if(b.fromCity||b.fromTerminal||b.fromCode){ add('From', [b.fromCity||b.fromCode, b.fromTerminal].filter(Boolean).join(' · '), false); }
@@ -906,14 +940,26 @@ function addBudget(b){D.budget.push(Object.assign({id:uid(),desc:'',cost:''},b||
 function openSettings(){
   document.getElementById('apiKeyInput').value=getKey();
   document.getElementById('curInput').value=D.cur||'€';
+  // populate hero city dropdown from itinerary stops
+  const sel=document.getElementById('heroCitySel');
+  if(sel){
+    const stops=(typeof getStops==='function')?getStops():[];
+    sel.innerHTML='<option value="">Automatic (first stop)</option>'+
+      stops.map(s=>'<option value="'+esc(s.name)+'"'+(D.heroCity===s.name?' selected':'')+'>'+esc(s.name)+'</option>').join('');
+  }
   document.getElementById('sheetBg').classList.add('show');
 }
 function closeSettings(){document.getElementById('sheetBg').classList.remove('show')}
 function saveSettings(){
   const k=document.getElementById('apiKeyInput').value.trim();
   localStorage.setItem('trip_api_key',k);
-  D.cur=document.getElementById('curInput').value.trim()||'€';save();
+  D.cur=document.getElementById('curInput').value.trim()||'€';
+  const sel=document.getElementById('heroCitySel');
+  const newHero=sel?sel.value:'';
+  const changed = (newHero||'')!==(D.heroCity||'');
+  save();
   renderBudget();refreshKeyNote();closeSettings();
+  if(changed){ setHeroCity(newHero); }
 }
 function refreshKeyNote(){document.getElementById('noKeyNote').classList.toggle('show',!getKey())}
 
@@ -956,15 +1002,38 @@ async function doPaste(){
   }catch(err){ st.textContent="Couldn't read that: "+(err.message||'unknown error'); }
 }
 
-const PARSE_PROMPT=`You are reading travel content (a flight, train, hotel, or other booking; an itinerary; or an address), given as either an image or text. Return ONLY a JSON object — no markdown, no prose.
+/* ---------- Activity type registry ---------- */
+// Each type: label, accent color, soft bg, and an SVG icon (stroke uses currentColor)
+const SVG=(p)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+const TYPES={
+  flight:{label:'Flight', color:'#2f6fb0', soft:'rgba(47,111,176,.1)', icon:SVG('<path d="M21 15.5c-.5.9-1.6 1.2-2.5.7L4 8.2c-.6-.3-1-1-1-1.7V4l2 .5 3 3 5.5 1.5L11 4.5 13 5l4 6 3.2 1.8c.9.5 1.3 1.7.8 2.7z"/>')},
+  hotel:{label:'Hotel', color:'#8a6d3b', soft:'rgba(138,109,59,.12)', icon:SVG('<path d="M3 21V7l9-4 9 4v14M3 21h18M9 21v-5h6v5M7 10h.01M12 10h.01M17 10h.01"/>')},
+  restaurant:{label:'Restaurant', color:'#b0592f', soft:'rgba(176,89,47,.11)', icon:SVG('<path d="M5 2v7a3 3 0 0 0 6 0V2M8 9v13M17 2c-1.5 0-3 1.5-3 5s1.5 4 3 4m0 0v2m0-2c1.5 0 3-.5 3-4s-1.5-5-3-5v9z"/>')},
+  event:{label:'Event', color:'#7a4fb0', soft:'rgba(122,79,176,.12)', icon:SVG('<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H5a2 2 0 0 1-2-2 2 2 0 0 0 0-4zM13 6v2m0 3v2m0 3v2"/>')},
+  spa:{label:'Spa', color:'#4f9e8a', soft:'rgba(79,158,138,.13)', icon:SVG('<path d="M12 21c-4-3-7-6-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 4-3 7-7 10zM12 8.5V21"/>')},
+  car:{label:'Car', color:'#5a6b4a', soft:'rgba(90,107,74,.13)', icon:SVG('<path d="M5 13l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13m-14 0h14m-14 0v4m14-4v4M7 17h.01M17 17h.01M4 13h16v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/>')},
+  train:{label:'Train', color:'#356b6b', soft:'rgba(53,107,107,.13)', icon:SVG('<rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M9 3v8m6-8v8M8 21l1.5-2m6.5 2l-1.5-2M9 15h.01M15 15h.01"/>')},
+  museum:{label:'Museum', color:'#9a7b3c', soft:'rgba(154,123,60,.13)', icon:SVG('<path d="M3 9l9-5 9 5M4 9h16M6 9v8m4-8v8m4-8v8m4-8v8M3 21h18"/>')},
+  coffee:{label:'Café', color:'#7a5230', soft:'rgba(122,82,48,.12)', icon:SVG('<path d="M4 8h13v5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4zM17 9h2a2 2 0 0 1 0 4h-2M7 4c0 1 1 1 1 2m3-2c0 1 1 1 1 2"/>')},
+  shopping:{label:'Shopping', color:'#a44f7a', soft:'rgba(164,79,122,.12)', icon:SVG('<path d="M6 2 4 6v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V6l-2-4zM4 6h16M9 10a3 3 0 0 0 6 0"/>')},
+  activity:{label:'Activity', color:'#6b7355', soft:'rgba(107,115,85,.13)', icon:SVG('<path d="M12 2v4m0 12v4M2 12h4m12 0h4M5 5l2.5 2.5M16.5 16.5 19 19M5 19l2.5-2.5M16.5 7.5 19 5"/>')},
+  booking:{label:'Booking', color:'#6b7355', soft:'rgba(107,115,85,.13)', icon:SVG('<path d="M5 4h14a1 1 0 0 1 1 1v15l-4-2-4 2-4-2-4 2V5a1 1 0 0 1 1-1z"/>')}
+};
+function typeOf(b){ return TYPES[(b.cat||'').toLowerCase()] || (b.kind==='Flight'?TYPES.flight:null) || TYPES.booking; }
+
+const PARSE_PROMPT=`You are reading travel content (a booking, ticket, reservation, itinerary, or address) given as an image or text. Return ONLY a JSON object — no markdown, no prose.
 
 If it is a FLIGHT, use this schema exactly:
 {"type":"flight","flightNo":"e.g. DL0016","confirmation":"booking/confirmation code if shown, else empty","fromCode":"DTW","fromCity":"Detroit, MI","toCode":"LHR","toCity":"London-Heathrow, UK","depDate":"Fri, 25 Dec","depTime":"7:15pm","arrDate":"Sat, 26 Dec (ONLY if arrival is a DIFFERENT day than departure, else empty string)","arrTime":"7:45am","fromTerminal":"McNamara Terminal","toTerminal":"Terminal 3","aircraft":"Airbus A330-900neo","seats":"35A, 35B","cabin":"Comfort Classic","duration":"7h 30m","destCity":"London (short arrival-city name for a title)"}
 CRITICAL: look for a next-day arrival marker (a second date near the arrival time). If arrival is a later day than departure you MUST fill arrDate. If seats are unassigned (shown as "--") set seats to "".
 
-Otherwise use:
-{"type":"booking"|"day"|"address"|"unknown","kind":"Train"|"Hotel"|"Car"|"Restaurant"|"Activity"|"","title":"short label","when":"date and time","details":"confirmation #, seat, address, phone — newline-separated","destCity":"city if applicable"}
-For a day-by-day itinerary use type "day" (title=place, when=date, details=plan). For an address use type "address". Extract real values only; leave a field empty if absent. Return JSON only.`;
+For any OTHER booking/reservation/ticket, use:
+{"type":"booking","cat":"<one of: hotel, restaurant, event, spa, car, train, museum, coffee, shopping, activity>","title":"short label (e.g. 'Hôtel Caron' or 'Dinner at Le Comptoir' or 'Chelsea vs Arsenal')","when":"date and time","confirmation":"conf/booking code if any","seats":"seat/section/row if any (events, trains)","address":"street address if any","phone":"phone if any","party":"party size or guests if any","details":"anything else useful, newline-separated","destCity":"city if applicable"}
+Pick "cat" by what it is: a match/concert/show/game ticket = event; a table booking = restaurant; a massage/treatment = spa; a rental car = car; a rail ticket = train; a gallery/exhibit = museum; a café = coffee; a store/retail = shopping; anything else = activity.
+
+For a day-by-day ITINERARY use {"type":"day","title":"place","when":"date","details":"plan"}.
+For an ADDRESS use {"type":"address","title":"place","details":"address"}.
+Extract real values only; leave a field empty if absent. Return JSON only.`;
 
 async function parseContent(contentBlocks){
   let resp;
@@ -1009,7 +1078,7 @@ function applyResult(r){
     let when=(r.depDate||'')+(r.depTime?' · '+r.depTime:'');
     if(r.arrTime){when+=' → '+r.arrTime; if(r.arrDate)when+=' ('+r.arrDate+')';}
     addBooking({
-      kind:'Flight', title:title, when:when,
+      kind:'Flight', cat:'flight', title:title, when:when,
       flightNo:r.flightNo||'', confirmation:r.confirmation||'',
       seats:r.seats||'', cabin:r.cabin||'', aircraft:r.aircraft||'',
       fromCode:r.fromCode||'', toCode:r.toCode||'',
@@ -1024,9 +1093,16 @@ function applyResult(r){
 
   if(r.type==='day'){addDay({title:r.title||'',date:r.when||'',plan:r.details||''});return 'Added a day to your itinerary. ✓'}
   if(r.type==='address'){addAddress({title:r.title||'',body:r.details||''});return 'Saved to addresses. ✓'}
-  addBooking({kind:r.kind||'Booking',title:r.title||'',when:r.when||'',details:r.details||'',
-    confirmation:r.confirmation||'',phone:r.phone||'',address:r.address||''});
-  return 'Added to bookings. ✓';
+
+  // typed booking (hotel, restaurant, event, spa, car, train, museum, coffee, shopping, activity)
+  const cat=(r.cat||'').toLowerCase();
+  const t=TYPES[cat]||TYPES.booking;
+  addBooking({
+    kind:t.label, cat:cat||'booking', title:r.title||'', when:r.when||'',
+    confirmation:r.confirmation||'', seats:r.seats||'', address:r.address||'',
+    phone:r.phone||'', party:r.party||'', details:r.details||''
+  });
+  return 'Added '+t.label.toLowerCase()+'. ✓';
 }
 
 /* ---------- MAP ---------- */
