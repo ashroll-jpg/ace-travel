@@ -977,7 +977,7 @@ async function parseContent(contentBlocks){
         "anthropic-version":"2023-06-01",
         "anthropic-dangerous-direct-browser-access":"true"
       },
-      body:JSON.stringify({model:"claude-3-5-sonnet-latest",max_tokens:1000,messages:[{role:"user",content:contentBlocks.concat([{type:'text',text:PARSE_PROMPT}])}]})
+      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:contentBlocks.concat([{type:'text',text:PARSE_PROMPT}])}]})
     });
   }catch(netErr){
     throw new Error('Network/CORS blocked ('+(netErr.message||'fetch failed')+')');
