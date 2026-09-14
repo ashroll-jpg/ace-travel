@@ -109,7 +109,11 @@
   .trip-dates{font-family:var(--serif); font-style:italic; font-size:15px; color:var(--sage); background:transparent; border:none; width:100%; margin-top:7px; padding:0; text-align:center}
   .trip-dates::placeholder{color:#c3bba6}
   .trip-countdown{margin-top:13px; display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--terra); background:rgba(176,89,47,.09); padding:7px 14px; border-radius:20px}
+  .map-back{border:none;background:transparent;color:var(--terra);font-size:26px;font-family:var(--serif);line-height:1;padding:0 8px 0 0;vertical-align:middle}
   .trip-countdown:empty{display:none}
+  .trip-map-btn{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:9px 16px;border:1px solid var(--sage-soft);background:transparent;color:var(--olive);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;border-radius:20px}
+  .trip-map-btn svg{width:15px;height:15px}
+  .trip-map-btn:active{background:var(--olive);color:var(--cream);border-color:var(--olive)}
   .trip-countdown .dot{width:5px; height:5px; border-radius:50%; background:var(--terra); animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
@@ -365,7 +369,20 @@
   .ci-seat{display:inline-flex;align-items:center;gap:2px;padding:3px 8px;border-radius:7px;background:var(--type-color);color:#fff;font-family:var(--sans);font-size:11px;font-weight:600}
   .ci-seat b{font-weight:700;opacity:.85;font-size:10px}
 
-  .lodg-pill{display:none}
+  .bk-group{margin-bottom:22px}
+  .bk-group-head{display:flex;align-items:center;gap:9px;margin-bottom:10px;padding-bottom:8px;border-bottom:1.5px solid color-mix(in srgb,var(--type-color) 30%,transparent)}
+  .bk-group-head .bg-ic{width:26px;height:26px;border-radius:8px;background:color-mix(in srgb,var(--type-color) 14%,transparent);color:var(--type-color);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .bk-group-head .bg-ic svg{width:15px;height:15px}
+  .bk-group-head .bg-label{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);flex:1}
+  .bk-group-head .bg-count{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--type-color);background:color-mix(in srgb,var(--type-color) 12%,transparent);padding:2px 9px;border-radius:12px}
+  .bk-editform{display:none}
+  .entry.booking.editing .bk-editform{display:block;padding-top:4px}
+  .entry.booking.editing .bk-read{display:none}
+  .ef-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line-soft)}
+  .ef-label{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sage);width:90px;flex-shrink:0}
+  .ef-input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);background:var(--paper-hi);border-radius:9px;font-family:var(--sans);font-size:14px;color:var(--ink)}
+  .ef-input::placeholder{color:#b8af99}
+  .ef-select{-webkit-appearance:none;appearance:none;background:var(--paper-hi) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7355' fill='none' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 11px center}
   .lodg-pill .lp-ic{width:18px;height:18px;color:var(--type-color,#8a6d3b);display:flex;flex-shrink:0}
   .lodg-pill .lp-ic svg{width:18px;height:18px}
   .lodg-pill .lp-name{flex:1;min-width:0;font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -527,6 +544,7 @@
         <input class="trip-name" id="tripName" placeholder="Your trip" />
         <input class="trip-dates" id="tripDates" placeholder="Add dates" />
         <div class="trip-countdown" id="tripCountdown"></div>
+        <button class="trip-map-btn" onclick="showView('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3zM9 3v15M15 6v15"/></svg> View map</button>
       </div>
     </div>
     <div class="view-head sec-head"><div class="view-title"><span class="sec-num">I.</span> Itinerary</div><div class="view-count" id="cnt-days"></div></div>
@@ -557,7 +575,7 @@
   </section>
 
   <section class="view" id="view-map">
-    <div class="view-head"><div class="view-title"><span class="sec-num">II.</span> Map</div><div class="view-count" id="cnt-map"></div></div>
+    <div class="view-head"><div class="view-title"><button class="map-back" onclick="showView('itinerary')">‹</button> Map</div><div class="view-count" id="cnt-map"></div></div>
     <div id="mapWrap">
       <div id="leafletMap" style="display:none"></div>
       <svg id="routeDiagram" viewBox="0 0 340 400" style="display:none"></svg>
@@ -614,7 +632,6 @@
 <nav>
   <button class="active" onclick="showView('itinerary',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>Itinerary</button>
   <button onclick="showView('wishlist',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9.5 2.5 6 6 6c2 0 3.2 1.2 4 2.3C10.8 7.2 12 6 14 6c3.5 0 5 3.5 3.5 6.5C19 16.65 12 21 12 21z"/></svg></span>Wishlist</button>
-  <button onclick="showView('map',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3zM9 3v15M15 6v15"/></svg></span>Map</button>
   <button onclick="showView('bookings',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15.5c-.5.9-1.6 1.2-2.5.7L4 8.2c-.6-.3-1-1-1-1.7V4l2 .5 3 3 5.5 1.5L11 4.5 13 5l4 6 3.2 1.8c.9.5 1.3 1.7.8 2.7z"/></svg></span>Bookings</button>
   <button onclick="showView('packing',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Packing</button>
   <button onclick="showView('info',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>Info</button>
@@ -636,7 +653,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-l</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-n</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -773,6 +790,8 @@ function showView(v,btn){
   document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  // find the matching nav button (if not passed) so we don't depend on indices
+  if(!btn){ var q="'"+v+"'"; btn=[...document.querySelectorAll('nav button')].find(function(b){var oc=b.getAttribute('onclick');return oc&&oc.indexOf(q)>=0;}); }
   if(btn)btn.classList.add('active'); window.scrollTo(0,0);
   if(v==='map')renderMap();
 }
@@ -804,6 +823,9 @@ function parseLoose(s){
   if(!s)return null; s=(''+s).toLowerCase();
   const iso=s.match(/(\d{4})-(\d{2})-(\d{2})/);
   if(iso)return {mon:+iso[2]-1,day:+iso[3],year:+iso[1]};
+  // numeric M/D/YYYY or M/D/YY or M/D
+  const num=s.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
+  if(num){ let y=num[3]?+num[3]:null; if(y&&y<100)y+=2000; return {mon:+num[1]-1, day:+num[2], year:y}; }
   let mon=null; for(const k in MONTHS){if(s.includes(k)){mon=MONTHS[k];break}}
   if(mon===null)return null;
   const dm=s.match(/\b(\d{1,2})\b/); return {mon,day:dm?+dm[1]:1};
@@ -952,32 +974,29 @@ function timeToMin(s){
   return 9999;
 }
 // Collect every dated activity, grouped by day key, time-ordered
+// Resolve the effective date string and time string for any booking
+function bookingDate(b){ return b.cat==='flight' ? (b.depDate||b.date||'') : (b.date||b.when||''); }
+function bookingTime(b){ return b.cat==='flight' ? (b.depTime||b.time||'') : (b.time||b.when||''); }
 function buildTimeline(){
   const by=baseYear();
-  const daysMap={}; // dayKey -> {key, dateLabel, items:[]}
+  const daysMap={};
   function ensure(dateStr){
     const p=parseLoose(dateStr); if(!p)return null;
     const key=normDay(toSortable(p,by));
     if(!daysMap[key])daysMap[key]={key,dateLabel:fmtDate(key),items:[]};
     return daysMap[key];
   }
-  // flights & bookings
   (D.bookings||[]).forEach(b=>{
-    if(b.cat==='hotel')return; // hotels handled as lodging ribbon
-    let dateStr, time;
-    if(b.cat==='flight'){ dateStr=b.depDate; time=b.depTime; }
-    else { dateStr=b.when; time=b.when; }
-    const g=ensure(dateStr); if(!g)return;
-    g.items.push({b, tmin:timeToMin(time)});
+    if(b.cat==='hotel')return;
+    const g=ensure(bookingDate(b)); if(!g)return;
+    g.items.push({b, tmin:timeToMin(bookingTime(b))});
   });
-  // sort items within each day
   Object.values(daysMap).forEach(g=>g.items.sort((a,b)=>a.tmin-b.tmin));
   return daysMap;
 }
-// Full continuous date span covering all activities + lodging
 function timelineSpan(){
   const by=baseYear(); const keys=[];
-  (D.bookings||[]).forEach(b=>{ if(b.cat==='hotel')return; const p=parseLoose(b.cat==='flight'?b.depDate:b.when); if(p)keys.push(normDay(toSortable(p,by))); });
+  (D.bookings||[]).forEach(b=>{ if(b.cat==='hotel')return; const p=parseLoose(bookingDate(b)); if(p)keys.push(normDay(toSortable(p,by))); });
   (D.lodging||[]).forEach(L=>{ const ci=parseLoose(L.checkIn),co=parseLoose(L.checkOut); if(ci)keys.push(normDay(toSortable(ci,by))); if(co)keys.push(normDay(toSortable(co,by)-86400000)); });
   if(!keys.length)return null;
   return {start:Math.min.apply(null,keys), end:Math.max.apply(null,keys)};
@@ -1051,7 +1070,7 @@ function jumpToLodging(L){
   // find & expand the matching hotel booking, then go to Bookings
   const match=(D.bookings||[]).find(b=>b.cat==='hotel' && (b.title||'').includes((L.name||'').slice(0,10)));
   if(match){ D.bookings.forEach(b=>b._open=false); match._open=true; renderBookings(); }
-  showView('bookings',document.querySelectorAll('nav button')[3]);
+  showView('bookings');
   setTimeout(()=>{
     const el=match?document.getElementById('bk-'+match.id):null;
     const target=el||[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value.includes((L.name||'').slice(0,12)));
@@ -1077,7 +1096,7 @@ function calItem(b, hasNext){
     block.appendChild(badge);
   }
   const body=document.createElement('div');body.className='ci-body';
-  const timeLabel=(b.cat==='flight'&&b.depTime)?b.depTime:'';
+  const timeLabel=(b.cat==='flight'&&b.depTime)?b.depTime:(b.time||'');
   body.innerHTML='<div class="ci-kind">'+t.label+(timeLabel?(' · '+esc(timeLabel)):'')+'</div><div class="ci-title">'+esc(b.title||'')+'</div>';
   if(b.cat==='flight'){
     if(b.fromCode||b.toCode){const r=document.createElement('div');r.className='ci-sub';r.textContent=(b.fromCode||'')+' → '+(b.toCode||'')+(b.arrTime?('  ·  lands '+b.arrTime+(b.arrDate?(' '+b.arrDate):'')):'');body.appendChild(r);}
@@ -1088,7 +1107,7 @@ function calItem(b, hasNext){
   }
   block.appendChild(body);
   wrap.appendChild(block);
-  wrap.onclick=()=>{ showView('bookings',document.querySelectorAll('nav button')[3]); setTimeout(()=>{const el=document.getElementById('bk-'+b.id)||[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value===b.title); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.transition='box-shadow .3s'; el.style.boxShadow='0 0 0 2px var(--terra)'; setTimeout(()=>el.style.boxShadow='',1400);}},200); };
+  wrap.onclick=()=>{ showView('bookings'); setTimeout(()=>{const el=document.getElementById('bk-'+b.id)||[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value===b.title); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.transition='box-shadow .3s'; el.style.boxShadow='0 0 0 2px var(--terra)'; setTimeout(()=>el.style.boxShadow='',1400);}},200); };
   return wrap;
 }
 // Compute an event's time span for the shaded block. Uses duration if known, else flight arr time, else 2h default.
@@ -1097,7 +1116,7 @@ function fmtClock(min){
   return hh+(m?(':'+String(m).padStart(2,'0')):'')+ap;
 }
 function eventSpan(b){
-  let startTime = (b.cat==='flight'?b.depTime:b.when);
+  let startTime = bookingTime(b);
   const startMin=timeToMin(startTime);
   if(startMin>=9999)return null; // no usable start time
   let endMin=null;
@@ -1238,7 +1257,24 @@ function promoteWish(w){
 function renderBookings(){
   const c=document.getElementById('bookings');c.innerHTML='';
   if(!D.bookings.length){c.innerHTML='<div class="empty"><div class="mark">Flights, trains, hotels, tickets — upload a screenshot or add one below.</div></div>';counts();return}
-  D.bookings.forEach(b=>{
+  // group by category, with flights & hotels first (most crucial), then the rest
+  const order=['flight','hotel','train','car','event','restaurant','spa','museum','coffee','shopping','activity','booking'];
+  const groups={};
+  D.bookings.forEach(b=>{ const k=(b.cat||'booking'); (groups[k]=groups[k]||[]).push(b); });
+  const keys=Object.keys(groups).sort((a,b)=>{ let ia=order.indexOf(a); let ib=order.indexOf(b); if(ia<0)ia=99; if(ib<0)ib=99; return ia-ib; });
+  keys.forEach(k=>{
+    const t=TYPES[k]||TYPES.booking;
+    const sec=document.createElement('div');sec.className='bk-group';
+    const hd=document.createElement('div');hd.className='bk-group-head';
+    hd.style.setProperty('--type-color',t.color);
+    hd.innerHTML='<span class="bg-ic">'+t.icon+'</span><span class="bg-label">'+t.label+(groups[k].length>1?'s':'')+'</span><span class="bg-count">'+groups[k].length+'</span>';
+    sec.appendChild(hd);
+    groups[k].forEach(b=>sec.appendChild(makeBookingCard(b)));
+    c.appendChild(sec);
+  });
+  counts();
+}
+function makeBookingCard(b){
     const t=typeOf(b);
     const e=document.createElement('div');e.id='bk-'+b.id;e.className='entry booking type-'+(b.cat||'booking')+(b._open?' open':'');
     e.style.setProperty('--type-color',t.color);
@@ -1258,19 +1294,47 @@ function renderBookings(){
     e.appendChild(cardCtrls(e,b,()=>{D.bookings=D.bookings.filter(x=>x.id!==b.id);save();renderBookings()}));
 
     const body=document.createElement('div');body.className='bk-body';
-    // seats as chips (flights + events/trains)
-    if(b.seats){ body.appendChild(seatBlock(b.seats, b.cat)); }
+
+    // ── EDIT FORM (shown in edit mode) ──
+    const form=document.createElement('div');form.className='bk-editform';
+    form.appendChild(editField('Category', catSelect(b)));
+    form.appendChild(editField('Date', inp(b.date||b.when||'', 'ef-input', 'e.g. Sat, 26 Dec', v=>{b.date=v;save();})));
+    form.appendChild(editField('Time', inp(b.time||'', 'ef-input', 'e.g. 4:30pm', v=>{b.time=v;save();})));
+    form.appendChild(editField('Duration', inp(b.duration||'', 'ef-input', 'e.g. 2h 30m', v=>{b.duration=v;save();})));
+    form.appendChild(editField('Seats / Section', inp(b.seats||'', 'ef-input', 'e.g. 35A, 35B or Block 5', v=>{b.seats=v;save();})));
+    form.appendChild(editField('Confirmation', inp(b.confirmation||'', 'ef-input', 'code', v=>{b.confirmation=v;save();})));
+    form.appendChild(editField('Address', inp(b.address||'', 'ef-input', 'address', v=>{b.address=v;save();})));
+    form.appendChild(editField('Phone', inp(b.phone||'', 'ef-input', 'phone', v=>{b.phone=v;save();})));
+    body.appendChild(form);
+
+    // ── READ VIEW ──
+    const read=document.createElement('div');read.className='bk-read';
+    if(b.seats){ read.appendChild(seatBlock(b.seats, b.cat)); }
     const rows=fieldRows(b);
-    if(rows.length){ rows.forEach(r=>body.appendChild(fieldRow(r.label,r.value,r.copy))); }
-    if(b.details){ const d=document.createElement('div');d.className='bk-detail';d.textContent=b.details;body.appendChild(d); }
+    if(rows.length){ rows.forEach(r=>read.appendChild(fieldRow(r.label,r.value,r.copy))); }
+    if(b.details){ const d=document.createElement('div');d.className='bk-detail';d.textContent=b.details;read.appendChild(d); }
     const acts=buildActions(b);
-    if(acts)body.appendChild(acts);
+    if(acts)read.appendChild(acts);
     if(!b.seats && !rows.length && !b.details && !acts){
-      const none=document.createElement('div');none.className='bk-detail';none.style.color='var(--sage)';none.textContent='No extra details yet. Tap ✎ to add them.';body.appendChild(none);
+      const none=document.createElement('div');none.className='bk-detail';none.style.color='var(--sage)';none.textContent='No extra details yet. Tap ✎ to add them.';read.appendChild(none);
     }
+    body.appendChild(read);
     e.appendChild(body);
-    c.appendChild(e);
-  });counts();
+    return e;
+}
+// small labeled edit field
+function editField(label, controlEl){
+  const w=document.createElement('div');w.className='ef-row';
+  const l=document.createElement('div');l.className='ef-label';l.textContent=label;
+  w.appendChild(l);w.appendChild(controlEl);return w;
+}
+// category dropdown for a booking
+function catSelect(b){
+  const sel=document.createElement('select');sel.className='ef-input ef-select';
+  const cats=['flight','hotel','restaurant','event','spa','car','train','museum','coffee','shopping','activity'];
+  cats.forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=TYPES[cat].label;if((b.cat||'activity')===cat)o.selected=true;sel.appendChild(o);});
+  sel.onchange=e=>{ b.cat=e.target.value; b.kind=TYPES[b.cat].label; save(); renderBookings(); };
+  return sel;
 }
 
 // Seat chips — seat icon for flights/trains, ticket icon for events
@@ -1638,6 +1702,7 @@ function applyResult(r){
   // other bookings: keep in Bookings, and also drop an event onto the matching day
   addBooking({
     kind:t.label, cat:cat||'booking', title:r.title||'', when:r.when||'',
+    date:r.when||'', time:r.when||'',
     confirmation:r.confirmation||'', seats:r.seats||'', address:r.address||'',
     phone:r.phone||'', party:r.party||'', details:r.details||''
   });
