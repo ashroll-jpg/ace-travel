@@ -126,7 +126,8 @@
   .view-title{font-family:var(--serif); font-size:26px; font-weight:500; letter-spacing:-.015em}
   .view-count{font-family:var(--serif); font-style:italic; font-size:14px; color:var(--sage)}
   .view-lead{font-family:var(--serif); font-style:italic; font-size:14px; color:var(--sage); margin:14px 0 4px}
-  #view-itinerary .magic,#view-itinerary #days,#view-itinerary>.add-btn{margin-left:16px;margin-right:16px}
+  #view-itinerary .magic,#view-itinerary>.add-btn,#view-itinerary #lodgingSection{margin-left:16px;margin-right:16px}
+  #view-itinerary #days{margin-left:16px;margin-right:16px}
   #view-itinerary .view-head{margin:0 16px 6px}
 
   .entry{
@@ -301,7 +302,25 @@
   .seat-chip:active{transform:scale(.94)}
   .seat-chip.copied{background:linear-gradient(160deg,var(--olive),var(--olive-deep)); box-shadow:0 3px 8px rgba(58,66,49,.3)}
   .seat-chip svg{opacity:.9}
-  .lodg-pill{display:flex;align-items:center;gap:8px;margin:0 18px;padding:8px 12px;border-radius:10px;background:var(--type-soft,rgba(138,109,59,.12));border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 22%,transparent)}
+  /* ---------- Timeline / storytelling ---------- */
+  #days{position:relative;padding-left:44px}
+  #days::before{content:"";position:absolute;left:15px;top:18px;bottom:30px;width:2px;background:linear-gradient(180deg,var(--sage-soft) 0%,var(--line-soft) 100%);opacity:.7}
+  /* narrative transition captions between chapters */
+  .thread-transition{position:relative;margin:0 0 14px -6px;padding-left:8px;display:flex;align-items:center;gap:9px;min-height:26px}
+  .thread-transition .tt-dot{position:absolute;left:-23px;width:7px;height:7px;border-radius:50%;background:var(--terra);opacity:.6}
+  .thread-transition .tt-text{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--sage);letter-spacing:.01em}
+  /* chapter cards */
+  .entry.day.chapter{position:relative;margin-bottom:20px}
+  .entry.day.chapter::before{content:"";position:absolute;left:-35px;top:20px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--type-color,var(--sage));z-index:2}
+  .entry.day.is-today::before{background:var(--terra)!important;border-color:var(--terra)!important;box-shadow:0 0 0 4px rgba(176,89,47,.18)}
+  .entry.day.filler::before{width:9px;height:9px;top:23px;left:-32px;border-color:var(--line)}
+  .entry.day.type-flight::before{background:var(--type-color);border-color:var(--type-color)}
+  .chap-num{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--type-color,var(--sage));line-height:1;min-width:34px;flex-shrink:0;opacity:.9;font-optical-sizing:auto}
+  .entry.day.filler .chap-num{color:var(--line);opacity:.8}
+  .chap-eyebrow{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sage);margin-bottom:3px}
+  .day-head{display:flex;align-items:flex-start;gap:14px;padding:18px;cursor:pointer}
+
+  .lodg-pill{display:flex;align-items:center;gap:9px;margin:8px 16px 0;padding:10px 13px;border-radius:12px;background:var(--type-soft,rgba(138,109,59,.12));border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 20%,transparent)}
   .lodg-pill .lp-ic{width:18px;height:18px;color:var(--type-color,#8a6d3b);display:flex;flex-shrink:0}
   .lodg-pill .lp-ic svg{width:18px;height:18px}
   .lodg-pill .lp-name{flex:1;min-width:0;font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -562,7 +581,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-e</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-g</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -611,12 +630,25 @@ function openTrip(id){
   if(!D)return;
   STORE.activeId=id; persist();
   document.body.classList.remove('on-home');
+  applySmartExpand();
   bindHeader();
   renderDays();renderBookings();renderPacking();renderPhrases();renderNumbers();renderAddresses();renderBudget();renderDocs();
   refreshKeyNote();
   showView('itinerary',document.querySelectorAll('nav button')[0]);
   // if the trip is underway, scroll to today's card
   setTimeout(()=>{const t=document.querySelector('.entry.is-today');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},400);
+}
+// Smart expansion: today + upcoming days expanded, past days collapsed. Runs once per open.
+function applySmartExpand(){
+  const by=baseYear();
+  const now=new Date(); const t0=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  (D.days||[]).forEach(d=>{
+    const p=parseLoose(d.date);
+    if(!p){ d._open=true; return; }
+    const y=p.year||(p.mon<=5?by+1:by);
+    const dk=new Date(y,p.mon,p.day).getTime();
+    d._open = dk>=t0; // today & future open, past collapsed
+  });
 }
 function goHome(){ D=null; document.body.classList.add('on-home'); renderHome(); }
 function createTrip(){
@@ -854,24 +886,52 @@ function renderDays(){
   const c=document.getElementById('days');c.innerHTML='';
   if(!D.days.length){c.innerHTML='<div class="empty"><div class="mark">Your days will appear here, in order.</div></div>';counts();return}
   const ti=todayIndex();
+  let prevCity=null;
   D.days.forEach((d,i)=>{
     const Lday=lodgingForDay(d.date);
     const filler=!d.title&&!d.plan&&!Lday;
     const dt=dayType(d);
-    const e=document.createElement('div');e.className='entry day'+(filler?' filler':'')+(i===ti?' is-today':'')+(d._open?' open':'')+(dt?' type-'+Object.keys(TYPES).find(k=>TYPES[k]===dt):'');
+    const cityObj=extractCity(d.title)||(Lday?extractCity(Lday.name):null);
+    const city=cityObj?cityObj.name:null;
+
+    // ── Narrative transition caption on the thread ──
+    const tType=dayType(d);
+    let transition=null;
+    if(tType===TYPES.flight){
+      // a flight day = a move between places
+      const b=D.bookings.find(x=>x.cat==='flight' && (x.depDate===d.date));
+      if(b && b.toCity){ transition='Arrive '+ (extractCity(b.toCity)?extractCity(b.toCity).name : b.toCity); }
+      else if(city){ transition='Travel to '+city; }
+    } else if(city && city!==prevCity && prevCity!==null){
+      transition='On to '+city;
+    } else if(city && prevCity===null && i>0){
+      transition=null;
+    }
+    if(transition){
+      const tr=document.createElement('div');tr.className='thread-transition';
+      tr.innerHTML='<span class="tt-dot"></span><span class="tt-text">'+esc(transition)+'</span>';
+      c.appendChild(tr);
+    }
+
+    const e=document.createElement('div');e.className='entry day chapter'+(filler?' filler':'')+(i===ti?' is-today':'')+(d._open?' open':'')+(dt?' type-'+Object.keys(TYPES).find(k=>TYPES[k]===dt):'');
     if(dt){e.style.setProperty('--type-color',dt.color);e.style.setProperty('--type-soft',dt.soft);}
     if(i===ti){const badge=document.createElement('div');badge.className='today-badge';badge.textContent='TODAY';e.appendChild(badge);}
-    // tappable head
+
+    // ── Chapter header (big day numeral + city/date subtitle) ──
     const head=document.createElement('div');head.className='day-head';
     head.onclick=(ev)=>{ if(ev.target.closest('.card-ctrls')||ev.target.closest('input')||ev.target.closest('textarea')||e.classList.contains('editing'))return; d._open=!d._open; renderDays(); };
-    if(dt){const badge=document.createElement('div');badge.className='type-badge day-badge';badge.innerHTML=dt.icon;head.appendChild(badge);}
+    const chapNum=document.createElement('div');chapNum.className='chap-num';chapNum.textContent=(i+1);head.appendChild(chapNum);
     const hleft=document.createElement('div');hleft.style.flex='1';hleft.style.minWidth='0';
-    const idx=document.createElement('div');idx.className='entry-index';idx.textContent='Day '+(i+1)+(d.date?' — '+d.date:'');hleft.appendChild(idx);
+    const eyebrow=document.createElement('div');eyebrow.className='chap-eyebrow';
+    eyebrow.textContent=(d.date||'')+(city?('  ·  '+city):'');
+    hleft.appendChild(eyebrow);
     hleft.appendChild(inp(d.title,'entry-title','Open day — add a plan',v=>{d.title=v;save()}));
-    if(!filler){const chev=document.createElement('span');chev.className='chev';chev.textContent='⌄';head.appendChild(hleft);head.appendChild(chev);}
-    else{head.appendChild(hleft);}
+    head.appendChild(hleft);
+    if(dt){const badge=document.createElement('div');badge.className='type-badge day-badge';badge.innerHTML=dt.icon;head.appendChild(badge);}
+    if(!filler){const chev=document.createElement('span');chev.className='chev';chev.textContent='⌄';head.appendChild(chev);}
     e.appendChild(head);
-    // compact lodging pill — visible even when the day is collapsed
+
+    // compact lodging pill — visible even when collapsed
     if(Lday){
       const pill=document.createElement('div');pill.className='lodg-pill';
       pill.style.setProperty('--type-color',TYPES.hotel.color);pill.style.setProperty('--type-soft',TYPES.hotel.soft);
@@ -880,15 +940,15 @@ function renderDays(){
     }
     // expandable body
     const body=document.createElement('div');body.className='day-body';
-    // full lodging banner (with editable room #)
     if(Lday)body.appendChild(lodgingBanner(Lday,d.date));
     body.appendChild(inp(d.date,'entry-sub','Date',v=>{d.date=v;save();renderDays()}));
-    const ta=document.createElement('textarea');ta.className='entry-body';ta.value=d.plan||'';ta.placeholder='Plans, timings, notes…';
+    const ta=document.createElement('textarea');ta.className='entry-body';ta.value=d.plan||'';ta.placeholder='What\u2019s the story of this day? Plans, timings, notes…';
     ta.oninput=ev=>{d.plan=ev.target.value;grow(ta);save()};body.appendChild(ta);
     const wx=document.createElement('div');wx.className='day-wx';wx.id='wx-'+d.id;body.appendChild(wx);
     e.appendChild(body);
     e.appendChild(cardCtrls(e,d,()=>{D.days=D.days.filter(x=>x.id!==d.id);save();renderDays()}));
     c.appendChild(e);grow(ta);
+    if(city)prevCity=city;
   });counts();
   loadWeather();
   renderLodgingSection();
