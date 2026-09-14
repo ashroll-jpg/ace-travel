@@ -316,44 +316,52 @@
   .wish-add-day{flex-shrink:0;border:1px solid var(--sage-soft);background:rgba(255,255,255,.5);color:var(--olive);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.03em;padding:7px 11px;border-radius:10px}
   .wish-add-day:active{background:var(--olive);color:var(--cream);border-color:var(--olive)}
 
-  /* ---------- Rolling calendar itinerary (read-only) ---------- */
-  #days{position:relative;padding:0}
-  .cal-day{display:flex;gap:0;position:relative;min-height:64px}
-  .cal-ribbon{width:36px;flex-shrink:0;position:relative;display:flex;justify-content:center;padding-top:44px}
-  .cal-ribbon:not(.empty)::before{content:"";position:absolute;top:0;bottom:0;left:12px;width:12px;border-radius:6px;background:linear-gradient(180deg,var(--type-color,#8a6d3b),color-mix(in srgb,var(--type-color,#8a6d3b) 80%,#000));opacity:.9;box-shadow:0 2px 6px rgba(43,49,37,.15)}
-  .cal-ribbon .rib-ic{position:relative;z-index:2;width:20px;height:20px;color:#fff;margin-top:2px}
-  .cal-ribbon .rib-ic svg{width:15px;height:15px}
-  .cal-col{flex:1;min-width:0;position:relative;padding:0 4px 22px 14px}
-  .cal-ghost{position:absolute;top:24px;right:6px;font-family:var(--serif);font-size:80px;font-weight:500;color:var(--olive);opacity:.05;line-height:1;pointer-events:none;z-index:0}
-  .cal-divider{position:sticky;top:calc(8px + var(--safe-top));z-index:5;display:flex;align-items:baseline;gap:10px;padding:8px 0 8px;background:linear-gradient(180deg,var(--paper) 70%,transparent);backdrop-filter:blur(2px)}
-  .cal-divider .cd-day{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--terra)}
-  .cal-divider .cd-date{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink)}
-  .cal-divider .cd-city{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--sage);text-transform:uppercase;margin-left:auto}
-  .cal-divider .cd-today{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.1em;color:#fff;background:var(--terra);padding:2px 7px;border-radius:10px;margin-left:8px}
-  .cal-day.is-today .cal-ghost{color:var(--terra);opacity:.08}
-  .cal-lodging{display:flex;align-items:center;gap:8px;margin:8px 0 4px;padding:8px 11px;border-radius:11px;background:var(--type-soft);border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 18%,transparent);position:relative;z-index:1}
-  .cal-lodging .cl-ic{width:16px;height:16px;color:var(--type-color);flex-shrink:0}
-  .cal-lodging .cl-ic svg{width:16px;height:16px}
-  .cal-lodging .cl-name{flex:1;min-width:0;font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .cal-lodging .cl-room{flex-shrink:0;font-family:var(--sans);font-size:11px;font-weight:700;color:var(--type-color);background:rgba(255,255,255,.55);padding:3px 8px;border-radius:8px}
-  .cal-lodging .cl-room.dim{color:var(--sage);font-weight:500}
-  .cal-items{position:relative;z-index:1;margin-top:8px}
-  .cal-open{font-family:var(--serif);font-style:italic;font-size:14px;color:#c3bba6;padding:8px 0 4px;position:relative;z-index:1}
-  /* activity item with dotted connector */
-  .cal-item{display:flex;gap:12px;cursor:pointer}
-  .ci-rail{width:30px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;position:relative}
-  .ci-rail .ci-node{width:30px;height:30px;border-radius:9px;background:var(--type-soft);color:var(--type-color);display:flex;align-items:center;justify-content:center;z-index:2}
-  .ci-rail .ci-node svg{width:16px;height:16px}
-  .ci-rail.has-next::after{content:"";position:absolute;top:32px;bottom:-12px;width:0;border-left:2px dotted var(--sage-soft);opacity:.7}
-  .ci-body{flex:1;min-width:0;padding-bottom:18px}
-  .ci-kind{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--type-color)}
-  .ci-title{font-family:var(--serif);font-size:17px;font-weight:500;color:var(--ink);line-height:1.2;margin-top:2px}
-  .ci-sub{font-family:var(--sans);font-size:12.5px;color:var(--sage);margin-top:3px}
-  .ci-seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
-  .ci-seat{display:inline-flex;align-items:center;gap:2px;padding:4px 9px;border-radius:8px;background:var(--type-color);color:#fff;font-family:var(--sans);font-size:12px;font-weight:600}
-  .ci-seat b{font-weight:700;opacity:.85;font-size:11px}
+  /* ---------- Continuous vertical calendar (read-only) ---------- */
+  #days{position:relative;padding:8px 0 20px}
+  /* the continuous spine down the center */
+  #days::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:0;bottom:20px;width:1.5px;background:repeating-linear-gradient(180deg,var(--line-soft) 0 6px,transparent 6px 12px)}
+  .cal-row{position:relative;display:grid;grid-template-columns:1fr 44px 1fr;align-items:start;min-height:52px;padding:6px 0}
+  /* subtle alternating date marker */
+  .cal-marker{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:4px;opacity:.75}
+  .cal-row.side-left .cal-marker{grid-column:1;text-align:center}
+  .cal-row.side-right .cal-marker{grid-column:3;order:3}
+  .cal-row.side-left .cal-content{grid-column:3;order:3}
+  .cal-row.side-right .cal-content{grid-column:1;order:1}
+  .cal-spine{grid-column:2;order:2;display:flex;justify-content:center;align-items:flex-start;padding-top:2px;position:relative;z-index:2}
+  .cm-dow{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--sage)}
+  .cm-num{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--olive);line-height:1;opacity:.5}
+  .cm-mon{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--sage);text-transform:uppercase}
+  .cal-row.is-today .cm-num{color:var(--terra);opacity:.9}
+  .cm-today{font-family:var(--sans);font-size:8px;font-weight:700;letter-spacing:.1em;color:#fff;background:var(--terra);padding:2px 6px;border-radius:8px;margin-top:3px}
+  /* spine node: lodging house or dot */
+  .spine-dot{width:8px;height:8px;border-radius:50%;background:var(--paper);border:2px solid var(--sage-soft);margin-top:8px}
+  .spine-dot.today{background:var(--terra);border-color:var(--terra);box-shadow:0 0 0 3px rgba(176,89,47,.18)}
+  .spine-house{position:relative;width:34px;height:34px;border-radius:10px;border:none;background:var(--type-color,#8a6d3b);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 7px rgba(43,49,37,.28)}
+  .spine-house svg{width:17px;height:17px}
+  .spine-house.checkin::before{content:"";position:absolute;inset:-3px;border-radius:13px;border:1.5px solid var(--type-color);opacity:.4}
+  .spine-house .sh-room{position:absolute;bottom:-7px;right:-7px;background:var(--paper);color:var(--type-color);font-family:var(--sans);font-size:10px;font-weight:700;padding:1px 5px;border-radius:8px;box-shadow:0 1px 3px rgba(43,49,37,.25);border:1px solid color-mix(in srgb,var(--type-color) 30%,transparent)}
+  /* content column */
+  .cal-content{min-width:0;padding:2px 4px}
+  .cal-row.side-left .cal-content{padding-left:8px}
+  .cal-row.side-right .cal-content{padding-right:8px;text-align:right}
+  .cal-open{font-family:var(--serif);font-style:italic;font-size:13px;color:#c3bba6;padding-top:10px}
 
-  /* legacy chapter styles kept out of the way */
+  /* activity item */
+  .cal-item{display:flex;gap:11px;cursor:pointer;margin-bottom:12px}
+  .cal-row.side-right .cal-item{flex-direction:row-reverse;text-align:right}
+  .ci-rail{flex-shrink:0;display:flex;flex-direction:column;align-items:center;position:relative}
+  .ci-rail .ci-node{width:32px;height:32px;border-radius:9px;background:var(--type-soft);color:var(--type-color);display:flex;align-items:center;justify-content:center;z-index:2}
+  .ci-rail .ci-node svg{width:16px;height:16px}
+  .ci-rail.has-next::after{content:"";position:absolute;top:34px;bottom:-14px;width:0;border-left:2px dotted var(--sage-soft);opacity:.6}
+  .ci-body{flex:1;min-width:0;padding-bottom:2px}
+  .ci-kind{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--type-color)}
+  .ci-title{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:1.2;margin-top:2px}
+  .ci-sub{font-family:var(--sans);font-size:12px;color:var(--sage);margin-top:3px}
+  .ci-seats{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .cal-row.side-right .ci-seats{justify-content:flex-end}
+  .ci-seat{display:inline-flex;align-items:center;gap:2px;padding:3px 8px;border-radius:7px;background:var(--type-color);color:#fff;font-family:var(--sans);font-size:11px;font-weight:600}
+  .ci-seat b{font-weight:700;opacity:.85;font-size:10px}
+
   .lodg-pill{display:none}
   .lodg-pill .lp-ic{width:18px;height:18px;color:var(--type-color,#8a6d3b);display:flex;flex-shrink:0}
   .lodg-pill .lp-ic svg{width:18px;height:18px}
@@ -625,7 +633,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-j</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-k</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -974,63 +982,67 @@ function renderDays(){
   const by=baseYear();
   const now=new Date(); const todayKey=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
   const dayMs=86400000;
-  let dayNo=0, prevCity=null;
+  let dayNo=0, side='left';
+  const DOW=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   for(let key=span.start; key<=span.end; key+=dayMs){
     dayNo++;
     const g=timeline[key];
     const L=lodgingForDayKey(key);
+    const prevL=lodgingForDayKey(key-dayMs);
     const isToday=(key===todayKey);
     const d=new Date(key);
     const dnum=d.getDate();
-    const cityObj = (g && g.items.length? (extractCity(g.items[0].b.title)||(g.items[0].b.toCity?extractCity(g.items[0].b.toCity):null)) : (L?extractCity(L.name):null));
-    const city=cityObj?cityObj.name:null;
 
-    // ── Day block ──
-    const block=document.createElement('div');block.className='cal-day'+(isToday?' is-today':'');
-    // lodging ribbon (left)
+    // one continuous day-row on the calendar spine
+    const row=document.createElement('div');row.className='cal-row side-'+side+(isToday?' is-today':'')+(L?' has-lodg':'');
+
+    // subtle alternating date marker
+    const marker=document.createElement('div');marker.className='cal-marker';
+    marker.innerHTML='<span class="cm-dow">'+DOW[d.getDay()]+'</span><span class="cm-num">'+dnum+'</span><span class="cm-mon">'+MON[d.getMonth()]+'</span>'+(isToday?'<span class="cm-today">TODAY</span>':'');
+    row.appendChild(marker);
+
+    // spine node — lodging house icon (with room #) if staying, else a small dot
+    const spine=document.createElement('div');spine.className='cal-spine';
     if(L){
-      const rib=document.createElement('div');rib.className='cal-ribbon';
-      rib.style.setProperty('--type-color',TYPES.hotel.color);
-      rib.innerHTML='<div class="rib-ic">'+TYPES.hotel.icon+'</div>';
-      block.appendChild(rib);
+      const isCheckIn=!prevL || prevL.id!==L.id;
+      const house=document.createElement('button');house.className='spine-house'+(isCheckIn?' checkin':'');
+      house.style.setProperty('--type-color',TYPES.hotel.color);
+      house.innerHTML=TYPES.hotel.icon+(L.room?'<span class="sh-room">'+esc(L.room)+'</span>':'');
+      house.title=L.name+(L.room?(' · Room '+L.room):'');
+      house.onclick=()=>jumpToLodging(L);
+      spine.appendChild(house);
     } else {
-      const gap=document.createElement('div');gap.className='cal-ribbon empty';block.appendChild(gap);
+      const dot=document.createElement('span');dot.className='spine-dot'+(isToday?' today':'');spine.appendChild(dot);
     }
-    // main column
-    const col=document.createElement('div');col.className='cal-col';
-    // ghosted big date number behind
-    const ghost=document.createElement('div');ghost.className='cal-ghost';ghost.textContent=dnum;col.appendChild(ghost);
-    // sticky day divider
-    const div=document.createElement('div');div.className='cal-divider'+(isToday?' today':'');
-    div.innerHTML='<span class="cd-day">DAY '+dayNo+'</span><span class="cd-date">'+fmtDate(key)+'</span>'+(city?'<span class="cd-city">'+esc(city)+'</span>':'')+(isToday?'<span class="cd-today">TODAY</span>':'');
-    col.appendChild(div);
-    // lodging label (once, on check-in-ish/first covered day or every day subtly)
-    if(L){
-      const ll=document.createElement('div');ll.className='cal-lodging';
-      ll.style.setProperty('--type-color',TYPES.hotel.color);ll.style.setProperty('--type-soft',TYPES.hotel.soft);
-      ll.innerHTML='<span class="cl-ic">'+TYPES.hotel.icon+'</span><span class="cl-name">'+esc(L.name)+'</span>'+(L.room?'<span class="cl-room">Room '+esc(L.room)+'</span>':'<span class="cl-room dim">Room —</span>');
-      col.appendChild(ll);
-    }
-    // activities, time-ordered, connected by dotted line
+    row.appendChild(spine);
+
+    // content column
+    const col=document.createElement('div');col.className='cal-content';
     if(g && g.items.length){
-      const list=document.createElement('div');list.className='cal-items';
-      g.items.forEach((it,idx)=>{
-        list.appendChild(calItem(it.b, idx<g.items.length-1));
-      });
-      col.appendChild(list);
-    } else if(!L){
-      const open=document.createElement('div');open.className='cal-open';open.textContent='Open day';col.appendChild(open);
+      g.items.forEach((it,idx)=>{ col.appendChild(calItem(it.b, idx<g.items.length-1)); });
+    } else {
+      const open=document.createElement('div');open.className='cal-open';
+      open.textContent = L? 'Free day' : 'Open';
+      col.appendChild(open);
     }
-    block.appendChild(col);
-    c.appendChild(block);
-    if(city)prevCity=city;
+    row.appendChild(col);
+    c.appendChild(row);
+    side = (side==='left')?'right':'left';
   }
   counts();
   loadWeather();
   renderLodgingSection();
-  // scroll to today
-  setTimeout(()=>{const t=document.querySelector('.cal-day.is-today');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},350);
+  setTimeout(()=>{const t=document.querySelector('.cal-row.is-today');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},350);
+}
+// jump to a lodging's booking entry
+function jumpToLodging(L){
+  showView('bookings',document.querySelectorAll('nav button')[3]);
+  setTimeout(()=>{
+    const el=[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value.includes((L.name||'').slice(0,12)));
+    if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.transition='box-shadow .3s'; el.style.boxShadow='0 0 0 2px '+TYPES.hotel.color; setTimeout(()=>el.style.boxShadow='',1400);}
+  },200);
 }
 
 // A single activity in the calendar (read-only), with dynamic details
