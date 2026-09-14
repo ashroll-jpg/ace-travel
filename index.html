@@ -96,7 +96,7 @@
   @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   @media(prefers-reduced-motion:reduce){.view.active{animation:none}}
   /* consistent side padding for all non-itinerary views */
-  #view-map,#view-bookings,#view-packing,#view-info,#view-budget{padding:22px 16px 0}
+  #view-wishlist,#view-map,#view-bookings,#view-packing,#view-info,#view-budget{padding:22px 16px 0}
   #view-itinerary{padding:0}
 
   /* ---------- Hero + floating trip card ---------- */
@@ -302,25 +302,46 @@
   .seat-chip:active{transform:scale(.94)}
   .seat-chip.copied{background:linear-gradient(160deg,var(--olive),var(--olive-deep)); box-shadow:0 3px 8px rgba(58,66,49,.3)}
   .seat-chip svg{opacity:.9}
-  /* ---------- Timeline / storytelling ---------- */
-  #days{position:relative;padding-left:44px}
-  #days::before{content:"";position:absolute;left:15px;top:18px;bottom:30px;width:2px;background:linear-gradient(180deg,var(--sage-soft) 0%,var(--line-soft) 100%);opacity:.7}
-  /* narrative transition captions between chapters */
-  .thread-transition{position:relative;margin:0 0 14px -6px;padding-left:8px;display:flex;align-items:center;gap:9px;min-height:26px}
-  .thread-transition .tt-dot{position:absolute;left:-23px;width:7px;height:7px;border-radius:50%;background:var(--terra);opacity:.6}
-  .thread-transition .tt-text{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--sage);letter-spacing:.01em}
-  /* chapter cards */
-  .entry.day.chapter{position:relative;margin-bottom:20px}
-  .entry.day.chapter::before{content:"";position:absolute;left:-35px;top:20px;width:14px;height:14px;border-radius:50%;background:var(--paper);border:2px solid var(--type-color,var(--sage));z-index:2}
+  /* ---------- Wishlist ---------- */
+  .wish-add{display:flex;gap:8px;margin-bottom:16px}
+  .wish-input{flex:1;min-width:0;padding:13px;border:1px solid var(--line);background:var(--paper-hi);border-radius:12px;font-family:var(--sans);font-size:15px;color:var(--ink)}
+  .wish-input::placeholder{color:#b8af99}
+  .wish-add-btn{flex-shrink:0;padding:0 18px;border:none;border-radius:12px;background:var(--olive);color:var(--cream);font-family:var(--sans);font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .wish-card{display:flex;align-items:center;gap:12px;padding:13px 14px;margin-bottom:10px;border-radius:14px;background:var(--card-grad);border:1px solid var(--line-soft);border-left:3px solid var(--type-color,var(--sage));box-shadow:var(--shadow-sm)}
+  .wish-ic{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--type-soft);color:var(--type-color)}
+  .wish-ic svg{width:18px;height:18px}
+  .wish-mid{flex:1;min-width:0}
+  .wish-cat{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--type-color,var(--sage))}
+  .wish-text{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:1.2;margin-top:1px}
+  .wish-add-day{flex-shrink:0;border:1px solid var(--sage-soft);background:rgba(255,255,255,.5);color:var(--olive);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.03em;padding:7px 11px;border-radius:10px}
+  .wish-add-day:active{background:var(--olive);color:var(--cream);border-color:var(--olive)}
+
+  /* ---------- Timeline / storytelling (center thread, alternating) ---------- */
+  #days{position:relative;padding:0}
+  #days::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:18px;bottom:30px;width:2px;background:linear-gradient(180deg,var(--sage-soft) 0%,var(--line-soft) 100%);opacity:.7}
+  /* narrative transition captions — centered on the thread */
+  .thread-transition{position:relative;margin:2px 0 14px;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:3}
+  .thread-transition .tt-dot{width:8px;height:8px;border-radius:50%;background:var(--terra);opacity:.75;border:2px solid var(--paper)}
+  .thread-transition .tt-text{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--sage);letter-spacing:.01em;background:var(--paper);padding:0 10px}
+  /* chapter cards alternate sides */
+  .entry.day.chapter{position:relative;margin-bottom:22px;width:90%}
+  .entry.day.chapter.side-left{margin-right:auto;margin-left:0}
+  .entry.day.chapter.side-right{margin-left:auto;margin-right:0}
+  .entry.day.chapter::before{content:"";position:absolute;top:22px;width:13px;height:13px;border-radius:50%;background:var(--paper);border:2px solid var(--type-color,var(--sage));z-index:2}
+  .entry.day.chapter.side-left::before{right:-10%;margin-right:-6px}
+  .entry.day.chapter.side-right::before{left:-10%;margin-left:-7px}
+  .entry.day.chapter::after{content:"";position:absolute;top:28px;height:2px;width:10%;background:var(--line);opacity:.7;z-index:0}
+  .entry.day.chapter.side-left::after{right:-10%}
+  .entry.day.chapter.side-right::after{left:-10%}
   .entry.day.is-today::before{background:var(--terra)!important;border-color:var(--terra)!important;box-shadow:0 0 0 4px rgba(176,89,47,.18)}
-  .entry.day.filler::before{width:9px;height:9px;top:23px;left:-32px;border-color:var(--line)}
+  .entry.day.filler::before{width:9px;height:9px;top:24px}
   .entry.day.type-flight::before{background:var(--type-color);border-color:var(--type-color)}
   .chap-num{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--type-color,var(--sage));line-height:1;min-width:34px;flex-shrink:0;opacity:.9;font-optical-sizing:auto}
   .entry.day.filler .chap-num{color:var(--line);opacity:.8}
   .chap-eyebrow{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sage);margin-bottom:3px}
   .day-head{display:flex;align-items:flex-start;gap:14px;padding:18px;cursor:pointer}
 
-  .lodg-pill{display:flex;align-items:center;gap:9px;margin:8px 16px 0;padding:10px 13px;border-radius:12px;background:var(--type-soft,rgba(138,109,59,.12));border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 20%,transparent)}
+  .lodg-pill{display:flex;align-items:center;gap:9px;margin:12px 16px 16px;padding:10px 13px;border-radius:12px;background:var(--type-soft,rgba(138,109,59,.12));border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 20%,transparent)}
   .lodg-pill .lp-ic{width:18px;height:18px;color:var(--type-color,#8a6d3b);display:flex;flex-shrink:0}
   .lodg-pill .lp-ic svg{width:18px;height:18px}
   .lodg-pill .lp-name{flex:1;min-width:0;font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -503,6 +524,16 @@
     <button class="add-btn" onclick="addDay()">Add a day</button>
   </section>
 
+  <section class="view" id="view-wishlist">
+    <div class="view-head"><div class="view-title"><span class="sec-num">◇</span> Wishlist</div><div class="view-count" id="cnt-wish"></div></div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:2px 0 14px;line-height:1.5">Ideas and places you might want to hit — restaurants, cafés, sights. Add one to a day when you decide to go.</p>
+    <div class="wish-add">
+      <input id="wishInput" class="wish-input" placeholder="Add an idea… (e.g. Dinner at Septime)" />
+      <button class="wish-add-btn" onclick="addWishFromInput()">Add</button>
+    </div>
+    <div id="wishlist"></div>
+  </section>
+
   <section class="view" id="view-map">
     <div class="view-head"><div class="view-title"><span class="sec-num">II.</span> Map</div><div class="view-count" id="cnt-map"></div></div>
     <div id="mapWrap">
@@ -559,6 +590,7 @@
 
 <nav>
   <button class="active" onclick="showView('itinerary',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>Itinerary</button>
+  <button onclick="showView('wishlist',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.35-9.5-8.5C1 9.5 2.5 6 6 6c2 0 3.2 1.2 4 2.3C10.8 7.2 12 6 14 6c3.5 0 5 3.5 3.5 6.5C19 16.65 12 21 12 21z"/></svg></span>Wishlist</button>
   <button onclick="showView('map',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3zM9 3v15M15 6v15"/></svg></span>Map</button>
   <button onclick="showView('bookings',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15.5c-.5.9-1.6 1.2-2.5.7L4 8.2c-.6-.3-1-1-1-1.7V4l2 .5 3 3 5.5 1.5L11 4.5 13 5l4 6 3.2 1.8c.9.5 1.3 1.7.8 2.7z"/></svg></span>Bookings</button>
   <button onclick="showView('packing',this)"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Packing</button>
@@ -581,7 +613,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-g</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-i</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -602,7 +634,7 @@ const STORE_KEY='ace_trips_v1';       // {trips:[...], activeId}
 const LEGACY_KEY='trip_data_v2';      // old single-trip
 const uid=()=>Math.random().toString(36).slice(2,9);
 function getKey(){return localStorage.getItem('trip_api_key')||''}
-function fresh(name){return {id:uid(),name:name||'',dates:'',cur:'€',cover:'',days:[],lodging:[],bookings:[],packing:[],phrases:[],numbers:[],addresses:[],budget:[],docs:[]}}
+function fresh(name){return {id:uid(),name:name||'',dates:'',cur:'€',cover:'',days:[],lodging:[],bookings:[],wishlist:[],packing:[],phrases:[],numbers:[],addresses:[],budget:[],docs:[]}}
 
 function loadStore(){
   let store;
@@ -632,7 +664,7 @@ function openTrip(id){
   document.body.classList.remove('on-home');
   applySmartExpand();
   bindHeader();
-  renderDays();renderBookings();renderPacking();renderPhrases();renderNumbers();renderAddresses();renderBudget();renderDocs();
+  renderDays();renderBookings();renderPacking();renderPhrases();renderNumbers();renderAddresses();renderBudget();renderDocs();renderWishlist();
   refreshKeyNote();
   showView('itinerary',document.querySelectorAll('nav button')[0]);
   // if the trip is underway, scroll to today's card
@@ -887,12 +919,19 @@ function renderDays(){
   if(!D.days.length){c.innerHTML='<div class="empty"><div class="mark">Your days will appear here, in order.</div></div>';counts();return}
   const ti=todayIndex();
   let prevCity=null;
+  let side='left'; // flips on each new city
+  let cityForSide=null;
   D.days.forEach((d,i)=>{
     const Lday=lodgingForDay(d.date);
     const filler=!d.title&&!d.plan&&!Lday;
     const dt=dayType(d);
     const cityObj=extractCity(d.title)||(Lday?extractCity(Lday.name):null);
     const city=cityObj?cityObj.name:null;
+    // flip side when the city changes
+    if(city && city!==cityForSide){
+      if(cityForSide!==null){ side = (side==='left')?'right':'left'; }
+      cityForSide=city;
+    }
 
     // ── Narrative transition caption on the thread ──
     const tType=dayType(d);
@@ -913,7 +952,7 @@ function renderDays(){
       c.appendChild(tr);
     }
 
-    const e=document.createElement('div');e.className='entry day chapter'+(filler?' filler':'')+(i===ti?' is-today':'')+(d._open?' open':'')+(dt?' type-'+Object.keys(TYPES).find(k=>TYPES[k]===dt):'');
+    const e=document.createElement('div');e.className='entry day chapter side-'+side+(filler?' filler':'')+(i===ti?' is-today':'')+(d._open?' open':'')+(dt?' type-'+Object.keys(TYPES).find(k=>TYPES[k]===dt):'');
     if(dt){e.style.setProperty('--type-color',dt.color);e.style.setProperty('--type-soft',dt.soft);}
     if(i===ti){const badge=document.createElement('div');badge.className='today-badge';badge.textContent='TODAY';e.appendChild(badge);}
 
@@ -983,6 +1022,67 @@ function renderLodgingSection(){
   c.appendChild(wrap);
 }
 function addDay(d){D.days.push(Object.assign({id:uid(),title:'',date:'',plan:''},d||{}));save();renderDays();if(typeof updateCountdown==='function')updateCountdown();if(typeof loadHero==='function')loadHero();}
+
+/* ---------- Wishlist ---------- */
+// Detect a wishlist item's type from its text (reuses the type registry)
+function wishType(text){
+  const t=(text||'').toLowerCase();
+  if(/\brestaurant|dinner|lunch|breakfast|brunch|eat|food|bistro|trattoria\b/.test(t))return 'restaurant';
+  if(/\bcoffee|caf[eé]|espresso\b/.test(t))return 'coffee';
+  if(/\bbar|cocktail|pub|wine|drinks?\b/.test(t))return 'coffee';
+  if(/\bmatch|game|concert|show|tickets?|theatre|theater|opera\b/.test(t))return 'event';
+  if(/\bmuseum|gallery|exhibit|cathedral|church|palace\b/.test(t))return 'museum';
+  if(/\bspa|massage|sauna|hammam\b/.test(t))return 'spa';
+  if(/\bshop|market|boutique|store\b/.test(t))return 'shopping';
+  return 'activity';
+}
+function addWishFromInput(){
+  const el=document.getElementById('wishInput'); const v=el.value.trim(); if(!v)return;
+  D.wishlist=D.wishlist||[];
+  D.wishlist.push({id:uid(), text:v, cat:wishType(v), note:''});
+  el.value=''; save(); renderWishlist();
+}
+function renderWishlist(){
+  const c=document.getElementById('wishlist'); if(!c)return; c.innerHTML='';
+  const list=(D.wishlist||[]);
+  document.getElementById('cnt-wish').textContent=list.length||'';
+  if(!list.length){ c.innerHTML='<div class="empty"><div class="mark">No ideas yet. Drop in places you\u2019d love to check out.</div></div>'; return; }
+  list.forEach(w=>{
+    const t=TYPES[w.cat]||TYPES.activity;
+    const card=document.createElement('div');card.className='wish-card';
+    card.style.setProperty('--type-color',t.color);card.style.setProperty('--type-soft',t.soft);
+    const icon=document.createElement('div');icon.className='wish-ic';icon.innerHTML=t.icon;card.appendChild(icon);
+    const mid=document.createElement('div');mid.className='wish-mid';
+    mid.innerHTML='<div class="wish-cat">'+t.label+'</div><div class="wish-text">'+esc(w.text)+'</div>';
+    card.appendChild(mid);
+    // add-to-day button
+    const addBtn=document.createElement('button');addBtn.className='wish-add-day';addBtn.textContent='+ Day';
+    addBtn.onclick=()=>promoteWish(w);
+    card.appendChild(addBtn);
+    const del=document.createElement('button');del.className='del';del.style.flexShrink='0';del.textContent='×';
+    del.onclick=()=>{D.wishlist=D.wishlist.filter(x=>x.id!==w.id);save();renderWishlist();};
+    card.appendChild(del);
+    c.appendChild(card);
+  });
+}
+// Promote a wishlist idea onto a specific day
+function promoteWish(w){
+  const dated=(D.days||[]).filter(d=>d.date);
+  if(!dated.length){ alert('Add some days to your itinerary first, then you can assign ideas to them.'); return; }
+  // build a simple picker
+  const choices=dated.map((d,i)=>((d.title&&d.title!=='')?d.title:'Open day')+' — '+d.date);
+  const pick=prompt('Add "'+w.text+'" to which day?\n\n'+dated.map((d,i)=>(i+1)+'. '+((d.title&&d.title!=='')?d.title:'Open day')+' — '+d.date).join('\n')+'\n\nEnter a number:');
+  const idx=parseInt(pick,10);
+  if(!idx||idx<1||idx>dated.length)return;
+  const day=dated[idx-1];
+  // append the idea to that day's plan
+  const line=(TYPES[w.cat]||TYPES.activity).label+': '+w.text;
+  day.plan=(day.plan?day.plan+'\n':'')+line;
+  // remove from wishlist
+  D.wishlist=D.wishlist.filter(x=>x.id!==w.id);
+  save(); renderWishlist(); renderDays();
+  alert('Added to '+((day.title&&day.title!=='')?day.title:'day')+' — '+day.date);
+}
 
 function renderBookings(){
   const c=document.getElementById('bookings');c.innerHTML='';
@@ -1271,7 +1371,7 @@ async function doPaste(){
 // Each type: label, accent color, soft bg, and an SVG icon (stroke uses currentColor)
 const SVG=(p)=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
 const TYPES={
-  flight:{label:'Flight', color:'#2f6fb0', soft:'rgba(47,111,176,.1)', icon:SVG('<path d="M21 15.5c-.5.9-1.6 1.2-2.5.7L4 8.2c-.6-.3-1-1-1-1.7V4l2 .5 3 3 5.5 1.5L11 4.5 13 5l4 6 3.2 1.8c.9.5 1.3 1.7.8 2.7z"/>')},
+  flight:{label:'Flight', color:'#2f6fb0', soft:'rgba(47,111,176,.1)', icon:SVG('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>')},
   hotel:{label:'Hotel', color:'#8a6d3b', soft:'rgba(138,109,59,.12)', icon:SVG('<path d="M3 21V7l9-4 9 4v14M3 21h18M9 21v-5h6v5M7 10h.01M12 10h.01M17 10h.01"/>')},
   restaurant:{label:'Restaurant', color:'#b0592f', soft:'rgba(176,89,47,.11)', icon:SVG('<path d="M5 2v7a3 3 0 0 0 6 0V2M8 9v13M17 2c-1.5 0-3 1.5-3 5s1.5 4 3 4m0 0v2m0-2c1.5 0 3-.5 3-4s-1.5-5-3-5v9z"/>')},
   event:{label:'Event', color:'#7a4fb0', soft:'rgba(122,79,176,.12)', icon:SVG('<path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H5a2 2 0 0 1-2-2 2 2 0 0 0 0-4zM13 6v2m0 3v2m0 3v2"/>')},
