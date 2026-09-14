@@ -354,6 +354,9 @@
   .ci-rail .ci-node svg{width:16px;height:16px}
   .ci-rail.has-next::after{content:"";position:absolute;top:34px;bottom:-14px;width:0;border-left:2px dotted var(--sage-soft);opacity:.6}
   .ci-body{flex:1;min-width:0;padding-bottom:2px}
+  .ci-block{flex:1;min-width:0;background:var(--type-soft);border-left:3px solid var(--type-color);border-radius:0 12px 12px 0;padding:9px 12px;position:relative}
+  .cal-row.side-right .ci-block{border-left:none;border-right:3px solid var(--type-color);border-radius:12px 0 0 12px}
+  .ci-span{font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:.03em;color:var(--type-color);opacity:.85;margin-bottom:4px}
   .ci-kind{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--type-color)}
   .ci-title{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:1.2;margin-top:2px}
   .ci-sub{font-family:var(--sans);font-size:12px;color:var(--sage);margin-top:3px}
@@ -540,7 +543,6 @@
       <div class="magic-status" id="magicStatus"></div>
       <div class="no-key-note" id="noKeyNote">Add your API key in settings (⚙) to turn this on. You can always add items by hand below.</div>
     </div>
-    <div id="lodgingSection"></div>
     <div id="days"></div>
   </section>
 
@@ -572,6 +574,7 @@
 
   <section class="view" id="view-bookings">
     <div class="view-head"><div class="view-title"><span class="sec-num">III.</span> Bookings</div><div class="view-count" id="cnt-bookings"></div></div>
+    <div id="lodgingSection"></div>
     <div id="bookings"></div>
     <button class="add-btn" onclick="addBooking()">Add a booking</button>
   </section>
@@ -633,7 +636,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-k</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-l</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -936,11 +939,17 @@ function lodgingBanner(L, dateStr){
 // Parse a time string like "7:15pm" into minutes-since-midnight for ordering
 function timeToMin(s){
   if(!s)return 9999;
-  const m=(''+s).match(/(\d{1,2}):?(\d{2})?\s*(am|pm)?/i);
-  if(!m)return 9999;
-  let hh=+m[1]; const mm=m[2]?+m[2]:0; const ap=(m[3]||'').toLowerCase();
-  if(ap==='pm'&&hh<12)hh+=12; if(ap==='am'&&hh===12)hh=0;
-  return hh*60+mm;
+  // prefer an explicit am/pm time; fall back to a bare H:MM
+  let m=(''+s).match(/(\d{1,2}):(\d{2})\s*(am|pm)/i) || (''+s).match(/\b(\d{1,2})\s*(am|pm)/i);
+  if(m){
+    let hh=+m[1]; const mm=m[2]&&/^\d+$/.test(m[2])?+m[2]:0; const ap=(m[3]||m[2]||'').toLowerCase();
+    if(ap==='pm'&&hh<12)hh+=12; if(ap==='am'&&hh===12)hh=0;
+    return hh*60+mm;
+  }
+  // bare H:MM with no am/pm
+  m=(''+s).match(/\b(\d{1,2}):(\d{2})\b/);
+  if(m){ return (+m[1])*60+(+m[2]); }
+  return 9999;
 }
 // Collect every dated activity, grouped by day key, time-ordered
 function buildTimeline(){
@@ -1008,6 +1017,7 @@ function renderDays(){
     if(L){
       const isCheckIn=!prevL || prevL.id!==L.id;
       const house=document.createElement('button');house.className='spine-house'+(isCheckIn?' checkin':'');
+      house.dataset.lid=L.id;
       house.style.setProperty('--type-color',TYPES.hotel.color);
       house.innerHTML=TYPES.hotel.icon+(L.room?'<span class="sh-room">'+esc(L.room)+'</span>':'');
       house.title=L.name+(L.room?(' · Room '+L.room):'');
@@ -1038,11 +1048,15 @@ function renderDays(){
 }
 // jump to a lodging's booking entry
 function jumpToLodging(L){
+  // find & expand the matching hotel booking, then go to Bookings
+  const match=(D.bookings||[]).find(b=>b.cat==='hotel' && (b.title||'').includes((L.name||'').slice(0,10)));
+  if(match){ D.bookings.forEach(b=>b._open=false); match._open=true; renderBookings(); }
   showView('bookings',document.querySelectorAll('nav button')[3]);
   setTimeout(()=>{
-    const el=[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value.includes((L.name||'').slice(0,12)));
-    if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.transition='box-shadow .3s'; el.style.boxShadow='0 0 0 2px '+TYPES.hotel.color; setTimeout(()=>el.style.boxShadow='',1400);}
-  },200);
+    const el=match?document.getElementById('bk-'+match.id):null;
+    const target=el||[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value.includes((L.name||'').slice(0,12)));
+    if(target){target.scrollIntoView({behavior:'smooth',block:'center'}); target.style.transition='box-shadow .3s'; target.style.boxShadow='0 0 0 2px '+TYPES.hotel.color; setTimeout(()=>target.style.boxShadow='',1400);}
+  },250);
 }
 
 // A single activity in the calendar (read-only), with dynamic details
@@ -1054,24 +1068,46 @@ function calItem(b, hasNext){
   const rail=document.createElement('div');rail.className='ci-rail'+(hasNext?' has-next':'');
   rail.innerHTML='<span class="ci-node">'+t.icon+'</span>';
   wrap.appendChild(rail);
-  // content
+  // content wrapped in a duration time-block (Apple-calendar style)
+  const block=document.createElement('div');block.className='ci-block';
+  const span=eventSpan(b);
+  if(span){
+    const badge=document.createElement('div');badge.className='ci-span';
+    badge.textContent=span.label;
+    block.appendChild(badge);
+  }
   const body=document.createElement('div');body.className='ci-body';
-  const time=(b.cat==='flight'?b.depTime:b.when)||'';
   const timeLabel=(b.cat==='flight'&&b.depTime)?b.depTime:'';
   body.innerHTML='<div class="ci-kind">'+t.label+(timeLabel?(' · '+esc(timeLabel)):'')+'</div><div class="ci-title">'+esc(b.title||'')+'</div>';
-  // flight extras: route + seat tiles
   if(b.cat==='flight'){
     if(b.fromCode||b.toCode){const r=document.createElement('div');r.className='ci-sub';r.textContent=(b.fromCode||'')+' → '+(b.toCode||'')+(b.arrTime?('  ·  lands '+b.arrTime+(b.arrDate?(' '+b.arrDate):'')):'');body.appendChild(r);}
     if(b.seats){ body.appendChild(miniSeats(b.seats,b.cat)); }
   } else {
-    if(b.when && b.cat!=='flight'){ /* time already shown via when */ }
     if(b.seats){ body.appendChild(miniSeats(b.seats,b.cat)); }
     if(b.confirmation){const r=document.createElement('div');r.className='ci-sub';r.textContent='Conf '+b.confirmation;body.appendChild(r);}
   }
-  wrap.appendChild(body);
-  // tapping jumps to the booking to edit
-  wrap.onclick=()=>{ showView('bookings',document.querySelectorAll('nav button')[3]); setTimeout(()=>{const el=[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value===b.title); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.transition='box-shadow .3s'; el.style.boxShadow='0 0 0 2px var(--terra)'; setTimeout(()=>el.style.boxShadow='',1400);}},200); };
+  block.appendChild(body);
+  wrap.appendChild(block);
+  wrap.onclick=()=>{ showView('bookings',document.querySelectorAll('nav button')[3]); setTimeout(()=>{const el=document.getElementById('bk-'+b.id)||[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value===b.title); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.transition='box-shadow .3s'; el.style.boxShadow='0 0 0 2px var(--terra)'; setTimeout(()=>el.style.boxShadow='',1400);}},200); };
   return wrap;
+}
+// Compute an event's time span for the shaded block. Uses duration if known, else flight arr time, else 2h default.
+function fmtClock(min){
+  min=((min%1440)+1440)%1440; let h=Math.floor(min/60), m=min%60; const ap=h>=12?'pm':'am'; let hh=h%12; if(hh===0)hh=12;
+  return hh+(m?(':'+String(m).padStart(2,'0')):'')+ap;
+}
+function eventSpan(b){
+  let startTime = (b.cat==='flight'?b.depTime:b.when);
+  const startMin=timeToMin(startTime);
+  if(startMin>=9999)return null; // no usable start time
+  let endMin=null;
+  // flights: use duration or arrival time
+  if(b.cat==='flight'){
+    if(b.duration){ const dm=(''+b.duration).match(/(\d+)\s*h(?:\s*(\d+))?/i); if(dm){endMin=startMin+(+dm[1])*60+(dm[2]?+dm[2]:0);} }
+    if(endMin===null && b.arrTime){ let a=timeToMin(b.arrTime); if(a<9999){ if(b.arrDate)a+=1440; endMin=a; } }
+  }
+  if(endMin===null) endMin=startMin+120; // default 2 hours
+  return {label:fmtClock(startMin)+' – '+fmtClock(endMin), mins:endMin-startMin};
 }
 // compact seat tiles for the calendar
 function miniSeats(seatsStr,cat){
@@ -1105,26 +1141,36 @@ function renderLodgingSection(){
   const wrap=document.createElement('div');wrap.className='lodg-section';
   const lbl=document.createElement('div');lbl.className='lodg-section-label';lbl.textContent='WHERE YOU\u2019RE STAYING';wrap.appendChild(lbl);
   lodg.forEach(L=>{
-    const card=document.createElement('div');card.className='lodg-card';
+    const card=document.createElement('div');card.className='lodg-card';card.id='lodg-card-'+L.id;
     card.style.setProperty('--type-color',t.color);card.style.setProperty('--type-soft',t.soft);
     const icon=document.createElement('div');icon.className='lodg-icon';icon.innerHTML=t.icon;card.appendChild(icon);
     const mid=document.createElement('div');mid.className='lodg-mid';
     const dates=[L.checkIn,L.checkOut].filter(Boolean).join(' → ');
     mid.innerHTML='<div class="lodg-name">'+esc(L.name)+'</div>'+(dates?'<div class="lodg-dates">'+esc(dates)+'</div>':'')+(L.confirmation?'<div class="lodg-conf">Conf '+esc(L.confirmation)+'</div>':'');
     card.appendChild(mid);
-    // room field
+    // room field — update value only; refresh the itinerary house icons quietly (no full re-render while typing)
     const roomWrap=document.createElement('div');roomWrap.className='lodg-room';
     roomWrap.innerHTML='<div class="lodg-room-label">ROOM</div>';
     const rin=document.createElement('input');rin.className='lodg-room-input';rin.value=L.room||'';rin.placeholder='—';rin.maxLength=6;
-    rin.oninput=e=>{L.room=e.target.value;save();renderDays();};
+    rin.oninput=e=>{ L.room=e.target.value; save(); updateHouseRoom(L); };
     roomWrap.appendChild(rin);card.appendChild(roomWrap);
     // delete
     const del=document.createElement('button');del.className='del';del.textContent='×';del.style.flexShrink='0';
-    del.onclick=()=>{ if(confirm('Remove this lodging?')){D.lodging=D.lodging.filter(x=>x.id!==L.id);save();renderDays();} };
+    del.onclick=()=>{ if(confirm('Remove this lodging?')){D.lodging=D.lodging.filter(x=>x.id!==L.id);save();renderDays();renderLodgingSection();} };
     card.appendChild(del);
     wrap.appendChild(card);
   });
   c.appendChild(wrap);
+}
+// Update the room badge on itinerary house icons without a full re-render (keeps input focus)
+function updateHouseRoom(L){
+  document.querySelectorAll('.spine-house').forEach(h=>{
+    if(h.dataset.lid===L.id){
+      let badge=h.querySelector('.sh-room');
+      if(L.room){ if(!badge){badge=document.createElement('span');badge.className='sh-room';h.appendChild(badge);} badge.textContent=L.room; }
+      else if(badge){ badge.remove(); }
+    }
+  });
 }
 function addDay(d){D.days.push(Object.assign({id:uid(),title:'',date:'',plan:''},d||{}));save();renderDays();if(typeof updateCountdown==='function')updateCountdown();if(typeof loadHero==='function')loadHero();}
 
@@ -1194,7 +1240,7 @@ function renderBookings(){
   if(!D.bookings.length){c.innerHTML='<div class="empty"><div class="mark">Flights, trains, hotels, tickets — upload a screenshot or add one below.</div></div>';counts();return}
   D.bookings.forEach(b=>{
     const t=typeOf(b);
-    const e=document.createElement('div');e.className='entry booking type-'+(b.cat||'booking')+(b._open?' open':'');
+    const e=document.createElement('div');e.id='bk-'+b.id;e.className='entry booking type-'+(b.cat||'booking')+(b._open?' open':'');
     e.style.setProperty('--type-color',t.color);
     e.style.setProperty('--type-soft',t.soft);
     const head=document.createElement('div');head.className='bk-head';
