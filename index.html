@@ -316,32 +316,45 @@
   .wish-add-day{flex-shrink:0;border:1px solid var(--sage-soft);background:rgba(255,255,255,.5);color:var(--olive);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.03em;padding:7px 11px;border-radius:10px}
   .wish-add-day:active{background:var(--olive);color:var(--cream);border-color:var(--olive)}
 
-  /* ---------- Timeline / storytelling (center thread, alternating) ---------- */
+  /* ---------- Rolling calendar itinerary (read-only) ---------- */
   #days{position:relative;padding:0}
-  #days::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:18px;bottom:30px;width:2px;background:linear-gradient(180deg,var(--sage-soft) 0%,var(--line-soft) 100%);opacity:.7}
-  /* narrative transition captions — centered on the thread */
-  .thread-transition{position:relative;margin:2px 0 14px;display:flex;flex-direction:column;align-items:center;gap:5px;z-index:3}
-  .thread-transition .tt-dot{width:8px;height:8px;border-radius:50%;background:var(--terra);opacity:.75;border:2px solid var(--paper)}
-  .thread-transition .tt-text{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--sage);letter-spacing:.01em;background:var(--paper);padding:0 10px}
-  /* chapter cards alternate sides */
-  .entry.day.chapter{position:relative;margin-bottom:22px;width:90%}
-  .entry.day.chapter.side-left{margin-right:auto;margin-left:0}
-  .entry.day.chapter.side-right{margin-left:auto;margin-right:0}
-  .entry.day.chapter::before{content:"";position:absolute;top:22px;width:13px;height:13px;border-radius:50%;background:var(--paper);border:2px solid var(--type-color,var(--sage));z-index:2}
-  .entry.day.chapter.side-left::before{right:-10%;margin-right:-6px}
-  .entry.day.chapter.side-right::before{left:-10%;margin-left:-7px}
-  .entry.day.chapter::after{content:"";position:absolute;top:28px;height:2px;width:10%;background:var(--line);opacity:.7;z-index:0}
-  .entry.day.chapter.side-left::after{right:-10%}
-  .entry.day.chapter.side-right::after{left:-10%}
-  .entry.day.is-today::before{background:var(--terra)!important;border-color:var(--terra)!important;box-shadow:0 0 0 4px rgba(176,89,47,.18)}
-  .entry.day.filler::before{width:9px;height:9px;top:24px}
-  .entry.day.type-flight::before{background:var(--type-color);border-color:var(--type-color)}
-  .chap-num{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--type-color,var(--sage));line-height:1;min-width:34px;flex-shrink:0;opacity:.9;font-optical-sizing:auto}
-  .entry.day.filler .chap-num{color:var(--line);opacity:.8}
-  .chap-eyebrow{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sage);margin-bottom:3px}
-  .day-head{display:flex;align-items:flex-start;gap:14px;padding:18px;cursor:pointer}
+  .cal-day{display:flex;gap:0;position:relative;min-height:64px}
+  .cal-ribbon{width:36px;flex-shrink:0;position:relative;display:flex;justify-content:center;padding-top:44px}
+  .cal-ribbon:not(.empty)::before{content:"";position:absolute;top:0;bottom:0;left:12px;width:12px;border-radius:6px;background:linear-gradient(180deg,var(--type-color,#8a6d3b),color-mix(in srgb,var(--type-color,#8a6d3b) 80%,#000));opacity:.9;box-shadow:0 2px 6px rgba(43,49,37,.15)}
+  .cal-ribbon .rib-ic{position:relative;z-index:2;width:20px;height:20px;color:#fff;margin-top:2px}
+  .cal-ribbon .rib-ic svg{width:15px;height:15px}
+  .cal-col{flex:1;min-width:0;position:relative;padding:0 4px 22px 14px}
+  .cal-ghost{position:absolute;top:24px;right:6px;font-family:var(--serif);font-size:80px;font-weight:500;color:var(--olive);opacity:.05;line-height:1;pointer-events:none;z-index:0}
+  .cal-divider{position:sticky;top:calc(8px + var(--safe-top));z-index:5;display:flex;align-items:baseline;gap:10px;padding:8px 0 8px;background:linear-gradient(180deg,var(--paper) 70%,transparent);backdrop-filter:blur(2px)}
+  .cal-divider .cd-day{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--terra)}
+  .cal-divider .cd-date{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink)}
+  .cal-divider .cd-city{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--sage);text-transform:uppercase;margin-left:auto}
+  .cal-divider .cd-today{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.1em;color:#fff;background:var(--terra);padding:2px 7px;border-radius:10px;margin-left:8px}
+  .cal-day.is-today .cal-ghost{color:var(--terra);opacity:.08}
+  .cal-lodging{display:flex;align-items:center;gap:8px;margin:8px 0 4px;padding:8px 11px;border-radius:11px;background:var(--type-soft);border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 18%,transparent);position:relative;z-index:1}
+  .cal-lodging .cl-ic{width:16px;height:16px;color:var(--type-color);flex-shrink:0}
+  .cal-lodging .cl-ic svg{width:16px;height:16px}
+  .cal-lodging .cl-name{flex:1;min-width:0;font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cal-lodging .cl-room{flex-shrink:0;font-family:var(--sans);font-size:11px;font-weight:700;color:var(--type-color);background:rgba(255,255,255,.55);padding:3px 8px;border-radius:8px}
+  .cal-lodging .cl-room.dim{color:var(--sage);font-weight:500}
+  .cal-items{position:relative;z-index:1;margin-top:8px}
+  .cal-open{font-family:var(--serif);font-style:italic;font-size:14px;color:#c3bba6;padding:8px 0 4px;position:relative;z-index:1}
+  /* activity item with dotted connector */
+  .cal-item{display:flex;gap:12px;cursor:pointer}
+  .ci-rail{width:30px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;position:relative}
+  .ci-rail .ci-node{width:30px;height:30px;border-radius:9px;background:var(--type-soft);color:var(--type-color);display:flex;align-items:center;justify-content:center;z-index:2}
+  .ci-rail .ci-node svg{width:16px;height:16px}
+  .ci-rail.has-next::after{content:"";position:absolute;top:32px;bottom:-12px;width:0;border-left:2px dotted var(--sage-soft);opacity:.7}
+  .ci-body{flex:1;min-width:0;padding-bottom:18px}
+  .ci-kind{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--type-color)}
+  .ci-title{font-family:var(--serif);font-size:17px;font-weight:500;color:var(--ink);line-height:1.2;margin-top:2px}
+  .ci-sub{font-family:var(--sans);font-size:12.5px;color:var(--sage);margin-top:3px}
+  .ci-seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+  .ci-seat{display:inline-flex;align-items:center;gap:2px;padding:4px 9px;border-radius:8px;background:var(--type-color);color:#fff;font-family:var(--sans);font-size:12px;font-weight:600}
+  .ci-seat b{font-weight:700;opacity:.85;font-size:11px}
 
-  .lodg-pill{display:flex;align-items:center;gap:9px;margin:12px 16px 16px;padding:10px 13px;border-radius:12px;background:var(--type-soft,rgba(138,109,59,.12));border:1px solid color-mix(in srgb,var(--type-color,#8a6d3b) 20%,transparent)}
+  /* legacy chapter styles kept out of the way */
+  .lodg-pill{display:none}
   .lodg-pill .lp-ic{width:18px;height:18px;color:var(--type-color,#8a6d3b);display:flex;flex-shrink:0}
   .lodg-pill .lp-ic svg{width:18px;height:18px}
   .lodg-pill .lp-name{flex:1;min-width:0;font-family:var(--serif);font-size:14px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -521,7 +534,6 @@
     </div>
     <div id="lodgingSection"></div>
     <div id="days"></div>
-    <button class="add-btn" onclick="addDay()">Add a day</button>
   </section>
 
   <section class="view" id="view-wishlist">
@@ -613,7 +625,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-i</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-j</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -913,85 +925,166 @@ function lodgingBanner(L, dateStr){
   el.appendChild(roomWrap);
   return el;
 }
+// Parse a time string like "7:15pm" into minutes-since-midnight for ordering
+function timeToMin(s){
+  if(!s)return 9999;
+  const m=(''+s).match(/(\d{1,2}):?(\d{2})?\s*(am|pm)?/i);
+  if(!m)return 9999;
+  let hh=+m[1]; const mm=m[2]?+m[2]:0; const ap=(m[3]||'').toLowerCase();
+  if(ap==='pm'&&hh<12)hh+=12; if(ap==='am'&&hh===12)hh=0;
+  return hh*60+mm;
+}
+// Collect every dated activity, grouped by day key, time-ordered
+function buildTimeline(){
+  const by=baseYear();
+  const daysMap={}; // dayKey -> {key, dateLabel, items:[]}
+  function ensure(dateStr){
+    const p=parseLoose(dateStr); if(!p)return null;
+    const key=normDay(toSortable(p,by));
+    if(!daysMap[key])daysMap[key]={key,dateLabel:fmtDate(key),items:[]};
+    return daysMap[key];
+  }
+  // flights & bookings
+  (D.bookings||[]).forEach(b=>{
+    if(b.cat==='hotel')return; // hotels handled as lodging ribbon
+    let dateStr, time;
+    if(b.cat==='flight'){ dateStr=b.depDate; time=b.depTime; }
+    else { dateStr=b.when; time=b.when; }
+    const g=ensure(dateStr); if(!g)return;
+    g.items.push({b, tmin:timeToMin(time)});
+  });
+  // sort items within each day
+  Object.values(daysMap).forEach(g=>g.items.sort((a,b)=>a.tmin-b.tmin));
+  return daysMap;
+}
+// Full continuous date span covering all activities + lodging
+function timelineSpan(){
+  const by=baseYear(); const keys=[];
+  (D.bookings||[]).forEach(b=>{ if(b.cat==='hotel')return; const p=parseLoose(b.cat==='flight'?b.depDate:b.when); if(p)keys.push(normDay(toSortable(p,by))); });
+  (D.lodging||[]).forEach(L=>{ const ci=parseLoose(L.checkIn),co=parseLoose(L.checkOut); if(ci)keys.push(normDay(toSortable(ci,by))); if(co)keys.push(normDay(toSortable(co,by)-86400000)); });
+  if(!keys.length)return null;
+  return {start:Math.min.apply(null,keys), end:Math.max.apply(null,keys)};
+}
+
 function renderDays(){
-  reflowDays();
-  const c=document.getElementById('days');c.innerHTML='';
-  if(!D.days.length){c.innerHTML='<div class="empty"><div class="mark">Your days will appear here, in order.</div></div>';counts();return}
-  const ti=todayIndex();
-  let prevCity=null;
-  let side='left'; // flips on each new city
-  let cityForSide=null;
-  D.days.forEach((d,i)=>{
-    const Lday=lodgingForDay(d.date);
-    const filler=!d.title&&!d.plan&&!Lday;
-    const dt=dayType(d);
-    const cityObj=extractCity(d.title)||(Lday?extractCity(Lday.name):null);
+  const c=document.getElementById('days'); if(!c)return; c.innerHTML='';
+  const span=timelineSpan();
+  if(!span){ c.innerHTML='<div class="empty"><div class="mark">Your journey appears here.<br>Add flights, hotels and plans from the Bookings tab.</div></div>'; counts(); return; }
+  const timeline=buildTimeline();
+  const by=baseYear();
+  const now=new Date(); const todayKey=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  const dayMs=86400000;
+  let dayNo=0, prevCity=null;
+
+  for(let key=span.start; key<=span.end; key+=dayMs){
+    dayNo++;
+    const g=timeline[key];
+    const L=lodgingForDayKey(key);
+    const isToday=(key===todayKey);
+    const d=new Date(key);
+    const dnum=d.getDate();
+    const cityObj = (g && g.items.length? (extractCity(g.items[0].b.title)||(g.items[0].b.toCity?extractCity(g.items[0].b.toCity):null)) : (L?extractCity(L.name):null));
     const city=cityObj?cityObj.name:null;
-    // flip side when the city changes
-    if(city && city!==cityForSide){
-      if(cityForSide!==null){ side = (side==='left')?'right':'left'; }
-      cityForSide=city;
-    }
 
-    // ── Narrative transition caption on the thread ──
-    const tType=dayType(d);
-    let transition=null;
-    if(tType===TYPES.flight){
-      // a flight day = a move between places
-      const b=D.bookings.find(x=>x.cat==='flight' && (x.depDate===d.date));
-      if(b && b.toCity){ transition='Arrive '+ (extractCity(b.toCity)?extractCity(b.toCity).name : b.toCity); }
-      else if(city){ transition='Travel to '+city; }
-    } else if(city && city!==prevCity && prevCity!==null){
-      transition='On to '+city;
-    } else if(city && prevCity===null && i>0){
-      transition=null;
+    // ── Day block ──
+    const block=document.createElement('div');block.className='cal-day'+(isToday?' is-today':'');
+    // lodging ribbon (left)
+    if(L){
+      const rib=document.createElement('div');rib.className='cal-ribbon';
+      rib.style.setProperty('--type-color',TYPES.hotel.color);
+      rib.innerHTML='<div class="rib-ic">'+TYPES.hotel.icon+'</div>';
+      block.appendChild(rib);
+    } else {
+      const gap=document.createElement('div');gap.className='cal-ribbon empty';block.appendChild(gap);
     }
-    if(transition){
-      const tr=document.createElement('div');tr.className='thread-transition';
-      tr.innerHTML='<span class="tt-dot"></span><span class="tt-text">'+esc(transition)+'</span>';
-      c.appendChild(tr);
+    // main column
+    const col=document.createElement('div');col.className='cal-col';
+    // ghosted big date number behind
+    const ghost=document.createElement('div');ghost.className='cal-ghost';ghost.textContent=dnum;col.appendChild(ghost);
+    // sticky day divider
+    const div=document.createElement('div');div.className='cal-divider'+(isToday?' today':'');
+    div.innerHTML='<span class="cd-day">DAY '+dayNo+'</span><span class="cd-date">'+fmtDate(key)+'</span>'+(city?'<span class="cd-city">'+esc(city)+'</span>':'')+(isToday?'<span class="cd-today">TODAY</span>':'');
+    col.appendChild(div);
+    // lodging label (once, on check-in-ish/first covered day or every day subtly)
+    if(L){
+      const ll=document.createElement('div');ll.className='cal-lodging';
+      ll.style.setProperty('--type-color',TYPES.hotel.color);ll.style.setProperty('--type-soft',TYPES.hotel.soft);
+      ll.innerHTML='<span class="cl-ic">'+TYPES.hotel.icon+'</span><span class="cl-name">'+esc(L.name)+'</span>'+(L.room?'<span class="cl-room">Room '+esc(L.room)+'</span>':'<span class="cl-room dim">Room —</span>');
+      col.appendChild(ll);
     }
-
-    const e=document.createElement('div');e.className='entry day chapter side-'+side+(filler?' filler':'')+(i===ti?' is-today':'')+(d._open?' open':'')+(dt?' type-'+Object.keys(TYPES).find(k=>TYPES[k]===dt):'');
-    if(dt){e.style.setProperty('--type-color',dt.color);e.style.setProperty('--type-soft',dt.soft);}
-    if(i===ti){const badge=document.createElement('div');badge.className='today-badge';badge.textContent='TODAY';e.appendChild(badge);}
-
-    // ── Chapter header (big day numeral + city/date subtitle) ──
-    const head=document.createElement('div');head.className='day-head';
-    head.onclick=(ev)=>{ if(ev.target.closest('.card-ctrls')||ev.target.closest('input')||ev.target.closest('textarea')||e.classList.contains('editing'))return; d._open=!d._open; renderDays(); };
-    const chapNum=document.createElement('div');chapNum.className='chap-num';chapNum.textContent=(i+1);head.appendChild(chapNum);
-    const hleft=document.createElement('div');hleft.style.flex='1';hleft.style.minWidth='0';
-    const eyebrow=document.createElement('div');eyebrow.className='chap-eyebrow';
-    eyebrow.textContent=(d.date||'')+(city?('  ·  '+city):'');
-    hleft.appendChild(eyebrow);
-    hleft.appendChild(inp(d.title,'entry-title','Open day — add a plan',v=>{d.title=v;save()}));
-    head.appendChild(hleft);
-    if(dt){const badge=document.createElement('div');badge.className='type-badge day-badge';badge.innerHTML=dt.icon;head.appendChild(badge);}
-    if(!filler){const chev=document.createElement('span');chev.className='chev';chev.textContent='⌄';head.appendChild(chev);}
-    e.appendChild(head);
-
-    // compact lodging pill — visible even when collapsed
-    if(Lday){
-      const pill=document.createElement('div');pill.className='lodg-pill';
-      pill.style.setProperty('--type-color',TYPES.hotel.color);pill.style.setProperty('--type-soft',TYPES.hotel.soft);
-      pill.innerHTML='<span class="lp-ic">'+TYPES.hotel.icon+'</span><span class="lp-name">'+esc(Lday.name)+'</span>'+(Lday.room?'<span class="lp-room">Rm '+esc(Lday.room)+'</span>':'');
-      e.appendChild(pill);
+    // activities, time-ordered, connected by dotted line
+    if(g && g.items.length){
+      const list=document.createElement('div');list.className='cal-items';
+      g.items.forEach((it,idx)=>{
+        list.appendChild(calItem(it.b, idx<g.items.length-1));
+      });
+      col.appendChild(list);
+    } else if(!L){
+      const open=document.createElement('div');open.className='cal-open';open.textContent='Open day';col.appendChild(open);
     }
-    // expandable body
-    const body=document.createElement('div');body.className='day-body';
-    if(Lday)body.appendChild(lodgingBanner(Lday,d.date));
-    body.appendChild(inp(d.date,'entry-sub','Date',v=>{d.date=v;save();renderDays()}));
-    const ta=document.createElement('textarea');ta.className='entry-body';ta.value=d.plan||'';ta.placeholder='What\u2019s the story of this day? Plans, timings, notes…';
-    ta.oninput=ev=>{d.plan=ev.target.value;grow(ta);save()};body.appendChild(ta);
-    const wx=document.createElement('div');wx.className='day-wx';wx.id='wx-'+d.id;body.appendChild(wx);
-    e.appendChild(body);
-    e.appendChild(cardCtrls(e,d,()=>{D.days=D.days.filter(x=>x.id!==d.id);save();renderDays()}));
-    c.appendChild(e);grow(ta);
+    block.appendChild(col);
+    c.appendChild(block);
     if(city)prevCity=city;
-  });counts();
+  }
+  counts();
   loadWeather();
   renderLodgingSection();
+  // scroll to today
+  setTimeout(()=>{const t=document.querySelector('.cal-day.is-today');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},350);
 }
+
+// A single activity in the calendar (read-only), with dynamic details
+function calItem(b, hasNext){
+  const t=typeOf(b);
+  const wrap=document.createElement('div');wrap.className='cal-item type-'+(b.cat||'booking');
+  wrap.style.setProperty('--type-color',t.color);wrap.style.setProperty('--type-soft',t.soft);
+  // dotted connector + node
+  const rail=document.createElement('div');rail.className='ci-rail'+(hasNext?' has-next':'');
+  rail.innerHTML='<span class="ci-node">'+t.icon+'</span>';
+  wrap.appendChild(rail);
+  // content
+  const body=document.createElement('div');body.className='ci-body';
+  const time=(b.cat==='flight'?b.depTime:b.when)||'';
+  const timeLabel=(b.cat==='flight'&&b.depTime)?b.depTime:'';
+  body.innerHTML='<div class="ci-kind">'+t.label+(timeLabel?(' · '+esc(timeLabel)):'')+'</div><div class="ci-title">'+esc(b.title||'')+'</div>';
+  // flight extras: route + seat tiles
+  if(b.cat==='flight'){
+    if(b.fromCode||b.toCode){const r=document.createElement('div');r.className='ci-sub';r.textContent=(b.fromCode||'')+' → '+(b.toCode||'')+(b.arrTime?('  ·  lands '+b.arrTime+(b.arrDate?(' '+b.arrDate):'')):'');body.appendChild(r);}
+    if(b.seats){ body.appendChild(miniSeats(b.seats,b.cat)); }
+  } else {
+    if(b.when && b.cat!=='flight'){ /* time already shown via when */ }
+    if(b.seats){ body.appendChild(miniSeats(b.seats,b.cat)); }
+    if(b.confirmation){const r=document.createElement('div');r.className='ci-sub';r.textContent='Conf '+b.confirmation;body.appendChild(r);}
+  }
+  wrap.appendChild(body);
+  // tapping jumps to the booking to edit
+  wrap.onclick=()=>{ showView('bookings',document.querySelectorAll('nav button')[3]); setTimeout(()=>{const el=[...document.querySelectorAll('#bookings .entry.booking')].find(x=>x.querySelector('.entry-title')&&x.querySelector('.entry-title').value===b.title); if(el){el.scrollIntoView({behavior:'smooth',block:'center'}); el.style.transition='box-shadow .3s'; el.style.boxShadow='0 0 0 2px var(--terra)'; setTimeout(()=>el.style.boxShadow='',1400);}},200); };
+  return wrap;
+}
+// compact seat tiles for the calendar
+function miniSeats(seatsStr,cat){
+  const row=document.createElement('div');row.className='ci-seats';
+  seatsStr.split(/[,/]| and /i).map(s=>s.trim()).filter(Boolean).forEach(s=>{
+    const chip=document.createElement('span');chip.className='ci-seat';
+    const mm=s.toUpperCase().match(/^(\d{1,3})\s*([A-K])$/);
+    chip.innerHTML = mm? ('<b>'+mm[1]+'</b>'+mm[2]) : esc(s);
+    row.appendChild(chip);
+  });
+  return row;
+}
+// lodging lookup by day-key (ms)
+function lodgingForDayKey(key){
+  if(!D.lodging||!D.lodging.length)return null;
+  const by=baseYear();
+  for(const L of D.lodging){
+    const ci=parseLoose(L.checkIn),co=parseLoose(L.checkOut); if(!ci)continue;
+    const ciK=normDay(toSortable(ci,by));
+    const coK=co?normDay(toSortable(co,by)):ciK+86400000;
+    if(key>=ciK && key<coK)return L;
+  }
+  return null;
+}
+
 function renderLodgingSection(){
   const c=document.getElementById('lodgingSection'); if(!c)return; c.innerHTML='';
   const lodg=(D.lodging||[]);
