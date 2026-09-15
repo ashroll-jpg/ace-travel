@@ -320,8 +320,11 @@
   .wish-mid{flex:1;min-width:0}
   .wish-cat{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--type-color,var(--sage))}
   .wish-text{font-family:var(--serif);font-size:16px;font-weight:500;color:var(--ink);line-height:1.2;margin-top:1px}
-  .wish-add-day{flex-shrink:0;border:1px solid var(--sage-soft);background:rgba(255,255,255,.5);color:var(--olive);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.03em;padding:7px 11px;border-radius:10px}
-  .wish-add-day:active{background:var(--olive);color:var(--cream);border-color:var(--olive)}
+  .wish-btns{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+  .wish-day-btn,.wish-book-btn{border:1px solid var(--sage-soft);background:rgba(255,255,255,.5);color:var(--olive);font-family:var(--sans);font-size:10.5px;font-weight:600;letter-spacing:.02em;padding:6px 10px;border-radius:9px;white-space:nowrap}
+  .wish-book-btn{background:var(--olive);color:var(--cream);border-color:var(--olive)}
+  .wish-day-btn:active{background:var(--olive);color:var(--cream)}
+  .wish-book-btn:active{opacity:.85}
 
   /* ---------- Continuous vertical calendar (read-only) ---------- */
   #days{position:relative;padding:8px 0 20px}
@@ -371,6 +374,13 @@
   .cal-row.side-right .ci-seats{justify-content:flex-end}
   .ci-seat{display:inline-flex;align-items:center;gap:2px;padding:3px 8px;border-radius:7px;background:var(--type-color);color:#fff;font-family:var(--sans);font-size:11px;font-weight:600}
   .ci-seat b{font-weight:700;opacity:.85;font-size:10px}
+  /* tentative (penciled-in) items — lighter, dashed */
+  .cal-item.tentative .ci-block{background:transparent;border-left-style:dashed;opacity:.92}
+  .cal-row.side-right .cal-item.tentative .ci-block{border-right-style:dashed}
+  .cal-item.tentative .ci-node{background:transparent;border:1.5px dashed var(--type-color);opacity:.8}
+  .ci-tent{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--sage);padding:2px 6px;border-radius:7px;margin-right:5px}
+  .ci-confirm{margin-top:9px;border:1px solid var(--type-color);background:transparent;color:var(--type-color);font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.03em;padding:6px 12px;border-radius:9px}
+  .ci-confirm:active{background:var(--type-color);color:#fff}
 
   .bk-group{margin-bottom:22px}
   .bk-group-head{display:flex;align-items:center;gap:9px;margin-bottom:10px;padding-bottom:8px;border-bottom:1.5px solid color-mix(in srgb,var(--type-color) 30%,transparent)}
@@ -666,7 +676,7 @@
 
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
-    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-p</span></h3>
+    <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-r</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
@@ -1094,7 +1104,7 @@ function jumpToLodging(L){
 // A single activity in the calendar (read-only), with dynamic details
 function calItem(b, hasNext){
   const t=typeOf(b);
-  const wrap=document.createElement('div');wrap.className='cal-item type-'+(b.cat||'booking');
+  const wrap=document.createElement('div');wrap.className='cal-item type-'+(b.cat||'booking')+(b.tentative?' tentative':'');
   wrap.style.setProperty('--type-color',t.color);wrap.style.setProperty('--type-soft',t.soft);
   // dotted connector + node
   const rail=document.createElement('div');rail.className='ci-rail'+(hasNext?' has-next':'');
@@ -1113,13 +1123,20 @@ function calItem(b, hasNext){
   }
   const body=document.createElement('div');body.className='ci-body';
   const timeLabel=(b.cat==='flight'&&b.depTime)?b.depTime:(b.time||'');
-  body.innerHTML='<div class="ci-kind">'+t.label+(timeLabel?(' · '+esc(timeLabel)):'')+'</div><div class="ci-title">'+esc(b.title||'')+'</div>';
+  const kindLabel = b.tentative ? ('<span class="ci-tent">Tentative</span> '+t.label) : (t.label+(timeLabel?(' · '+esc(timeLabel)):''));
+  body.innerHTML='<div class="ci-kind">'+kindLabel+'</div><div class="ci-title">'+esc(b.title||'')+'</div>';
   if(b.cat==='flight'){
     if(b.fromCode||b.toCode){const r=document.createElement('div');r.className='ci-sub';r.textContent=(b.fromCode||'')+' → '+(b.toCode||'')+(b.arrTime?('  ·  lands '+b.arrTime+(b.arrDate?(' '+b.arrDate):'')):'');body.appendChild(r);}
     if(b.seats){ body.appendChild(miniSeats(b.seats,b.cat)); }
   } else {
     if(b.seats){ body.appendChild(miniSeats(b.seats,b.cat)); }
     if(b.confirmation){const r=document.createElement('div');r.className='ci-sub';r.textContent='Conf '+b.confirmation;body.appendChild(r);}
+  }
+  // tentative → offer a Confirm button
+  if(b.tentative){
+    const cf=document.createElement('button');cf.className='ci-confirm';cf.textContent='Confirm this';
+    cf.onclick=(ev)=>{ ev.stopPropagation(); b.tentative=false; save(); renderDays(); renderBookings(); };
+    body.appendChild(cf);
   }
   block.appendChild(body);
   wrap.appendChild(block);
@@ -1286,33 +1303,60 @@ function renderWishlist(){
     const mid=document.createElement('div');mid.className='wish-mid';
     mid.innerHTML='<div class="wish-cat">'+t.label+'</div><div class="wish-text">'+esc(w.text)+'</div>';
     card.appendChild(mid);
-    // add-to-day button
-    const addBtn=document.createElement('button');addBtn.className='wish-add-day';addBtn.textContent='+ Day';
-    addBtn.onclick=()=>promoteWish(w);
-    card.appendChild(addBtn);
+    // action buttons: tentative "to day" + confirmed "book it"
+    const btns=document.createElement('div');btns.className='wish-btns';
+    const dayBtn=document.createElement('button');dayBtn.className='wish-day-btn';dayBtn.textContent='Pencil in';
+    dayBtn.title='Add as a tentative idea on a day';
+    dayBtn.onclick=()=>promoteWish(w,true);
+    const bookBtn=document.createElement('button');bookBtn.className='wish-book-btn';bookBtn.textContent='Book it';
+    bookBtn.title='Convert to a confirmed booking';
+    bookBtn.onclick=()=>convertWishToBooking(w);
+    btns.appendChild(dayBtn);btns.appendChild(bookBtn);
+    card.appendChild(btns);
     const del=document.createElement('button');del.className='del';del.style.flexShrink='0';del.textContent='×';
     del.onclick=()=>{D.wishlist=D.wishlist.filter(x=>x.id!==w.id);save();renderWishlist();};
     card.appendChild(del);
     c.appendChild(card);
   });
 }
+// Convert a wishlist idea to a confirmed booking, prompting for how to add details
+function convertWishToBooking(w){
+  const choice=confirm('Convert "'+w.text+'" to a confirmed booking.\n\nOK = add a screenshot to auto-fill details\nCancel = enter details by hand');
+  const t=TYPES[w.cat]||TYPES.activity;
+  // create the booking (confirmed) and open it in Bookings, expanded + in edit mode
+  addBooking({ kind:t.label, cat:(w.cat||'activity'), title:w.text, when:'', date:'', time:'', details:w.note||'', _open:true });
+  const nb=D.bookings[D.bookings.length-1];
+  D.wishlist=D.wishlist.filter(x=>x.id!==w.id); save(); renderWishlist();
+  if(choice){
+    // screenshot route — trigger the booking-scoped uploader
+    convertTargetId=nb.id;
+    document.getElementById('fileInput').click();
+    showView('bookings');
+  } else {
+    // manual route — open the booking in edit mode
+    renderBookings();
+    showView('bookings');
+    setTimeout(()=>{ const el=document.getElementById('bk-'+nb.id); if(el){ const ed=el.querySelector('.icon-btn'); if(ed && !el.classList.contains('editing'))ed.click(); el.scrollIntoView({behavior:'smooth',block:'center'}); } },250);
+  }
+}
 // Promote a wishlist idea onto a specific day
-function promoteWish(w){
-  const dated=(D.days||[]).filter(d=>d.date);
-  if(!dated.length){ alert('Add some days to your itinerary first, then you can assign ideas to them.'); return; }
-  // build a simple picker
-  const choices=dated.map((d,i)=>((d.title&&d.title!=='')?d.title:'Open day')+' — '+d.date);
-  const pick=prompt('Add "'+w.text+'" to which day?\n\n'+dated.map((d,i)=>(i+1)+'. '+((d.title&&d.title!=='')?d.title:'Open day')+' — '+d.date).join('\n')+'\n\nEnter a number:');
+function promoteWish(w, tentative){
+  // gather the distinct dates already in the trip (from bookings + lodging) as day options
+  const by=baseYear();
+  const dateSet={};
+  (D.bookings||[]).forEach(b=>{ const ds=bookingDate(b); const p=parseLoose(ds); if(p)dateSet[normDay(toSortable(p,by))]=fmtDate(normDay(toSortable(p,by))); });
+  (D.lodging||[]).forEach(L=>{ const ci=parseLoose(L.checkIn),co=parseLoose(L.checkOut); if(ci){let s=normDay(toSortable(ci,by));const e=co?normDay(toSortable(co,by)):s+86400000;for(let k=s;k<e;k+=86400000)dateSet[k]=fmtDate(k);} });
+  const keys=Object.keys(dateSet).map(Number).sort((a,b)=>a-b);
+  if(!keys.length){ alert('Add a flight or hotel first so there are days to assign to — then you can drop this idea onto one.'); return; }
+  const pick=prompt('Pencil "'+w.text+'" in on which day?\n\n'+keys.map((k,i)=>(i+1)+'. '+dateSet[k]).join('\n')+'\n\nEnter a number:');
   const idx=parseInt(pick,10);
-  if(!idx||idx<1||idx>dated.length)return;
-  const day=dated[idx-1];
-  // append the idea to that day's plan
-  const line=(TYPES[w.cat]||TYPES.activity).label+': '+w.text;
-  day.plan=(day.plan?day.plan+'\n':'')+line;
-  // remove from wishlist
+  if(!idx||idx<1||idx>keys.length)return;
+  const chosenLabel=dateSet[keys[idx-1]];
+  const t=TYPES[w.cat]||TYPES.activity;
+  addBooking({ kind:t.label, cat:(w.cat||'activity'), title:w.text, date:chosenLabel, when:chosenLabel, time:'', details:w.note||'', tentative:!!tentative });
   D.wishlist=D.wishlist.filter(x=>x.id!==w.id);
   save(); renderWishlist(); renderDays();
-  alert('Added to '+((day.title&&day.title!=='')?day.title:'day')+' — '+day.date);
+  alert((tentative?'Penciled in':'Added')+' "'+w.text+'" on '+chosenLabel+'.');
 }
 
 function renderBookings(){
@@ -1644,8 +1688,29 @@ function refreshKeyNote(){document.getElementById('noKeyNote').classList.toggle(
 
 function pickImage(){if(!getKey()){refreshKeyNote();openSettings();return}document.getElementById('fileInput').click()}
 function setStatus(html,show=true){const s=document.getElementById('magicStatus');s.innerHTML=html;s.classList.toggle('show',show)}
+let convertTargetId=null;
 async function handleImage(ev){
   const files=Array.from(ev.target.files||[]);ev.target.value='';if(!files.length)return;
+  // If we're filling in a specific converted booking, merge parsed data into it
+  if(convertTargetId){
+    const target=D.bookings.find(x=>x.id===convertTargetId); convertTargetId=null;
+    if(target){
+      try{
+        const b64=await toB64(files[0]);
+        const r=await parseContent([{type:'image',source:{type:'base64',media_type:files[0].type||'image/jpeg',data:b64}}]);
+        // merge parsed fields into the existing booking (keep its title if parse is vague)
+        if(r){
+          if(r.cat)target.cat=r.cat, target.kind=(TYPES[r.cat]||TYPES.booking).label;
+          if(r.title)target.title=r.title;
+          if(r.when){target.when=r.when;target.date=r.when;target.time=r.when;}
+          if(r.checkIn)target.date=r.checkIn;
+          ['confirmation','seats','address','phone','duration','flightNo','fromCode','toCode','depDate','depTime','arrDate','arrTime','aircraft','cabin'].forEach(k=>{ if(r[k])target[k]=r[k]; });
+          save(); renderBookings(); renderDays();
+        }
+      }catch(e){ alert('Could not read that screenshot: '+(e.message||'error')+'. The booking was still created — tap the pencil to fill it in.'); }
+    }
+    return;
+  }
   const btns=document.querySelectorAll('.magic-btn');btns.forEach(b=>b.disabled=true);
   let added=0, failed=0, lastErr='';
   for(let i=0;i<files.length;i++){
