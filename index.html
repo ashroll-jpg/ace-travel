@@ -259,6 +259,29 @@
   .btn-save{background:var(--olive); color:var(--cream)}
   .btn-cancel{background:transparent; color:var(--ink-soft); border:1px solid var(--line)!important}
 
+  /* ---------- Today card & heads-up warnings ---------- */
+  .today-card{margin:16px 0 0; padding:18px 18px 14px; border-radius:var(--radius); background:var(--olive); color:var(--cream); box-shadow:var(--shadow-md)}
+  .today-card:empty{display:none}
+  .tc-top{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--sans); font-size:10.5px; font-weight:700; letter-spacing:.16em; color:var(--sage-soft); margin-bottom:10px}
+  .tc-next{display:flex; gap:12px; align-items:center; padding:12px 13px; border-radius:12px; background:rgba(244,239,226,.09); margin-bottom:10px}
+  .tc-next .ic{width:34px; height:34px; border-radius:50%; background:var(--cream); color:var(--olive); display:flex; align-items:center; justify-content:center; flex-shrink:0}
+  .tc-next .ic svg{width:17px; height:17px}
+  .tc-next .t{font-family:var(--serif); font-size:18px; line-height:1.2; color:var(--cream)}
+  .tc-next .m{font-family:var(--sans); font-size:12px; color:var(--sage-soft); margin-top:2px}
+  .tc-next .m b{color:#f0c9a8; font-weight:600}
+  .tc-later{font-family:var(--sans); font-size:12.5px; color:var(--cream-dim); margin:0 2px 10px; line-height:1.7}
+  .tc-later span{color:var(--sage-soft); display:inline-block; min-width:62px}
+  .tc-stay{display:flex; align-items:center; justify-content:space-between; gap:10px; border-top:1px solid rgba(244,239,226,.14); padding-top:11px; font-family:var(--sans); font-size:12.5px; color:var(--cream-dim); line-height:1.45}
+  .tc-stay b{color:var(--cream); font-weight:600}
+  .tc-stay button{flex-shrink:0; border:1px solid rgba(244,239,226,.3); background:transparent; color:var(--cream); border-radius:16px; padding:6px 12px; font-family:var(--sans); font-size:11.5px; font-weight:600}
+  .tc-sky{font-family:var(--sans); font-size:12px; color:var(--sage-soft); margin-top:8px}
+  .warn-card{margin:0 0 18px; padding:14px 16px 6px; border-radius:var(--radius); border:1px solid rgba(176,89,47,.32); background:rgba(176,89,47,.06)}
+  .warn-card:empty{display:none}
+  .warn-head{font-family:var(--sans); font-size:10.5px; font-weight:700; letter-spacing:.16em; color:var(--terra); margin-bottom:6px}
+  .warn-row{display:flex; gap:10px; align-items:flex-start; padding:7px 0; border-top:1px solid rgba(176,89,47,.13); font-family:var(--sans); font-size:13px; color:var(--ink); line-height:1.45}
+  .warn-row:first-of-type{border-top:none}
+  .warn-row .x{margin-left:auto; flex-shrink:0; border:none; background:transparent; color:var(--sage); font-size:12px; font-weight:600; padding:2px 0 2px 8px}
+
   /* ---------- Sync & backup ---------- */
   .sync-sheet{max-height:88vh; overflow-y:auto}
   .sync-status{font-family:var(--sans); font-size:13px; font-weight:600; color:var(--olive); margin:0 0 14px}
@@ -584,6 +607,7 @@
 
 <main>
   <section class="view active" id="view-itinerary">
+    <div style="padding:0 14px"><div class="today-card" id="todayCard"></div></div>
     <div class="hero" id="hero">
       <div class="hero-photo" id="heroPhoto"></div>
       <div class="hero-scrim"></div>
@@ -596,6 +620,7 @@
       </div>
     </div>
     <div class="view-head sec-head"><div class="view-title"><span class="sec-num">I.</span> Itinerary</div><div class="view-count" id="cnt-days"></div></div>
+    <div class="warn-card" id="warnCard" style="margin-top:18px"></div>
     <div class="magic" style="margin-top:22px">
       <div class="magic-text">
         <h3>Add automatically</h3>
@@ -1154,7 +1179,9 @@ function renderDays(){
   counts();
   loadWeather();
   renderLodgingSection();
-  setTimeout(()=>{const t=document.querySelector('.cal-row.is-today');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},350);
+  renderExtras();
+  // jump to today's row, unless the Today card at the top already covers it
+  setTimeout(()=>{const tc=document.getElementById('todayCard');if(tc&&tc.innerHTML)return;const t=document.querySelector('.cal-row.is-today');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},350);
 }
 // jump to a lodging's booking entry
 function jumpToLodging(L){
@@ -2174,6 +2201,110 @@ async function openDoc(id){
   if(w){ if((rec.type||'').includes('pdf')){w.document.write('<iframe src="'+rec.data+'" style="width:100%;height:100%;border:none"></iframe>');} else {w.document.write('<img src="'+rec.data+'" style="max-width:100%">');} }
 }
 
+/* ---------- Heads-up: gaps and clashes in the plan ---------- */
+const DAYMS=864e5;
+function dayKeyOf(str){ const p=parseLoose(str); return p?normDay(toSortable(p,baseYear())):null; }
+function shortDay(k){ const d=new Date(k); return MON3[d.getMonth()]+' '+d.getDate(); }
+function dayRange(a,b){ return a===b?shortDay(a):shortDay(a)+'–'+(new Date(a).getMonth()===new Date(b).getMonth()?new Date(b).getDate():shortDay(b)); }
+function bookingLabel(b){ return b.cat==='flight'?('Flight'+(b.flightNo?' '+b.flightNo:'')+(b.toCity?' to '+b.toCity.split(',')[0]:'')):(b.title||typeOf(b).label); }
+function tripWarnings(){
+  const out=[]; const span=timelineSpan(); if(!span)return out;
+  const lod=(D.lodging||[]).map(L=>{ const ci=dayKeyOf(L.checkIn), co=dayKeyOf(L.checkOut); return ci?{L,ci,co:co||ci+DAYMS}:null; }).filter(Boolean);
+  // nights spent on a plane don't need a bed
+  const planeNights=new Set();
+  (D.bookings||[]).forEach(b=>{ if(b.cat!=='flight'||!b.arrDate)return; const dk=dayKeyOf(bookingDate(b)), ak=dayKeyOf(b.arrDate); if(dk&&ak)for(let k=dk;k<ak;k+=DAYMS)planeNights.add(k); });
+  if(lod.length){
+    let run=null; const gaps=[];
+    for(let k=span.start;k<span.end;k+=DAYMS){
+      const covered=planeNights.has(k)||lod.some(x=>k>=x.ci&&k<x.co);
+      if(!covered){ if(run&&run[1]===k-DAYMS)run[1]=k; else{ run=[k,k]; gaps.push(run); } }
+    }
+    gaps.forEach(g=>out.push({key:'gap'+g[0]+'-'+g[1],text:'No place to stay booked for the night'+(g[0]===g[1]?' of ':'s of ')+dayRange(g[0],g[1])+'.'}));
+    for(let i=0;i<lod.length;i++)for(let j=i+1;j<lod.length;j++){
+      const a=lod[i],b=lod[j], s0=Math.max(a.ci,b.ci), e0=Math.min(a.co,b.co);
+      if(s0<e0)out.push({key:'ovl'+a.L.id+b.L.id,text:esc(a.L.name)+' and '+esc(b.L.name)+' are both booked for the night'+(e0-s0>DAYMS?'s of ':' of ')+dayRange(s0,e0-DAYMS)+'.'});
+    }
+  }
+  // timing clashes on the same day
+  const tl=buildTimeline();
+  const arrivals={};   // dayKey -> [{min,b}] flight landings
+  (D.bookings||[]).forEach(b=>{ if(b.cat!=='flight'||!b.arrTime)return; const k=b.arrDate?dayKeyOf(b.arrDate):dayKeyOf(bookingDate(b)); const m=timeToMin(b.arrTime); if(k&&m<9999)(arrivals[k]=arrivals[k]||[]).push({min:m,b}); });
+  Object.values(tl).forEach(g=>{
+    const items=g.items.filter(x=>x.tmin<9999);
+    items.forEach((x,i)=>{
+      if(x.b.cat==='flight'){
+        // anything in the 2 hours before a departure
+        items.forEach(y=>{ if(y!==x&&y.b.cat!=='flight'&&y.tmin<x.tmin&&y.tmin>x.tmin-120)
+          out.push({key:'dep'+x.b.id+y.b.id,text:esc(bookingLabel(y.b))+' at '+fmtClock(y.tmin)+' is close to your '+fmtClock(x.tmin)+' '+esc(bookingLabel(x.b))+' on '+shortDay(g.key)+' — you’ll want to be at the airport by then.'}); });
+      }
+      const nx=items[i+1];
+      if(nx&&x.b.cat!=='flight'&&nx.b.cat!=='flight'&&nx.tmin-x.tmin<45)
+        out.push({key:'clash'+x.b.id+nx.b.id,text:esc(bookingLabel(x.b))+' ('+fmtClock(x.tmin)+') and '+esc(bookingLabel(nx.b))+' ('+fmtClock(nx.tmin)+') on '+shortDay(g.key)+' are '+(nx.tmin===x.tmin?'at the same time':'only '+(nx.tmin-x.tmin)+' min apart')+'.'});
+    });
+    (arrivals[g.key]||[]).forEach(a=>{
+      items.forEach(y=>{ if(y.b.cat!=='flight'&&y.tmin>=a.min-60&&y.tmin<a.min+120)
+        out.push({key:'arr'+a.b.id+y.b.id,text:esc(bookingLabel(y.b))+' at '+fmtClock(y.tmin)+' is soon after '+esc(bookingLabel(a.b))+' lands ('+fmtClock(a.min)+') on '+shortDay(g.key)+'. Leave time for bags and getting into town.'}); });
+    });
+  });
+  // checking in somewhere new before your flight there lands
+  (D.bookings||[]).forEach(b=>{
+    if(b.cat!=='flight'||!b.toCity)return;
+    const ak=b.arrDate?dayKeyOf(b.arrDate):dayKeyOf(bookingDate(b)); if(!ak)return;
+    const city=b.toCity.split(/[,-]/)[0].trim().toLowerCase(); if(city.length<3)return;
+    lod.forEach(x=>{ const where=((x.L.address||'')+' '+(x.L.name||'')).toLowerCase();
+      if(where.includes(city)&&x.ci<ak&&x.co>ak-DAYMS&&x.ci>=ak-DAYMS*1)
+        out.push({key:'early'+b.id+x.L.id,text:esc(x.L.name)+' check-in is '+shortDay(x.ci)+', but your flight to '+esc(b.toCity.split(',')[0])+' lands '+shortDay(ak)+'. Worth double-checking the dates.'}); });
+  });
+  const dis=new Set(D.dismissedWarnings||[]);
+  return out.filter(w=>!dis.has(w.key));
+}
+function renderWarnings(){
+  const c=document.getElementById('warnCard'); if(!c)return;
+  const ws=tripWarnings();
+  if(!ws.length){ c.innerHTML=''; return; }
+  c.innerHTML='<div class="warn-head">HEADS UP</div>'+ws.map(w=>'<div class="warn-row"><span>⚠︎</span><span>'+w.text+'</span><button class="x" data-k="'+esc(w.key)+'">Got it</button></div>').join('');
+  c.querySelectorAll('.x').forEach(b=>b.onclick=()=>{ D.dismissedWarnings=(D.dismissedWarnings||[]).concat(b.dataset.k); save(); renderWarnings(); });
+}
+
+/* ---------- Today: what's next while the trip is underway ---------- */
+let todayPlace=null;
+function nowMinIn(tz){ const t=new Date(); if(!tz)return {key:normDay(t.getTime()),min:t.getHours()*60+t.getMinutes()};
+  const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'}).formatToParts(t);
+  const g=x=>+p.find(y=>y.type===x).value; return {key:new Date(g('year'),g('month')-1,g('day')).getTime(),min:g('hour')*60+g('minute')}; }
+function inText(m){ if(m<1)return 'now'; const h=Math.floor(m/60), mm=m%60; return 'in '+(h?h+' hr'+(mm?' '+mm+' min':''):mm+' min'); }
+function renderToday(){
+  const c=document.getElementById('todayCard'); if(!c||!D)return;
+  const span=timelineSpan();
+  const now=nowMinIn(todayPlace&&todayPlace.tz);
+  if(!span||now.key<span.start||now.key>span.end){ c.innerHTML=''; return; }
+  const dayNo=Math.round((now.key-span.start)/DAYMS)+1, total=Math.round((span.end-span.start)/DAYMS)+1;
+  const g=buildTimeline()[now.key];
+  const items=g?g.items:[];
+  const upcoming=items.filter(x=>x.tmin<9999&&x.tmin>=now.min-15);
+  const untimed=items.filter(x=>x.tmin>=9999);
+  const next=upcoming[0];
+  let html='<div class="tc-top"><span>TODAY · '+DOW[new Date(now.key).getDay()].toUpperCase()+' '+shortDay(now.key).toUpperCase()+'</span><span>DAY '+dayNo+' OF '+total+'</span></div>';
+  if(next){ const t=typeOf(next.b);
+    const where=next.b.cat==='flight'?[next.b.fromCode,next.b.toCode].filter(Boolean).join(' → '):(next.b.address||'');
+    html+='<div class="tc-next"><span class="ic">'+t.icon+'</span><div><div class="t">'+esc(bookingLabel(next.b))+'</div><div class="m">'+fmtClock(next.tmin)+' · <b>'+inText(next.tmin-now.min)+'</b>'+(where?' · '+esc(where):'')+'</div></div></div>';
+  } else {
+    html+='<div class="tc-next"><span class="ic">☀︎</span><div><div class="t">'+(items.length?'Nothing else scheduled':'A free day')+'</div><div class="m">Enjoy it.</div></div></div>';
+  }
+  const later=upcoming.slice(1).concat(untimed);
+  if(later.length)html+='<div class="tc-later">'+later.map(x=>'<div><span>'+(x.tmin<9999?fmtClock(x.tmin):'Today')+'</span>'+esc(bookingLabel(x.b))+'</div>').join('')+'</div>';
+  const L=lodgingForDayKey(now.key);
+  if(L){
+    html+='<div class="tc-stay"><div>Tonight: <b>'+esc(L.name)+'</b>'+(L.room?' · Room <b>'+esc(L.room)+'</b>':'')+(L.address?'<br>'+esc(L.address):'')+'</div>'+(L.address||L.name?'<button id="tcMaps">Directions</button>':'')+'</div>';
+  }
+  const sky=document.querySelector('.cm-sky[data-key="'+now.key+'"]');
+  if(sky&&sky.innerText.trim())html+='<div class="tc-sky">'+sky.innerHTML.replace(/<\/?div>/g,' ')+'</div>';
+  c.innerHTML=html;
+  const mb=document.getElementById('tcMaps'); if(mb)mb.onclick=()=>openInMaps(L.address||L.name);
+}
+function renderExtras(){ renderWarnings(); renderToday(); }
+setInterval(()=>{ if(D&&document.visibilityState==='visible')renderToday(); },60000);
+document.addEventListener('visibilitychange',()=>{ if(D&&document.visibilityState==='visible')renderToday(); });
+
 /* ---------- Day extras: weather, sunrise/sunset, destination local time ---------- */
 const WX_ICON={0:'☀',1:'🌤',2:'⛅',3:'☁',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'🌨',75:'❄',80:'🌦',81:'🌧',82:'⛈',95:'⛈',96:'⛈',99:'⛈'};
 function isUS(){ return (D&&D.cur==='$'); }
@@ -2301,6 +2432,7 @@ async function loadWeather(){
     }
   }
   updateLocalTime();
+  renderToday();
 }
 
 // "3:42pm in Paris · 6 hrs ahead" under the countdown
@@ -2313,6 +2445,7 @@ async function updateLocalTime(){
   const qs=span?dayPlaceQueries(key):(tripDestQuery()?[tripDestQuery()]:[]);
   const p=qs.length?await placeForQueries(qs):null;
   if(!p){ el.innerHTML=''; return; }
+  if(!todayPlace||todayPlace.tz!==p.tz){ todayPlace=p; renderToday(); }
   const t=new Date();
   const diff=tzOffsetMin(p.tz,t)+t.getTimezoneOffset();
   let rel;
