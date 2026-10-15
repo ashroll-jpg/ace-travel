@@ -282,6 +282,20 @@
   .warn-row:first-of-type{border-top:none}
   .warn-row .x{margin-left:auto; flex-shrink:0; border:none; background:transparent; color:var(--sage); font-size:12px; font-weight:600; padding:2px 0 2px 8px}
 
+  /* ---------- Ask your trip ---------- */
+  .ask-sheet{display:flex; flex-direction:column; height:86vh; padding-bottom:calc(14px + var(--safe-bot))}
+  .ask-log{flex:1; overflow-y:auto; margin:6px -4px 12px; padding:0 4px}
+  .ask-msg{max-width:88%; padding:10px 14px; border-radius:16px; margin-bottom:10px; font-family:var(--sans); font-size:14px; line-height:1.5; color:var(--ink); word-wrap:break-word}
+  .ask-msg.me{margin-left:auto; background:var(--olive); color:var(--cream); border-bottom-right-radius:5px}
+  .ask-msg.ai{background:var(--paper-hi); border:1px solid var(--line-soft); border-bottom-left-radius:5px}
+  .ask-msg.ai a{color:var(--terra)}
+  .ask-msg.wait{color:var(--sage); font-style:italic}
+  .ask-sugg{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:12px}
+  .ask-sugg button{border:1px solid var(--line); background:var(--paper-hi); color:var(--olive); border-radius:16px; padding:7px 12px; font-family:var(--sans); font-size:12.5px}
+  .ask-bar{display:flex; gap:8px}
+  .ask-bar textarea{flex:1; min-width:0; resize:none; height:46px; padding:12px; border:1px solid var(--line); background:var(--paper-hi); border-radius:12px; font-family:var(--sans); font-size:15px; color:var(--ink)}
+  .ask-bar button{border:none; border-radius:12px; padding:0 16px; background:var(--olive); color:var(--cream); font-family:var(--sans); font-size:13px; font-weight:600}
+
   /* ---------- Sync & backup ---------- */
   .sync-sheet{max-height:88vh; overflow-y:auto}
   .sync-status{font-family:var(--sans); font-size:13px; font-weight:600; color:var(--olive); margin:0 0 14px}
@@ -616,6 +630,7 @@
         <input class="trip-dates" id="tripDates" placeholder="Add dates" />
         <div class="trip-countdown" id="tripCountdown"></div>
         <div class="trip-localtime" id="tripLocalTime"></div>
+        <button class="trip-map-btn" onclick="openAsk()" style="margin-right:6px"><span style="font-size:13px">✦</span> Ask</button>
         <button class="trip-map-btn" onclick="showView('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3zM9 3v15M15 6v15"/></svg> View map</button>
       </div>
     </div>
@@ -727,6 +742,15 @@
       <button class="btn-save" onclick="doPaste()">Add it</button>
     </div>
     <div id="pasteStatus" style="text-align:center;font-size:13px;color:var(--sage);font-style:italic;margin-top:14px;display:none"></div>
+  </div>
+</div>
+
+<div class="sheet-bg" id="askBg" onclick="if(event.target===this)closeAsk()">
+  <div class="sheet ask-sheet">
+    <h3 style="display:flex;justify-content:space-between;align-items:baseline">Ask about this trip <button onclick="closeAsk()" style="border:none;background:transparent;color:var(--sage);font-family:var(--sans);font-size:13px;font-weight:600">Close</button></h3>
+    <div class="ask-log" id="askLog"></div>
+    <div class="ask-sugg" id="askSugg"></div>
+    <div class="ask-bar"><textarea id="askInput" placeholder="e.g. What time should we leave for the airport?" rows="1"></textarea><button onclick="sendAsk()">Ask</button></div>
   </div>
 </div>
 
@@ -2615,6 +2639,78 @@ async function doExport(kind){
   }catch(e){ exStatus('Export failed: '+(e.message||'try again')+(navigator.onLine?'':' (you appear offline — photos need signal)')); }
 }
 function triggerDownload(blob,name){ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1500); }
+
+/* ---------- Ask your trip: Claude answers from the itinerary (and can search the web) ---------- */
+const ASK_MODEL='claude-opus-5-5';
+const askHist={};   // tripId -> messages (this session only)
+let askBusy=false, askErr='';
+const ASK_SUGG=['What’s our plan tomorrow?','When should we leave for the airport?','Good dinner near our hotel?','What are we forgetting?'];
+function askTripContext(){
+  const t=syncTrip(D);
+  const now=new Date();
+  const tz=todayPlace&&todayPlace.tz;
+  const local=tz?new Intl.DateTimeFormat('en-US',{timeZone:tz,dateStyle:'full',timeStyle:'short'}).format(now):now.toLocaleString();
+  return 'Right now it is '+local+(tz?' at the destination ('+tz+')':'')+'.\n\nThe trip, as saved in the app (JSON):\n'+JSON.stringify(t);
+}
+function askHTML(text){
+  return esc(text).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(https?:\/\/[^\s<)]+)/g,'<a href="$1" target="_blank" rel="noopener">link</a>').replace(/\n/g,'<br>');
+}
+function renderAsk(){
+  const log=document.getElementById('askLog'); const h=askHist[D.id]||[];
+  const shown=h.filter(m=>m.role==='user'&&typeof m.content==='string'||m.role==='assistant'&&m.shown);
+  log.innerHTML=shown.length?'':'<div class="ask-msg ai">Ask me anything about this trip — your plans, timing, what’s nearby. I can see everything saved here'+(getKey()?'':'. <b>Add your Anthropic API key in Settings (⚙) first.</b>')+'</div>';
+  shown.forEach(m=>{ const d=document.createElement('div'); d.className='ask-msg '+(m.role==='user'?'me':'ai'); d.innerHTML=m.role==='user'?esc(m.content):askHTML(m.shown); log.appendChild(d); });
+  if(askBusy){ const d=document.createElement('div'); d.className='ask-msg ai wait'; d.textContent='Looking into it…'; log.appendChild(d); }
+  else if(askErr){ const d=document.createElement('div'); d.className='ask-msg ai wait'; d.textContent=askErr; log.appendChild(d); }
+  document.getElementById('askSugg').innerHTML=shown.length?'':ASK_SUGG.map(q=>'<button>'+esc(q)+'</button>').join('');
+  document.querySelectorAll('#askSugg button').forEach(b=>b.onclick=()=>{ document.getElementById('askInput').value=b.textContent; sendAsk(); });
+  log.scrollTop=log.scrollHeight;
+}
+function openAsk(){ if(!D)return; renderAsk(); document.getElementById('askBg').classList.add('show'); }
+function closeAsk(){ document.getElementById('askBg').classList.remove('show'); }
+document.addEventListener('keydown',e=>{ if(e.target&&e.target.id==='askInput'&&e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendAsk(); } });
+async function askCall(messages){
+  const tz=todayPlace&&todayPlace.tz;
+  const search={type:'web_search_20260209',name:'web_search',max_uses:4};
+  if(todayPlace&&todayPlace.city)search.user_location={type:'approximate',city:todayPlace.city,timezone:tz||undefined};
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+      'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01',
+      'anthropic-beta':'server-side-fallback-2026-07-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:ASK_MODEL,max_tokens:8000,fallbacks:'default',output_config:{effort:'low'},
+      system:[{type:'text',text:'You are the travel assistant inside Ace Travel, a trip-planning app. Answer questions about the traveler’s trip using the saved trip data below, and search the web when a question needs current outside information (restaurants, opening hours, transit, events). Be brief and practical — this is read on a phone mid-trip. Use plain text with short lines; **bold** is fine, no tables or headings. Times in the trip data are local to where each event happens. If something isn’t in the trip data, say so rather than guessing.'},
+              {type:'text',text:askTripContext(),cache_control:{type:'ephemeral'}}],
+      tools:[search],messages})});
+  if(!r.ok){ let m='HTTP '+r.status; try{const e=await r.json(); if(e.error&&e.error.message)m=e.error.message;}catch(_){}
+    if(r.status===401)m='Your API key was rejected — check it in Settings.'; throw new Error(m); }
+  return r.json();
+}
+async function sendAsk(){
+  const inp=document.getElementById('askInput'); const q=inp.value.trim();
+  if(!q||askBusy||!D)return;
+  if(!getKey()){ renderAsk(); return; }
+  const id=D.id; const h=askHist[id]=askHist[id]||[];
+  h.push({role:'user',content:q}); inp.value=''; askErr='';
+  askBusy=true; renderAsk();
+  try{
+    let text='', turn=null;
+    for(let i=0;i<4;i++){
+      const res=await askCall(h.map(m=>({role:m.role,content:m.content})));
+      if(res.stop_reason==='refusal'){ text='Sorry — I can’t help with that one.'; break; }
+      // a paused turn (long web search) continues in the same assistant message
+      if(!turn){ turn={role:'assistant',content:[]}; h.push(turn); }
+      turn.content=turn.content.concat(res.content||[]);
+      text+=(res.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+      if(res.stop_reason!=='pause_turn')break;
+    }
+    if(!turn){ turn={role:'assistant',content:[{type:'text',text}]}; h.push(turn); }
+    turn.shown=text.trim()||'(No answer.)';
+  }catch(e){
+    if(h[h.length-1].role==='assistant')h.pop();
+    h.pop();   // drop the unanswered question so the conversation stays valid
+    inp.value=q;
+    askErr='Couldn’t reach Claude: '+(e.message||'error');
+  }finally{ askBusy=false; if(D&&D.id===id)renderAsk(); }
+}
 
 /* =========================================================
    SYNC through a private GitHub Gist (same approach as LiftLog).
