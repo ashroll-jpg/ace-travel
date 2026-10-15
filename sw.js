@@ -23,14 +23,14 @@ self.addEventListener('activate',e=>{
 // Fetch strategy:
 //  - Navigations & the app itself: network-first (revalidating past the HTTP cache), fall back to cache (so you get updates online, but it works offline)
 //  - Fonts & other GET assets: cache-first, update in background
-//  - API calls (anthropic, openstreetmap, wikipedia, open-meteo): network-only (never cache; fail gracefully offline)
+//  - API calls (anthropic, github sync, openstreetmap, wikipedia, open-meteo, holidays): network-only (never cache; fail gracefully offline)
 self.addEventListener('fetch',e=>{
   const req=e.request;
   if(req.method!=='GET')return;
   const url=new URL(req.url);
 
   // never intercept API / tile / photo calls — let them hit network (and fail cleanly offline)
-  if(/api\.anthropic\.com|nominatim\.openstreetmap|tile\.openstreetmap|basemaps\.cartocdn|wikipedia\.org|open-meteo\.com|cloudflare|unpkg\.com/.test(url.href)){
+  if(/api\.anthropic\.com|api\.github\.com|githubusercontent\.com|nominatim\.openstreetmap|tile\.openstreetmap|basemaps\.cartocdn|wikipedia\.org|open-meteo\.com|date\.nager\.at|cloudflare|unpkg\.com/.test(url.href)){
     return; // default browser handling
   }
 
