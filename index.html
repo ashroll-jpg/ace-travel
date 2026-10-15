@@ -246,7 +246,7 @@
   .no-key-note.show{display:block}
   .magic{flex-wrap:wrap}
 
-  .sheet-bg{position:fixed; inset:0; background:rgba(37,35,24,.44); z-index:40; display:none; align-items:flex-end}
+  .sheet-bg{position:fixed; inset:0; background:rgba(37,35,24,.44); z-index:60; display:none; align-items:flex-end}
   .sheet-bg.show{display:flex}
   .sheet{background:var(--paper); width:100%; border-radius:18px 18px 0 0; padding:26px 24px calc(26px + var(--safe-bot)); animation:sheetup .26s ease}
   @keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
@@ -258,6 +258,29 @@
   .sheet-actions button{flex:1; padding:14px; font-size:14px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; border:none}
   .btn-save{background:var(--olive); color:var(--cream)}
   .btn-cancel{background:transparent; color:var(--ink-soft); border:1px solid var(--line)!important}
+
+  /* ---------- Sync & backup ---------- */
+  .sync-sheet{max-height:88vh; overflow-y:auto}
+  .sync-status{font-family:var(--sans); font-size:13px; font-weight:600; color:var(--olive); margin:0 0 14px}
+  .sync-status.err{color:var(--terra)}
+  .sync-steps{margin:0 0 14px; padding-left:20px; font-size:13px; color:var(--ink-soft); line-height:1.55}
+  .sync-steps li{margin-bottom:8px}
+  .sync-steps a{color:var(--terra)}
+  .sync-in{display:flex; gap:8px; margin-top:8px}
+  .sync-in input{margin:0; flex:1; min-width:0}
+  .sync-in button,.sync-btns button{padding:12px 16px; border:none; font-size:13px; font-weight:600; letter-spacing:.03em; border-radius:10px}
+  .sync-btns{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:14px}
+  .sync-btns button{flex:1 1 40%}
+  .sync-note{font-size:12px!important; color:var(--sage)!important; line-height:1.5!important}
+  .sync-sec{border-top:1px solid var(--line); margin-top:8px; padding-top:18px}
+  .sync-hist{margin:0 0 14px}
+  .sync-hist button{display:flex; justify-content:space-between; width:100%; padding:11px 2px; border:none; border-bottom:1px solid var(--line-soft); background:transparent; font-family:var(--sans); font-size:13px; color:var(--ink); text-align:left}
+  .sync-hist button span{color:var(--terra); font-weight:600}
+  .home-sync{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 18px; padding:13px 16px; border-radius:14px; background:var(--card-grad); border:1px solid var(--line-soft); box-shadow:var(--shadow-sm); font-family:var(--sans); font-size:13px; color:var(--ink-soft); line-height:1.4}
+  .home-sync.warn{border-color:rgba(176,89,47,.35); background:rgba(176,89,47,.07)}
+  .home-sync b{color:var(--ink); font-weight:600}
+  .home-sync button{flex-shrink:0; padding:9px 14px; border:none; border-radius:20px; background:var(--olive); color:var(--cream); font-family:var(--sans); font-size:12px; font-weight:600}
+  .settings-sync-btn{width:100%; padding:13px; margin:0 0 18px; border:1px solid var(--line); background:var(--paper-hi); color:var(--olive); font-family:var(--sans); font-size:14px; font-weight:600; border-radius:8px; text-align:left}
 
   /* ---------- Map view ---------- */
   #mapWrap{border:1px solid var(--line); background:var(--olive-deep); position:relative; overflow:hidden; height:340px; margin-bottom:14px}
@@ -524,6 +547,7 @@
     <div class="home-tag">YOUR TRAVELS</div>
   </div>
   <div class="home-body">
+    <div id="homeSync"></div>
     <div id="tripGrid"></div>
     <button class="new-trip-btn" onclick="createTrip()">+ New trip</button>
     <button class="new-trip-btn" style="margin-top:10px;border-style:solid;border-color:var(--line)" onclick="importTripData()">Import a shared trip</button>
@@ -543,7 +567,7 @@
     <div class="sheet-actions" style="flex-direction:column;margin-bottom:6px">
       <button class="btn-save" onclick="exportTripData()" style="margin-bottom:10px">Send trip file</button>
       <button class="btn-cancel" onclick="importTripData()" style="margin-bottom:10px">Import a trip file</button>
-      <input type="file" id="tripImportInput" accept=".acetrip,application/json" style="display:none" onchange="handleTripImport(event)">
+      <input type="file" id="tripImportInput" accept=".acetrip,.acebackup,application/json" style="display:none" onchange="handleTripImport(event)">
       <button class="btn-cancel" onclick="closeExport()">Cancel</button>
     </div>
     <div id="exportStatus" style="text-align:center;font-size:13px;color:var(--sage);font-style:italic;margin-top:14px;display:none"></div>
@@ -681,10 +705,45 @@
   </div>
 </div>
 
+<div class="sheet-bg" id="syncBg" onclick="if(event.target===this)closeSync()">
+  <div class="sheet sync-sheet">
+    <h3>Sync &amp; backup</h3>
+    <div class="sync-status" id="syncStatusLine"></div>
+    <div id="syncSetup">
+      <p>Keep your trips the same on every phone — yours and your travel partner's — free, through your GitHub account.</p>
+      <ol class="sync-steps">
+        <li><a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=Ace%20Travel%20sync" target="_blank" rel="noopener">Create a GitHub token</a>. It opens with only <b>gist</b> checked. Set Expiration to <b>No expiration</b>, tap <b>Generate token</b>, and copy it.</li>
+        <li>Paste it here and tap Connect.<div class="sync-in"><input id="syncToken" type="password" placeholder="ghp_…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="GitHub token"><button class="btn-save" onclick="syncConnect()">Connect</button></div></li>
+        <li>On the other phone, open Ace Travel and paste the <b>same token</b>.</li>
+      </ol>
+      <p class="sync-note">The token can only read and write gists. Your trips are saved to a secret gist in your GitHub account — unlisted, but not encrypted. Documents (passport photos, PDFs) stay on the phone they were added to.</p>
+    </div>
+    <div id="syncOn" hidden>
+      <div class="sync-btns">
+        <button class="btn-save" onclick="syncNow(true)">Sync now</button>
+        <button class="btn-cancel" onclick="syncCopyToken()">Copy token for another phone</button>
+        <button class="btn-cancel" onclick="syncShowHistory()">Sync history</button>
+        <button class="btn-cancel" onclick="syncOff()">Turn off</button>
+      </div>
+      <div class="sync-hist" id="syncHist"></div>
+    </div>
+    <div class="sync-sec">
+      <label>Backup file</label>
+      <p id="backupLine" style="margin-bottom:12px"></p>
+      <div class="sync-btns">
+        <button class="btn-save" onclick="backupAll()">Back up all trips</button>
+        <button class="btn-cancel" onclick="importTripData()">Restore a backup</button>
+      </div>
+    </div>
+    <div class="sheet-actions"><button class="btn-cancel" onclick="closeSync()">Done</button></div>
+  </div>
+</div>
+
 <div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
   <div class="sheet">
     <h3>Settings <span style="font-family:var(--sans);font-size:11px;font-weight:500;color:var(--sage);letter-spacing:.08em">BUILD 2026.09.13-r</span></h3>
     <p>Your API key powers screenshot reading. It's stored only on this device and sent only to Anthropic. The app works fully without it — you just add items by hand.</p>
+    <button class="settings-sync-btn" onclick="closeSettings();openSync()">⇅ Sync &amp; backup <span id="settingsSyncState" style="float:right;font-weight:500;color:var(--sage)"></span></button>
     <label>Anthropic API key</label>
     <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off">
     <label>Currency symbol</label>
@@ -726,6 +785,7 @@ let st; function save(){clearTimeout(st);st=setTimeout(persist,150)}
 function persist(){
   if(D){ const i=STORE.trips.findIndex(t=>t.id===D.id); if(i>=0)STORE.trips[i]=D; }
   localStorage.setItem(STORE_KEY,JSON.stringify(STORE));
+  if(typeof scheduleSync==='function')scheduleSync();
 }
 function openTrip(id){
   D=STORE.trips.find(t=>t.id===id)||null;
@@ -752,7 +812,7 @@ function applySmartExpand(){
     d._open = dk>=t0; // today & future open, past collapsed
   });
 }
-function goHome(){ D=null; document.body.classList.add('on-home'); renderHome(); }
+function goHome(){ D=null; document.body.classList.add('on-home'); renderHome(); renderHomeSync(); }
 function createTrip(){
   const t=fresh(''); STORE.trips.push(t); persist(); openTrip(t.id);
   // jump straight into editing the name
@@ -2316,6 +2376,7 @@ async function handleTripImport(ev){
   try{
     const text=await file.text();
     const bundle=JSON.parse(text);
+    if(bundle&&bundle.ace==='backup'){ await restoreBackup(bundle); return; }
     if(!bundle||bundle.ace!=='trip'||!bundle.trip) throw new Error('Not an Ace Travel trip file');
     const t=bundle.trip;
     // give it a fresh id so it doesn't clash with an existing trip
@@ -2422,6 +2483,270 @@ async function doExport(kind){
 }
 function triggerDownload(blob,name){ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1500); }
 
+/* =========================================================
+   SYNC through a private GitHub Gist (same approach as LiftLog).
+   The token and gist id stay on this device, never inside the synced data.
+   Merging is three-way against the last synced copy, trip by trip and item by
+   item, so edits on two phones between syncs combine instead of overwriting.
+   Documents (IndexedDB files) and UI state (keys starting with _) stay local.
+   ========================================================= */
+const SYNC_KEY='ace-sync', SYNC_BASE='ace-sync-base', SYNC_FILE='ace-travel-trips.json', BACKUP_KEY='ace-last-backup';
+let syncCfg={}; try{ syncCfg=JSON.parse(localStorage.getItem(SYNC_KEY))||{}; }catch(e){ syncCfg={}; }
+const syncSaveCfg=()=>localStorage.setItem(SYNC_KEY,JSON.stringify(syncCfg));
+let syncBusy=false, syncAgain=false, syncTimer=0, syncApplying=false;
+const SJ=x=>JSON.stringify(x===undefined?null:x);
+const sclone=x=>x===undefined?undefined:JSON.parse(JSON.stringify(x));
+
+function syncTrip(t){ return JSON.parse(JSON.stringify(t,(k,v)=>(k==='docs'||k.charAt(0)==='_')?undefined:v)); }
+function syncPayload(){ return {v:1, trips:STORE.trips.map(syncTrip)}; }
+const isIdList=a=>Array.isArray(a)&&a.length>0&&a.every(x=>x&&typeof x==='object'&&x.id!=null);
+
+// three-way pick: whichever side changed since the base wins; null when both changed differently
+function pick3(l,r,b){
+  if(SJ(l)===SJ(r))return {v:l};
+  if(SJ(l)===SJ(b))return {v:r};
+  if(SJ(r)===SJ(b))return {v:l};
+  return null;
+}
+function mergeList(L,R,B,mergeItem,ctx){
+  const by=a=>{const m={};(a||[]).forEach(x=>{if(x&&x.id!=null)m[x.id]=x;});return m;};
+  const l=by(L), r=by(R), b=by(B), out=[], seen=new Set();
+  const one=id=>{
+    const li=l[id], ri=r[id], bi=b[id];
+    if(li!==undefined&&ri!==undefined&&mergeItem&&SJ(li)!==SJ(ri)){ return mergeItem(li,ri,bi||{},ctx); }
+    const m=pick3(li,ri,bi); if(m)return m.v;
+    ctx.conflicts++; return li!==undefined?li:ri;   // both changed: keep this phone's (and never lose an edit to a delete)
+  };
+  (L||[]).forEach(x=>{ if(!x||x.id==null)return; seen.add(x.id); const v=one(x.id); if(v!=null)out.push(v); });
+  (R||[]).forEach(x=>{ if(!x||x.id==null||seen.has(x.id))return; const v=one(x.id); if(v!=null)out.push(v); });
+  return out;
+}
+function mergeTrip(L,R,B,ctx){
+  const M={};
+  new Set([...Object.keys(L),...Object.keys(R)]).forEach(k=>{
+    if(isIdList(L[k])||isIdList(R[k])||isIdList(B[k])){ M[k]=mergeList(L[k],R[k],B[k],null,ctx); return; }
+    const m=pick3(L[k],R[k],B[k]);
+    if(m){ if(m.v!==undefined)M[k]=sclone(m.v); }
+    else { ctx.conflicts++; M[k]=sclone(L[k]!==undefined?L[k]:R[k]); }
+  });
+  return M;
+}
+function mergePayloads(L,R,B){
+  const ctx={conflicts:0};
+  if(!R||!Array.isArray(R.trips))return {merged:L,conflicts:0};
+  const trips=mergeList(L.trips,R.trips,(B&&B.trips)||[],mergeTrip,ctx);
+  return {merged:{v:1,trips},conflicts:ctx.conflicts};
+}
+// put this phone's documents and UI state back onto trips that came from the merge
+function withLocal(t){
+  const old=STORE.trips.find(x=>x.id===t.id);
+  const n=sclone(t);
+  n.docs=(old&&old.docs)||[];
+  ['days','lodging','bookings','wishlist','packing','phrases','numbers','addresses','budget'].forEach(k=>{ if(!Array.isArray(n[k]))n[k]=[]; });
+  if(old){
+    Object.keys(old).forEach(k=>{ if(k.charAt(0)==='_')n[k]=old[k]; });
+    Object.keys(n).forEach(k=>{
+      if(!Array.isArray(n[k])||!Array.isArray(old[k]))return;
+      const om={}; old[k].forEach(x=>{ if(x&&x.id!=null)om[x.id]=x; });
+      n[k].forEach(x=>{ const o=x&&om[x.id]; if(o)Object.keys(o).forEach(kk=>{ if(kk.charAt(0)==='_')x[kk]=o[kk]; }); });
+    });
+  }
+  return n;
+}
+function applyMerged(merged){
+  STORE.trips=merged.trips.map(withLocal);
+  syncApplying=true;
+  if(D){ D=STORE.trips.find(t=>t.id===D.id)||null; }
+  persist(); syncApplying=false;
+  if(document.body.classList.contains('on-home')){ renderHome(); return; }
+  if(!D){ goHome(); return; }   // the open trip was deleted on another phone
+  const y=window.scrollY, view=(document.querySelector('.view.active')||{}).id;
+  bindHeader();
+  renderDays();renderBookings();renderPacking();renderPhrases();renderNumbers();renderAddresses();renderBudget();renderDocs();renderWishlist();
+  if(view==='view-map')renderMap();
+  if(typeof renderExtras==='function')renderExtras();
+  window.scrollTo(0,y);
+}
+async function ghFetch(url,opts={}){
+  const r=await fetch(url,Object.assign({cache:'no-store'},opts,{headers:Object.assign({'Authorization':'Bearer '+syncCfg.token,'Accept':'application/vnd.github+json'},opts.headers||{})}));
+  if(r.status===401)throw Object.assign(new Error('bad token'),{code:401});
+  if(!r.ok)throw Object.assign(new Error('GitHub '+r.status),{code:r.status});
+  return r;
+}
+async function findOrCreateGist(){
+  for(let page=1;page<=5;page++){
+    const list=await (await ghFetch('https://api.github.com/gists?per_page=100&page='+page)).json();
+    const g=list.find(x=>x.files&&x.files[SYNC_FILE]);
+    if(g)return g.id;
+    if(list.length<100)break;
+  }
+  const r=await ghFetch('https://api.github.com/gists',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({description:'Ace Travel sync (trips)',public:false,files:{[SYNC_FILE]:{content:JSON.stringify(syncPayload())}}})});
+  return (await r.json()).id;
+}
+async function gistFileJSON(g){
+  const f=g.files&&g.files[SYNC_FILE]; if(!f)return null;
+  const txt=f.truncated?await (await fetch(f.raw_url,{cache:'no-store'})).text():f.content;
+  try{ return JSON.parse(txt); }catch(e){ return null; }
+}
+const userTyping=()=>{ const a=document.activeElement; return a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!a.closest('#syncBg'); };
+async function syncNow(manual){
+  if(!syncCfg.token)return;
+  if(syncBusy){ syncAgain=true; return; }
+  if(!navigator.onLine){ syncCfg.dirty=true; syncCfg.status='offline'; syncSaveCfg(); renderSyncStatus(); return; }
+  syncBusy=true; syncCfg.status='syncing'; renderSyncStatus();
+  try{
+    clearTimeout(st); if(D){ const i=STORE.trips.findIndex(t=>t.id===D.id); if(i>=0)STORE.trips[i]=D; } localStorage.setItem(STORE_KEY,JSON.stringify(STORE));
+    if(!syncCfg.gistId){ syncCfg.gistId=await findOrCreateGist(); syncSaveCfg(); }
+    const local=syncPayload();
+    const remote=await gistFileJSON(await (await ghFetch('https://api.github.com/gists/'+syncCfg.gistId)).json());
+    let base=null; try{ base=JSON.parse(localStorage.getItem(SYNC_BASE)); }catch(e){}
+    const {merged,conflicts}=mergePayloads(local,remote,base);
+    const changesHere=SJ(merged)!==SJ(local);
+    // don't swap data out from under someone mid-edit, or if they changed something while we were fetching
+    if((changesHere&&userTyping()&&!manual)||SJ(syncPayload())!==SJ(local)){ syncAgain=true; syncCfg.status=syncCfg.last?'ok':'connected'; return; }
+    if(SJ(merged)!==SJ(remote)){
+      await ghFetch('https://api.github.com/gists/'+syncCfg.gistId,{method:'PATCH',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({files:{[SYNC_FILE]:{content:JSON.stringify(merged)}}})});
+    }
+    if(changesHere)applyMerged(merged);
+    localStorage.setItem(SYNC_BASE,JSON.stringify(merged));
+    Object.assign(syncCfg,{last:Date.now(),status:'ok',dirty:false,error:''}); syncSaveCfg();
+    if(manual)syncMsg(conflicts?'Synced — combined changes from both phones.':changesHere?'Synced — pulled in new changes.':'Synced — everything’s up to date.');
+  }catch(err){
+    syncCfg.status='error'; syncCfg.dirty=true;
+    syncCfg.error=err.code===401?'GitHub didn’t accept the token. It may have expired — paste a new one.':err.code===404?'Couldn’t find the sync gist. Tap Sync now to make a new one.':navigator.onLine?'Couldn’t reach GitHub. Will try again.':'Offline. Will sync when you’re back online.';
+    if(err.code===404)syncCfg.gistId='';
+    syncSaveCfg();
+  }finally{
+    syncBusy=false; renderSyncStatus();
+    if(syncAgain){ syncAgain=false; clearTimeout(syncTimer); syncTimer=setTimeout(()=>syncNow(),3000); }
+  }
+}
+function scheduleSync(){
+  if(!syncCfg.token||syncApplying)return;
+  syncCfg.dirty=true;
+  clearTimeout(syncTimer); syncTimer=setTimeout(()=>syncNow(),4000);
+}
+let syncMsgText='';
+function syncMsg(t){ syncMsgText=t; renderSyncStatus(); setTimeout(()=>{ if(syncMsgText===t){ syncMsgText=''; renderSyncStatus(); } },4000); }
+function agoText(ms){ const s=Math.round((Date.now()-ms)/1000); return s<45?'just now':s<3600?Math.round(s/60)+' min ago':s<86400?Math.round(s/3600)+' hr ago':Math.round(s/86400)+' days ago'; }
+function syncStateText(){
+  if(!syncCfg.token)return '';
+  if(syncCfg.status==='syncing')return 'Syncing…';
+  if(syncCfg.status==='error'||syncCfg.status==='offline')return syncCfg.error||'Offline. Will sync when you’re back online.';
+  return syncCfg.last?'Synced '+agoText(syncCfg.last):'Connected';
+}
+function renderSyncStatus(){
+  const on=!!syncCfg.token;
+  const line=document.getElementById('syncStatusLine');
+  if(line){
+    line.textContent=syncMsgText||(on?syncStateText():'Not syncing — trips are only on this phone.');
+    line.classList.toggle('err',on&&(syncCfg.status==='error'));
+    document.getElementById('syncSetup').hidden=on;
+    document.getElementById('syncOn').hidden=!on;
+  }
+  const ss=document.getElementById('settingsSyncState'); if(ss)ss.textContent=on?(syncCfg.status==='error'?'Needs attention':'On'):'Off';
+  const bl=document.getElementById('backupLine');
+  if(bl){ const lb=+localStorage.getItem(BACKUP_KEY)||0;
+    bl.textContent=(lb?'Last backup file saved '+agoText(lb)+'. ':'No backup file saved yet. ')+(on?'Sync also keeps every version in your gist.':'Save one to Files or iCloud Drive now and then.'); }
+  renderHomeSync();
+}
+function renderHomeSync(){
+  const el=document.getElementById('homeSync'); if(!el)return;
+  if(!STORE.trips.length){ el.innerHTML=''; return; }
+  if(syncCfg.token){
+    const bad=syncCfg.status==='error';
+    el.innerHTML='<div class="home-sync'+(bad?' warn':'')+'"><span>⇅ <b>'+esc(syncStateText())+'</b></span><button onclick="openSync()">'+(bad?'Fix':'Sync')+'</button></div>';
+    return;
+  }
+  const lb=+localStorage.getItem(BACKUP_KEY)||0;
+  const stale=Date.now()-lb>14*864e5;
+  el.innerHTML=stale?'<div class="home-sync warn"><span><b>Your trips are only on this phone.</b> '+(lb?'Last backup '+agoText(lb)+'.':'They’ve never been backed up.')+'</span><button onclick="openSync()">Back up</button></div>':'';
+}
+function openSync(){ renderSyncStatus(); document.getElementById('syncHist').innerHTML=''; document.getElementById('syncBg').classList.add('show'); }
+function closeSync(){ document.getElementById('syncBg').classList.remove('show'); }
+async function syncConnect(){
+  const tok=(document.getElementById('syncToken').value||'').trim();
+  if(!/^(ghp_|github_pat_|gho_)/.test(tok)&&tok.length<30){ syncMsg('That doesn’t look like a GitHub token.'); return; }
+  syncCfg={token:tok}; syncSaveCfg(); document.getElementById('syncToken').value='';
+  localStorage.removeItem(SYNC_BASE);
+  renderSyncStatus(); await syncNow(true);
+  if(syncCfg.status==='error'&&/token/.test(syncCfg.error||'')){ const e=syncCfg.error; syncCfg={}; syncSaveCfg(); renderSyncStatus(); syncMsg(e); }
+}
+async function syncCopyToken(){
+  try{ await navigator.clipboard.writeText(syncCfg.token); syncMsg('Token copied — paste it into Ace Travel on the other phone.'); }
+  catch(e){ prompt('Copy this token to the other phone:',syncCfg.token); }
+}
+function syncOff(){
+  if(!confirm('Stop syncing this phone? Your trips stay here and in your gist.'))return;
+  syncCfg={}; syncSaveCfg(); localStorage.removeItem(SYNC_BASE); renderSyncStatus(); syncMsg('Sync is off on this phone.');
+}
+// Sync history: every sync is a revision of the gist, and any of them can be restored
+async function syncShowHistory(){
+  const box=document.getElementById('syncHist');
+  if(!syncCfg.gistId){ box.innerHTML='<p class="sync-note">Nothing synced yet.</p>'; return; }
+  box.innerHTML='<p class="sync-note">Loading…</p>';
+  try{
+    const list=await (await ghFetch('https://api.github.com/gists/'+syncCfg.gistId+'/commits?per_page=30')).json();
+    box.innerHTML='';
+    list.forEach((c,i)=>{
+      const b=document.createElement('button');
+      const when=new Date(c.committed_at);
+      b.innerHTML=when.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})+(i===0?' (current)':'')+(i?'<span>Restore</span>':'');
+      if(i)b.onclick=()=>syncRestore(c.version,when);
+      box.appendChild(b);
+    });
+  }catch(e){ box.innerHTML='<p class="sync-note">Couldn’t load history.</p>'; }
+}
+async function syncRestore(ver,when){
+  if(!confirm('Put your trips back to how they were on '+when.toLocaleString()+'? This changes every synced phone. (You can restore the current version again from history.)'))return;
+  try{
+    const data=await gistFileJSON(await (await ghFetch('https://api.github.com/gists/'+syncCfg.gistId+'/'+ver)).json());
+    if(!data||!Array.isArray(data.trips))throw new Error('empty');
+    // the restored copy counts as this phone's change, so it wins on the next merge
+    applyMerged(data);
+    await syncNow(true);
+    syncMsg('Restored.'); syncShowHistory();
+  }catch(e){ syncMsg('Couldn’t restore that version.'); }
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!syncCfg.token)return;
+  if(document.visibilityState==='visible')syncNow();
+  else if(syncCfg.dirty){ clearTimeout(syncTimer); syncNow(); }   // leaving the app: send changes now
+});
+window.addEventListener('online',()=>{ if(syncCfg.token)syncNow(); });
+setInterval(()=>{ if(syncCfg.token&&document.visibilityState==='visible')syncNow(); },90000);
+
+/* ---------- Backup file: all trips + documents ---------- */
+async function backupAll(){
+  try{
+    const docs={};
+    for(const t of STORE.trips)for(const doc of (t.docs||[])){ try{ const rec=await dbGet(doc.id); if(rec)docs[doc.id]={data:rec.data,type:rec.type,name:rec.name}; }catch(e){} }
+    const bundle={ace:'backup',version:1,exportedAt:new Date().toISOString(),trips:STORE.trips,docs};
+    const name='Ace-Travel-backup-'+new Date().toISOString().slice(0,10)+'.acebackup';
+    const file=new File([JSON.stringify(bundle)],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file],title:'Ace Travel backup'}); }
+      catch(e){ if(e&&e.name==='AbortError')return; triggerDownload(file,name); }
+    } else triggerDownload(file,name);
+    localStorage.setItem(BACKUP_KEY,String(Date.now()));
+    renderSyncStatus(); syncMsg('Backup saved. ✓');
+  }catch(e){ syncMsg('Backup failed: '+(e.message||'error')); }
+}
+async function restoreBackup(bundle){
+  const n=(bundle.trips||[]).length;
+  if(!confirm('Restore '+n+' trip'+(n===1?'':'s')+' from this backup? Trips in the backup replace the same trips on this phone; other trips are kept.'))return;
+  for(const t of bundle.trips||[]){
+    for(const doc of (t.docs||[])){ const rec=bundle.docs&&bundle.docs[doc.id]; if(rec)await dbPut({id:doc.id,data:rec.data,type:rec.type,name:rec.name}); }
+    const i=STORE.trips.findIndex(x=>x.id===t.id);
+    if(i>=0)STORE.trips[i]=t; else STORE.trips.push(t);
+  }
+  D=null;   // so the open trip doesn't overwrite its restored copy
+  persist(); closeExport(); closeSync(); goHome();
+  alert('Restored '+n+' trip'+(n===1?'':'s')+'.');
+}
+
 /* ---------- boot ---------- */
 /* ---------- Shared content via URL (iOS Shortcut) ---------- */
 // The Shortcut opens: <link>?share=<url-encoded text>. On load, if present, parse it into the active trip.
@@ -2447,6 +2772,8 @@ async function handleSharedContent(){
 if(STORE.activeId && STORE.trips.find(t=>t.id===STORE.activeId)){ openTrip(STORE.activeId); }
 else { goHome(); }
 handleSharedContent();
+renderSyncStatus();
+if(syncCfg.token)syncNow();
 
 /* ---------- Service worker: bulletproof offline ---------- */
 if('serviceWorker' in navigator){
