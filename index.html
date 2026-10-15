@@ -342,6 +342,12 @@
   .cm-num{font-family:var(--serif);font-size:30px;font-weight:500;color:var(--olive);line-height:1;opacity:.5}
   .cm-mon{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--sage);text-transform:uppercase}
   .cal-row.is-today .cm-num{color:var(--terra);opacity:.9}
+  .cm-sky{margin-top:6px;font-family:var(--sans);font-size:10px;font-weight:500;color:var(--sage);line-height:1.55;white-space:nowrap;text-align:center}
+  .cm-sky:empty{display:none}
+  .cm-sky .wx-lo{color:#b3ab97}
+  .trip-localtime{margin-top:9px;font-family:var(--sans);font-size:12px;color:var(--sage);font-weight:500}
+  .trip-localtime:empty{display:none}
+  .trip-localtime b{color:var(--olive);font-weight:600}
   .cm-today{font-family:var(--sans);font-size:8px;font-weight:700;letter-spacing:.1em;color:#fff;background:var(--terra);padding:2px 6px;border-radius:8px;margin-top:3px}
   /* spine node: lodging house or dot */
   .spine-dot{width:8px;height:8px;border-radius:50%;background:var(--paper);border:2px solid var(--sage-soft);margin-top:8px}
@@ -561,6 +567,7 @@
         <input class="trip-name" id="tripName" placeholder="Your trip" />
         <input class="trip-dates" id="tripDates" placeholder="Add dates" />
         <div class="trip-countdown" id="tripCountdown"></div>
+        <div class="trip-localtime" id="tripLocalTime"></div>
         <button class="trip-map-btn" onclick="showView('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3zM9 3v15M15 6v15"/></svg> View map</button>
       </div>
     </div>
@@ -761,6 +768,7 @@ function bindHeader(){
   nameEl.oninput=e=>{D.name=e.target.value;save();};
   datesEl.oninput=e=>{D.dates=e.target.value;D.datesManual=(e.target.value.trim()!=='');save();updateCountdown();};
   updateCountdown();
+  updateLocalTime();
   loadHero();
 }
 function updateCountdown(){
@@ -1051,7 +1059,7 @@ function renderDays(){
 
     // subtle alternating date marker
     const marker=document.createElement('div');marker.className='cal-marker';
-    marker.innerHTML='<span class="cm-dow">'+DOW[d.getDay()]+'</span><span class="cm-num">'+dnum+'</span><span class="cm-mon">'+MON[d.getMonth()]+'</span>'+(isToday?'<span class="cm-today">TODAY</span>':'');
+    marker.innerHTML='<span class="cm-dow">'+DOW[d.getDay()]+'</span><span class="cm-num">'+dnum+'</span><span class="cm-mon">'+MON[d.getMonth()]+'</span>'+(isToday?'<span class="cm-today">TODAY</span>':'')+'<div class="cm-sky" data-key="'+key+'"></div>';
     row.appendChild(marker);
 
     // spine node — lodging house icon (with room #) if staying, else a small dot
@@ -2106,41 +2114,152 @@ async function openDoc(id){
   if(w){ if((rec.type||'').includes('pdf')){w.document.write('<iframe src="'+rec.data+'" style="width:100%;height:100%;border:none"></iframe>');} else {w.document.write('<img src="'+rec.data+'" style="max-width:100%">');} }
 }
 
-/* ---------- Weather per day (Open-Meteo, key-free) ---------- */
-const wxCache={};
+/* ---------- Day extras: weather, sunrise/sunset, destination local time ---------- */
 const WX_ICON={0:'☀',1:'🌤',2:'⛅',3:'☁',45:'🌫',48:'🌫',51:'🌦',53:'🌦',55:'🌧',61:'🌧',63:'🌧',65:'🌧',71:'🌨',73:'🌨',75:'❄',80:'🌦',81:'🌧',82:'⛈',95:'⛈',96:'⛈',99:'⛈'};
 function isUS(){ return (D&&D.cur==='$'); }
-async function loadWeather(){
-  if(!navigator.onLine)return;
-  const by=baseYear();
-  for(const d of D.days){
-    if(!d.title&&!d.plan)continue;
-    const city=extractCity(d.title); const p=parseLoose(d.date);
-    if(!city||!p)continue;
-    const y=p.year||(p.mon<=5?by+1:by);
-    const dateStr=y+'-'+String(p.mon+1).padStart(2,'0')+'-'+String(p.day).padStart(2,'0');
-    // only fetch for dates within ~16 days (forecast horizon); else skip silently
-    const target=new Date(y,p.mon,p.day); const now=new Date();
-    const daysOut=(target-now)/86400000;
-    if(daysOut<-1||daysOut>16)continue;
-    const key=city.name.toLowerCase()+'|'+dateStr;
-    const slot=document.getElementById('wx-'+d.id); if(!slot)continue;
-    if(wxCache[key]){ slot.innerHTML=wxCache[key]; continue; }
+
+// Place lookups (coords + time zone + city), saved on the device so they work offline
+const PLACE_KEY='ace-places-v1';
+let PLACES={}; try{ PLACES=JSON.parse(localStorage.getItem(PLACE_KEY)||'{}')||{}; }catch(e){}
+const placeInflight={};
+let placeQueue=Promise.resolve();
+function getPlace(q){
+  q=(q||'').trim(); if(!q)return Promise.resolve(null);
+  const k=q.toLowerCase();
+  if(PLACES[k]!==undefined)return Promise.resolve(PLACES[k]);
+  if(!navigator.onLine)return Promise.resolve(null);
+  if(placeInflight[k])return placeInflight[k];
+  // one lookup at a time — OpenStreetMap asks for no more than 1 request/second
+  const run=async()=>{
+    let res=null, found=false;
     try{
-      let coords=city.coords;
-      if(!coords){ coords=await geocodeCity(city.name); }
-      if(!coords)continue;
-      const unit=isUS()?'fahrenheit':'celsius';
-      const url='https://api.open-meteo.com/v1/forecast?latitude='+coords[0]+'&longitude='+coords[1]+'&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit='+unit+'&start_date='+dateStr+'&end_date='+dateStr;
-      const r=await fetch(url); const j=await r.json();
-      if(j&&j.daily&&j.daily.time&&j.daily.time.length){
-        const code=j.daily.weather_code[0], hi=Math.round(j.daily.temperature_2m_max[0]), lo=Math.round(j.daily.temperature_2m_min[0]);
-        const deg=isUS()?'°F':'°C';
-        const html='<span class="wx-ic">'+(WX_ICON[code]||'·')+'</span> '+hi+deg+' <span class="wx-lo">/ '+lo+deg+'</span>';
-        wxCache[key]=html; slot.innerHTML=html;
+      const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&addressdetails=1&q='+encodeURIComponent(q));
+      const j=await r.json(); found=true;
+      if(j&&j[0]){
+        const a=j[0].address||{};
+        const lat=+j[0].lat, lon=+j[0].lon;
+        const city=a.city||a.town||a.village||a.municipality||a.county||a.state||q;
+        const t=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&timezone=auto&forecast_days=1&daily=sunrise');
+        const tj=await t.json();
+        res={lat,lon,city,tz:tj&&tj.timezone||''};
       }
-    }catch(e){}
+    }catch(e){ found=false; }
+    await new Promise(r=>setTimeout(r,1100));
+    if(found){ PLACES[k]=res; try{localStorage.setItem(PLACE_KEY,JSON.stringify(PLACES));}catch(e){} }
+    delete placeInflight[k];
+    return res;
+  };
+  placeInflight[k]=placeQueue=placeQueue.then(run,run);
+  return placeInflight[k];
+}
+// Main destination of the trip (chosen hero city, else first stop)
+function tripDestQuery(){
+  const stops=getStops();
+  const h=D.heroCity&&stops.find(s=>s.name===D.heroCity);
+  return h?h.name:(stops[0]?stops[0].name:'');
+}
+// Where you are on a given day: that night's lodging, else the nearest one, else the main destination
+function dayPlaceQueries(key){
+  let L=lodgingForDayKey(key);
+  if(!L&&D.lodging&&D.lodging.length){
+    const by=baseYear(); let before=null,after=null;
+    D.lodging.forEach(x=>{ const ci=parseLoose(x.checkIn); if(!ci)return; const k=normDay(toSortable(ci,by));
+      if(k<=key&&(!before||k>before.k))before={k,x}; if(k>key&&(!after||k<after.k))after={k,x}; });
+    L=(before||after||{}).x||null;
   }
+  const qs=[]; if(L){ if(L.address)qs.push(L.address); if(L.name)qs.push(L.name); }
+  const dest=tripDestQuery(); if(dest)qs.push(dest);
+  return qs;
+}
+async function placeForQueries(qs){
+  for(const q of qs){ const p=await getPlace(q); if(p&&p.tz)return p; }
+  return null;
+}
+
+// Sunrise/sunset, calculated on the device (standard NOAA/suncalc formulas)
+function sunTimes(y,m,d,lat,lon){
+  const rad=Math.PI/180, dayMs=864e5, J1970=2440588, J2000=2451545, e=rad*23.4397, J0=0.0009;
+  const date=new Date(Date.UTC(y,m,d,12)-lon/360*dayMs);
+  const lw=rad*-lon, phi=rad*lat;
+  const dd=date/dayMs-0.5+J1970-J2000;
+  const n=Math.round(dd-J0-lw/(2*Math.PI));
+  const ds=J0+lw/(2*Math.PI)+n;
+  const M=rad*(357.5291+0.98560028*ds);
+  const C=rad*(1.9148*Math.sin(M)+0.02*Math.sin(2*M)+0.0003*Math.sin(3*M));
+  const L=M+C+rad*102.9372+Math.PI;
+  const dec=Math.asin(Math.sin(e)*Math.sin(L));
+  const Jnoon=J2000+ds+0.0053*Math.sin(M)-0.0069*Math.sin(2*L);
+  const w=Math.acos((Math.sin(-0.833*rad)-Math.sin(phi)*Math.sin(dec))/(Math.cos(phi)*Math.cos(dec)));
+  if(isNaN(w))return null; // midnight sun / polar night
+  const Jset=J2000+J0+(w+lw)/(2*Math.PI)+n+0.0053*Math.sin(M)-0.0069*Math.sin(2*L);
+  const Jrise=Jnoon-(Jset-Jnoon);
+  const toDate=j=>new Date((j+0.5-J1970)*dayMs);
+  return {rise:toDate(Jrise), set:toDate(Jset)};
+}
+function fmtTimeIn(date,tz){
+  try{ return new Intl.DateTimeFormat(undefined,{timeZone:tz,hour:'numeric',minute:'2-digit'}).format(date).replace(/\s?([AP])M$/i,(x,a)=>a.toLowerCase()+'m'); }
+  catch(e){ return ''; }
+}
+// Minutes the given time zone is ahead of UTC at a moment
+function tzOffsetMin(tz,date){
+  const p=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(date);
+  const g=t=>+p.find(x=>x.type===t).value;
+  return Math.round((Date.UTC(g('year'),g('month')-1,g('day'),g('hour'),g('minute'))-Math.floor(date/60000)*60000)/60000);
+}
+
+const wxCache={};
+async function fetchWeather(p,dateStr){
+  const unit=isUS()?'fahrenheit':'celsius';
+  const key=p.lat.toFixed(2)+','+p.lon.toFixed(2)+'|'+dateStr+'|'+unit;
+  if(wxCache[key]!==undefined)return wxCache[key];
+  try{
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.lat+'&longitude='+p.lon+'&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit='+unit+'&timezone=auto&start_date='+dateStr+'&end_date='+dateStr);
+    const j=await r.json();
+    if(j&&j.daily&&j.daily.time&&j.daily.time.length){
+      const deg=isUS()?'°F':'°C';
+      wxCache[key]=(WX_ICON[j.daily.weather_code[0]]||'·')+' '+Math.round(j.daily.temperature_2m_max[0])+deg+' <span class="wx-lo">/ '+Math.round(j.daily.temperature_2m_min[0])+'°</span>';
+    } else wxCache[key]='';
+  }catch(e){ return ''; }
+  return wxCache[key];
+}
+async function loadWeather(){
+  const slots=[...document.querySelectorAll('.cm-sky[data-key]')];
+  const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  for(const slot of slots){
+    const key=+slot.dataset.key; const d=new Date(key);
+    const p=await placeForQueries(dayPlaceQueries(key));
+    if(!p||!slot.isConnected)continue;
+    const st=sunTimes(d.getFullYear(),d.getMonth(),d.getDate(),p.lat,p.lon);
+    const sun=st?'<div title="Sunrise / sunset in '+esc(p.city)+'">☀︎ '+fmtTimeIn(st.rise,p.tz)+' · ☾ '+fmtTimeIn(st.set,p.tz)+'</div>':'';
+    slot.innerHTML=sun;
+    // forecast only exists ~16 days out
+    const daysOut=(key-today)/864e5;
+    if(navigator.onLine && daysOut>=0 && daysOut<=15){
+      const dateStr=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const wx=await fetchWeather(p,dateStr);
+      if(wx&&slot.isConnected)slot.innerHTML='<div>'+wx+'</div>'+sun;
+    }
+  }
+  updateLocalTime();
+}
+
+// "3:42pm in Paris · 6 hrs ahead" under the countdown
+let localTimeTimer=null;
+async function updateLocalTime(){
+  const el=document.getElementById('tripLocalTime'); if(!el||!D)return;
+  const span=timelineSpan();
+  const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  const key=span?Math.min(Math.max(today,span.start),span.end):today;
+  const qs=span?dayPlaceQueries(key):(tripDestQuery()?[tripDestQuery()]:[]);
+  const p=qs.length?await placeForQueries(qs):null;
+  if(!p){ el.innerHTML=''; return; }
+  const t=new Date();
+  const diff=tzOffsetMin(p.tz,t)+t.getTimezoneOffset();
+  let rel;
+  if(diff===0)rel='same time as you';
+  else{ const h=Math.abs(diff)/60; rel=(Number.isInteger(h)?h:h.toFixed(1))+' hr'+(h===1?'':'s')+' '+(diff>0?'ahead':'behind'); }
+  el.innerHTML='🕐 <b>'+fmtTimeIn(t,p.tz)+'</b> in '+esc(p.city)+' · '+rel;
+  if(!localTimeTimer)localTimeTimer=setInterval(()=>{ if(document.visibilityState==='visible')updateLocalTime(); },30000);
 }
 async function geocodeCity(name){
   const key=name.toLowerCase();
