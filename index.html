@@ -2336,6 +2336,31 @@ if('serviceWorker' in navigator){
   });
 }
 
+/* ---------- Auto-update: reload when a new version is published ---------- */
+(function(){
+  let current=null, lastCheck=0;
+  async function stamp(){
+    try{
+      const r=await fetch('index.html',{method:'HEAD',cache:'no-store'});
+      if(!r.ok)return null;
+      return r.headers.get('etag')||r.headers.get('last-modified');
+    }catch(e){ return null; } // offline: skip
+  }
+  async function check(){
+    const now=Date.now();
+    if(now-lastCheck<60000)return; // at most once a minute
+    lastCheck=now;
+    const s=await stamp();
+    if(!s)return;
+    if(current&&s!==current){ location.reload(); return; }
+    current=s;
+    navigator.serviceWorker&&navigator.serviceWorker.getRegistration().then(reg=>reg&&reg.update()).catch(()=>{});
+  }
+  window.addEventListener('load',check);
+  // Check when the app comes back to the foreground — reloading then won't interrupt anything
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible')check(); });
+})();
+
 </script>
 </body>
 </html>

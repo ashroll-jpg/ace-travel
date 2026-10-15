@@ -21,7 +21,7 @@ self.addEventListener('activate',e=>{
 });
 
 // Fetch strategy:
-//  - Navigations & the app itself: network-first, fall back to cache (so you get updates online, but it works offline)
+//  - Navigations & the app itself: network-first (revalidating past the HTTP cache), fall back to cache (so you get updates online, but it works offline)
 //  - Fonts & other GET assets: cache-first, update in background
 //  - API calls (anthropic, openstreetmap, wikipedia, open-meteo): network-only (never cache; fail gracefully offline)
 self.addEventListener('fetch',e=>{
@@ -37,7 +37,7 @@ self.addEventListener('fetch',e=>{
   // app document: network-first
   if(req.mode==='navigate' || url.pathname.endsWith('index.html') || url.pathname.endsWith('/')){
     e.respondWith(
-      fetch(req).then(res=>{
+      fetch(req,{cache:'no-cache'}).then(res=>{
         const copy=res.clone(); caches.open(CACHE).then(c=>c.put(req,copy));
         return res;
       }).catch(()=>caches.match(req).then(r=>r||caches.match('./index.html')))
