@@ -836,6 +836,7 @@
         <button class="btn-cancel" onclick="syncShowHistory()">Sync history</button>
         <button class="btn-cancel" onclick="syncOff()">Turn off</button>
       </div>
+      <p class="sync-note" id="syncWho"></p>
       <div class="sync-hist" id="syncHist"></div>
     </div>
     <div class="sync-sec">
@@ -2939,7 +2940,7 @@ async function sendAsk(){
 const SYNC_KEY='ace-sync', SYNC_BASE='ace-sync-base', SYNC_FILE='ace-travel-trips.json', BACKUP_KEY='ace-last-backup';
 let syncCfg={}; try{ syncCfg=JSON.parse(localStorage.getItem(SYNC_KEY))||{}; }catch(e){ syncCfg={}; }
 const syncSaveCfg=()=>localStorage.setItem(SYNC_KEY,JSON.stringify(syncCfg));
-let syncBusy=false, syncAgain=false, syncTimer=0, syncApplying=false;
+let syncBusy=false, syncAgain=false, syncTimer=0, syncApplying=false, syncGistChecked=false;
 const SJ=x=>JSON.stringify(x===undefined?null:x);
 const sclone=x=>x===undefined?undefined:JSON.parse(JSON.stringify(x));
 
@@ -3019,13 +3020,21 @@ async function ghFetch(url,opts={}){
   if(!r.ok)throw Object.assign(new Error('GitHub '+r.status),{code:r.status});
   return r;
 }
-async function findOrCreateGist(){
+// Every sync gist in the account, oldest first. If two phones connected before either had
+// made the gist, each made its own and they'd never see each other's trips. The oldest gist
+// is the one every phone agrees on.
+async function listSyncGists(){
+  const all=[];
   for(let page=1;page<=5;page++){
     const list=await (await ghFetch('https://api.github.com/gists?per_page=100&page='+page)).json();
-    const g=list.find(x=>x.files&&x.files[SYNC_FILE]);
-    if(g)return g.id;
+    all.push(...list.filter(x=>x.files&&x.files[SYNC_FILE]));
     if(list.length<100)break;
   }
+  return all.sort((a,b)=>(Date.parse(a.created_at)||0)-(Date.parse(b.created_at)||0));
+}
+async function findOrCreateGist(){
+  const found=await listSyncGists();
+  if(found.length)return found[0].id;
   const r=await ghFetch('https://api.github.com/gists',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({description:'Ace Travel sync (trips)',public:false,files:{[SYNC_FILE]:{content:JSON.stringify(syncPayload())}}})});
   return (await r.json()).id;
@@ -3043,14 +3052,25 @@ async function syncNow(manual){
   syncBusy=true; syncCfg.status='syncing'; renderSyncStatus();
   try{
     clearTimeout(st); if(D){ const i=STORE.trips.findIndex(t=>t.id===D.id); if(i>=0)STORE.trips[i]=D; } localStorage.setItem(STORE_KEY,JSON.stringify(STORE));
+    let joined=false;
     if(!syncCfg.gistId){ syncCfg.gistId=await findOrCreateGist(); syncSaveCfg(); }
+    else if(manual||!syncGistChecked){
+      const found=await listSyncGists();
+      if(found.length&&found[0].id!==syncCfg.gistId){
+        // this phone was on its own duplicate gist: move to the shared one and combine everything
+        // (no base, so trips that exist on only one side are kept, not treated as deleted)
+        syncCfg.gistId=found[0].id; syncSaveCfg(); localStorage.removeItem(SYNC_BASE); joined=true;
+      }
+    }
+    syncGistChecked=true;
+    if(!syncCfg.login){ try{ syncCfg.login=(await (await ghFetch('https://api.github.com/user')).json()).login||''; syncSaveCfg(); }catch(e){} }
     const local=syncPayload();
     const remote=await gistFileJSON(await (await ghFetch('https://api.github.com/gists/'+syncCfg.gistId)).json());
     let base=null; try{ base=JSON.parse(localStorage.getItem(SYNC_BASE)); }catch(e){}
     const {merged,conflicts}=mergePayloads(local,remote,base);
     const changesHere=SJ(merged)!==SJ(local);
     // don't swap data out from under someone mid-edit, or if they changed something while we were fetching
-    if((changesHere&&userTyping()&&!manual)||SJ(syncPayload())!==SJ(local)){ syncAgain=true; syncCfg.status=syncCfg.last?'ok':'connected'; return; }
+    if((changesHere&&userTyping()&&!manual)||SJ(syncPayload())!==SJ(local)){ syncAgain=true; syncCfg.status=syncCfg.last?'ok':'connected'; if(manual)syncMsg('Saving your latest edit first — syncing again in a moment.'); return; }
     if(SJ(merged)!==SJ(remote)){
       await ghFetch('https://api.github.com/gists/'+syncCfg.gistId,{method:'PATCH',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({files:{[SYNC_FILE]:{content:JSON.stringify(merged)}}})});
@@ -3058,7 +3078,8 @@ async function syncNow(manual){
     if(changesHere)applyMerged(merged);
     localStorage.setItem(SYNC_BASE,JSON.stringify(merged));
     Object.assign(syncCfg,{last:Date.now(),status:'ok',dirty:false,error:''}); syncSaveCfg();
-    if(manual)syncMsg(conflicts?'Synced — combined changes from both phones.':changesHere?'Synced — pulled in new changes.':'Synced — everything’s up to date.');
+    if(joined)syncMsg('Synced — this phone had its own copy, so it joined the shared one and combined the trips.');
+    else if(manual)syncMsg(conflicts?'Synced — combined changes from both phones.':changesHere?'Synced — pulled in new changes.':'Synced — everything’s up to date.');
   }catch(err){
     syncCfg.status='error'; syncCfg.dirty=true;
     syncCfg.error=err.code===401?'GitHub didn’t accept the token. It may have expired — paste a new one.':err.code===404?'Couldn’t find the sync gist. Tap Sync now to make a new one.':navigator.onLine?'Couldn’t reach GitHub. Will try again.':'Offline. Will sync when you’re back online.';
@@ -3091,6 +3112,8 @@ function renderSyncStatus(){
     line.classList.toggle('err',on&&(syncCfg.status==='error'));
     document.getElementById('syncSetup').hidden=on;
     document.getElementById('syncOn').hidden=!on;
+    const who=document.getElementById('syncWho');
+    if(who)who.innerHTML=on&&syncCfg.gistId?'Syncing to '+(syncCfg.login?'<b>@'+esc(syncCfg.login)+'</b>, ':'')+'gist <b>'+esc(syncCfg.gistId.slice(0,7))+'</b>. Every phone should show the same — if one doesn’t, it’s on a different GitHub account: tap <b>Copy token for another phone</b> here and paste it there.':'';
   }
   const ss=document.getElementById('settingsSyncState'); if(ss)ss.textContent=on?(syncCfg.status==='error'?'Needs attention':'On'):'Off';
   const bl=document.getElementById('backupLine');
@@ -3116,7 +3139,7 @@ async function syncConnect(){
   const tok=(document.getElementById('syncToken').value||'').trim();
   if(!/^(ghp_|github_pat_|gho_)/.test(tok)&&tok.length<30){ syncMsg('That doesn’t look like a GitHub token.'); return; }
   syncCfg={token:tok}; syncSaveCfg(); document.getElementById('syncToken').value='';
-  localStorage.removeItem(SYNC_BASE);
+  localStorage.removeItem(SYNC_BASE); syncGistChecked=false;
   renderSyncStatus(); await syncNow(true);
   if(syncCfg.status==='error'&&/token/.test(syncCfg.error||'')){ const e=syncCfg.error; syncCfg={}; syncSaveCfg(); renderSyncStatus(); syncMsg(e); }
 }
