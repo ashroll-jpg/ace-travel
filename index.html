@@ -917,6 +917,26 @@
   .ic-olive{color:var(--flight-ink)} .ic-gold{color:var(--terra)} .ic-red{color:var(--red)}
   .add-new{align-self:center;color:var(--sage)}
 
+  /* account + sharing */
+  .acct{padding:16px;display:flex;flex-direction:column;gap:10px}
+  .acct-h{font-size:18px;font-weight:700;color:var(--ink)}
+  .acct-email{font-size:14px;font-weight:600;color:var(--sage);word-break:break-all}
+  .acct-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .acct-btns{display:flex;gap:10px;flex-wrap:wrap}
+  .acct-btns .red-btn{flex:1}
+  .acct .link-btn{align-self:flex-start;color:var(--sage);font-size:14px}
+  .acct .google{align-self:stretch;height:44px}
+  .acct-msg{margin:0;font-size:14px;font-weight:600;color:var(--red-ink)}
+  .acct-msg:empty{display:none}
+  .fld-note.err{color:var(--red-ink)}
+  .people{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:8px}
+  .people li{display:flex;align-items:center;gap:10px}
+  .people .pe{flex:1;min-width:0;font-size:15px;font-weight:600;color:var(--ink);word-break:break-all}
+  .people .av-sm{border:none}
+  .share-add{display:flex;gap:8px;margin-bottom:6px}
+  .share-add input{flex:1;min-width:0;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--paper-hi);color:var(--ink);font:inherit;font-size:16px;padding:0 12px}
+  .share-add .btn-save{flex:0 0 auto;padding:0 18px;border-radius:12px;border:none;font:inherit;font-weight:800}
+
   /* loading screen, cheer, offline */
   #splash{position:fixed;inset:0;z-index:100;background:#2F3A22;color:#F4ECD8;display:flex;align-items:center;justify-content:center;transition:opacity .4s ease}
   #splash.out{opacity:0;pointer-events:none}
@@ -1012,6 +1032,7 @@
 <div class="sheet-bg" id="exportBg" onclick="if(event.target===this)closeExport()">
   <div class="sheet share-sheet" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
     <h3 id="shareTitle">Share this trip</h3>
+    <div class="share-opt" id="sharePeople"></div>
     <div class="share-opt">
       <div class="so-h">As a picture</div>
       <p>A one-page summary for family and friends.</p>
@@ -1156,6 +1177,7 @@
 <div id="you" hidden>
   <div class="you-body">
     <h1>You</h1>
+    <div class="card acct" id="acct" aria-live="polite"></div>
     <div class="card you-id">
       <div class="you-id-row">
         <span class="av av-lg" id="youAv">AS</span>
@@ -1166,8 +1188,10 @@
       <p class="fld-note">Shows on what you add and what you pay for.</p>
     </div>
     <div class="card list-card">
-      <div class="lc-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><div class="lc-text"><b>Sync</b><span id="youSync">Not set up</span></div><button class="small-btn" onclick="openSync()">Open</button></div>
+      <div class="lc-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><div class="lc-text"><b>Old GitHub sync</b><span id="youSync">Not set up</span></div><button class="small-btn" onclick="openSync()">Open</button></div>
       <button class="lc-btn" onclick="syncPair()">Pair another phone</button>
+    </div>
+    <div class="card list-card">
       <button class="lc-btn" onclick="backupAll()">Save a backup file</button>
       <button class="lc-btn" onclick="importTripData()">Restore or import a file</button>
     </div>
@@ -1298,6 +1322,7 @@ function persist(){
   if(D){ const i=STORE.trips.findIndex(t=>t.id===D.id); if(i>=0)STORE.trips[i]=D; }
   localStorage.setItem(STORE_KEY,JSON.stringify(STORE));
   if(typeof scheduleSync==='function')scheduleSync();
+  if(typeof scheduleCloud==='function')scheduleCloud();
 }
 function openTrip(id){
   D=STORE.trips.find(t=>t.id===id)||null;
@@ -2909,7 +2934,7 @@ function openYou(focus){
   document.getElementById('apiKeyInput').value=getKey();
   try{ document.getElementById('themeSel').value=localStorage.getItem('ace-theme')||''; }catch(e){}
   const ys=document.getElementById('youSync'); if(ys)ys.textContent=syncCfg.token?(syncCfg.key?'Encrypted · ':'')+syncStateText():'Not set up — trips are only on this phone';
-  renderMe(); markBar(); y.scrollTop=0;
+  renderMe(); acctState=''; renderAccount(); markBar(); y.scrollTop=0;
   if(focus==='key')setTimeout(()=>document.getElementById('apiKeyInput').focus(),60);
 }
 function closeYou(){ const y=document.getElementById('you'); if(!y||y.hidden)return; y.hidden=true; document.body.classList.remove('on-you'); markBar(); }
@@ -3017,6 +3042,198 @@ function tripCard(t,sp,today,big){
   del.onclick=()=>deleteTrip(t.id); card.appendChild(del);
   if(!t.cover && stops.length && navigator.onLine){ fetchCityPhoto(stops[0]).then(url=>{ if(url){ t.cover=url; persist(); if(document.body.classList.contains('on-home'))renderHome(); } }); }
   return card;
+}
+
+
+/* =========================================================
+   Firebase: an account per person, trips stored in it, shared by email.
+   This phone's copy (localStorage) stays the working copy; Firestore keeps every phone in step.
+   Each trip is one document: trips/{id} = {json, memberEmails, owner, updatedBy, updatedAt}.
+   Edits from two phones are combined with the same three-way merge the old sync used.
+   ========================================================= */
+const FB_CFG={apiKey:'AIzaSyCUVxOUnq4P3nYbW2FctcOY4vtarAhklxo',authDomain:'ace-travel-35504.firebaseapp.com',projectId:'ace-travel-35504',
+  storageBucket:'ace-travel-35504.firebasestorage.app',messagingSenderId:'540437165046',appId:'1:540437165046:web:aa3f75d01bd7658033cdd7'};
+const FB_VER='10.12.2', FB_BASE_KEY='ace-cloud-base';
+let fbAuth=null, fbDb=null, fbUser=null, fbUnsub=null, fbRemote={}, fbReady=false, fbStatus='', fbErr='';
+let fbBusy=false, fbAgain=false, fbApplyAgain=false, fbTimer=0, acctState='';
+let fbBase={}; try{ fbBase=JSON.parse(localStorage.getItem(FB_BASE_KEY))||{}; }catch(e){}   // last version each trip agreed on
+const fbSaveBase=()=>{ try{ localStorage.setItem(FB_BASE_KEY,JSON.stringify(fbBase)); }catch(e){} };
+const myEmail=()=>((fbUser&&fbUser.email)||'').toLowerCase();
+const cloudOn=()=>!!(fbDb&&fbUser&&fbUser.emailVerified);
+const isStandalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+const fbNow=()=>firebase.firestore.FieldValue.serverTimestamp();
+function loadScript(src){ return new Promise((res,rej)=>{ const el=document.createElement('script'); el.src=src; el.onload=res; el.onerror=()=>rej(new Error('Couldn’t load '+src)); document.head.appendChild(el); }); }
+async function initCloud(){
+  try{
+    if(!window.firebase){ const b='https://www.gstatic.com/firebasejs/'+FB_VER+'/';
+      await loadScript(b+'firebase-app-compat.js'); await loadScript(b+'firebase-auth-compat.js'); await loadScript(b+'firebase-firestore-compat.js'); }
+    if(!firebase.apps.length)firebase.initializeApp(FB_CFG);
+    fbAuth=firebase.auth(); fbDb=firebase.firestore();
+    fbAuth.onAuthStateChanged(u=>{ fbUser=u; fbReady=true; if(cloudOn())startCloud(); else stopCloud(); renderAccount(); renderHomeSync(); });
+  }catch(e){ fbStatus='nosdk'; renderAccount(); renderHomeSync(); }   // no signal on first open: everything still works on this phone
+}
+window.addEventListener('online',()=>{ if(!fbAuth)initCloud(); else scheduleCloud(300); });
+
+/* ---- account ---- */
+const AUTH_ERR={'auth/invalid-email':'That email doesn’t look right.','auth/email-already-in-use':'There’s already an account with that email. Sign in instead.',
+  'auth/weak-password':'Use at least 6 characters.','auth/wrong-password':'Wrong email or password.','auth/invalid-credential':'Wrong email or password.',
+  'auth/invalid-login-credentials':'Wrong email or password.','auth/user-not-found':'No account with that email yet. Create one.',
+  'auth/too-many-requests':'Too many tries. Wait a minute and try again.','auth/network-request-failed':'Couldn’t reach the sign-in service. Check your connection.',
+  'auth/popup-blocked':'The sign-in window was blocked.','auth/popup-closed-by-user':'Sign-in was cancelled.','auth/unauthorized-domain':'This web address isn’t allowed to sign in yet (Firebase → Authentication → Settings → Authorized domains).',
+  'auth/operation-not-allowed':'This sign-in method is turned off in Firebase.'};
+const authError=err=>AUTH_ERR[err&&err.code]||('Couldn’t do that ('+((err&&(err.code||err.message))||'error')+').');
+function acctMsg(t){ const m=document.getElementById('acMsg'); if(m)m.textContent=t||''; }
+function acctBusy(on){ document.querySelectorAll('#acct button').forEach(b=>b.disabled=on); }
+async function acctSignIn(create){
+  const e=(document.getElementById('acEmail').value||'').trim(), pw=document.getElementById('acPass').value||'';
+  if(!e||pw.length<6){ acctMsg(create?'Use your email and a password of at least 6 characters.':'Enter your email and password.'); return; }
+  acctBusy(true); acctMsg('');
+  try{ if(create){ const c=await fbAuth.createUserWithEmailAndPassword(e,pw); await c.user.sendEmailVerification(); }
+       else await fbAuth.signInWithEmailAndPassword(e,pw); }
+  catch(err){ acctMsg(authError(err)); } finally{ acctBusy(false); }
+}
+async function acctGoogle(){ acctMsg(''); try{ await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(err){ acctMsg(authError(err)); } }
+async function acctReset(){
+  const e=(document.getElementById('acEmail').value||'').trim(); if(!e){ acctMsg('Type your email first, then tap Forgot password.'); return; }
+  try{ await fbAuth.sendPasswordResetEmail(e); acctMsg('Check your email for a link to set a new password.'); }catch(err){ acctMsg(authError(err)); }
+}
+async function acctVerified(){
+  try{ await fbUser.reload(); fbUser=fbAuth.currentUser; await fbUser.getIdToken(true); }catch(err){ acctMsg(authError(err)); return; }
+  if(fbUser.emailVerified){ acctState=''; startCloud(); renderAccount(); toast('Email confirmed. Your trips are moving into your account.'); }
+  else acctMsg('Not confirmed yet. Tap the link in the email first (check spam too).');
+}
+async function acctResend(){ try{ await fbUser.sendEmailVerification(); acctMsg('Sent again. Check spam too.'); }catch(err){ acctMsg(authError(err)); } }
+async function acctSignOut(){
+  if(!await uiConfirm('Your trips stay on this phone. Sign in again any time to keep them in step.',{title:'Sign out?',ok:'Sign out'}))return;
+  stopCloud(); fbBase={}; fbSaveBase(); await fbAuth.signOut();
+}
+function renderAccount(){
+  const el=document.getElementById('acct'); if(!el)return;
+  const st=!fbReady?(fbStatus==='nosdk'?'nosdk':'loading'):!fbUser?'out':!fbUser.emailVerified?'verify':'in';
+  if(st===acctState&&st!=='in'){ return; }       // don't wipe what someone is typing
+  acctState=st;
+  const e=esc(myEmail());
+  if(st==='loading')el.innerHTML='<div class="acct-h">Your account</div><p class="fld-note">Connecting…</p>';
+  else if(st==='nosdk')el.innerHTML='<div class="acct-h">Your account</div><p class="fld-note">Signing in needs a connection. Your trips are safe on this phone in the meantime.</p>';
+  else if(st==='out')el.innerHTML='<div class="acct-h">Keep your trips in your account</div>'+
+    '<p class="fld-note">Sign in so your trips are saved even if you delete the app or change phones, and so you can share a trip with your travel partner.</p>'+
+    '<label class="fld-block">Email<input id="acEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com"></label>'+
+    '<label class="fld-block">Password<input id="acPass" type="password" autocomplete="current-password" placeholder="At least 6 characters"></label>'+
+    '<div class="acct-btns"><button class="red-btn" onclick="acctSignIn(false)">Sign in</button><button class="small-btn" onclick="acctSignIn(true)">Create account</button></div>'+
+    (isStandalone()?'':'<button class="small-btn google" onclick="acctGoogle()">Sign in with Google</button>')+
+    '<button class="link-btn" onclick="acctReset()">Forgot password?</button><p class="acct-msg" id="acMsg" role="status"></p>';
+  else if(st==='verify')el.innerHTML='<div class="acct-h">Confirm your email</div><p class="fld-note">We sent a link to <b>'+e+'</b>. Tap it, then come back and tap below. (It may open in Safari; that’s fine.)</p>'+
+    '<div class="acct-btns"><button class="red-btn" onclick="acctVerified()">I’ve confirmed it</button><button class="small-btn" onclick="acctResend()">Send again</button></div>'+
+    '<button class="link-btn" onclick="acctSignOut()">Use a different email</button><p class="acct-msg" id="acMsg" role="status"></p>';
+  else{
+    const line=fbStatus==='error'?'Couldn’t sync just now. Will try again.':fbStatus==='offline'||!navigator.onLine?'Offline. Changes will sync when you’re back online.':fbStatus==='ok'?'Your trips are saved to your account and stay in step on every phone.':'Syncing…';
+    el.innerHTML='<div class="acct-row"><div><div class="acct-h">Signed in</div><div class="acct-email">'+e+'</div></div><button class="small-btn" onclick="acctSignOut()">Sign out</button></div>'+
+      '<p class="fld-note'+(fbStatus==='error'?' err':'')+'">'+line+'</p>';
+  }
+}
+
+/* ---- keeping trips in step ---- */
+function startCloud(){
+  if(fbUnsub||!cloudOn())return;
+  fbStatus='syncing'; renderAccount();
+  fbUnsub=fbDb.collection('trips').where('memberEmails','array-contains',myEmail()).onSnapshot(snap=>{
+    const r={}; snap.forEach(d=>{ const x=d.data(); try{ r[d.id]={trip:JSON.parse(x.json),memberEmails:x.memberEmails||[],owner:x.owner}; }catch(e){} });
+    fbRemote=r; fbStatus='ok';
+    if(fbBusy)fbApplyAgain=true; else cloudApplyRemote();
+    scheduleCloud(300); renderAccount(); if(document.getElementById('exportBg').classList.contains('show'))renderSharePeople();
+  },err=>{ fbStatus='error'; fbErr=err.message||String(err); renderAccount(); });
+}
+function stopCloud(){ if(fbUnsub){ fbUnsub(); fbUnsub=null; } fbRemote={}; }
+// replace trips on this phone with merged versions, keeping documents and on-screen state
+function cloudReplace(trips,removedNames){
+  applyMerged({trips:trips.map(t=>syncTrip(t))});
+  (removedNames||[]).forEach(n=>toast('“'+n+'” was removed on another phone'));
+}
+function cloudApplyRemote(){
+  if(!cloudOn())return;
+  let changed=false; const next=[], removed=[], ctx={conflicts:0}, local=new Set();
+  STORE.trips.forEach(t=>{
+    local.add(t.id); const R=fbRemote[t.id], B=fbBase[t.id];
+    if(!R){ if(B){ changed=true; removed.push(t.name||'A trip'); return; } next.push(t); return; }   // deleted (or unshared) elsewhere
+    const L=syncTrip(t);
+    if(SJ(L)!==SJ(R.trip)){ const M=mergeTrip(L,R.trip,B||{},ctx); if(SJ(M)!==SJ(L)){ changed=true; next.push(M); } else next.push(t); }
+    else next.push(t);
+    fbBase[t.id]=R.trip;
+  });
+  Object.keys(fbRemote).forEach(id=>{ if(local.has(id)||fbBase[id])return;    // a base with no local copy = removed here, push will delete it
+    next.push(fbRemote[id].trip); fbBase[id]=fbRemote[id].trip; changed=true; });
+  fbSaveBase();
+  if(changed)cloudReplace(next,removed);
+}
+function scheduleCloud(ms){ if(!cloudOn()||syncApplying)return; clearTimeout(fbTimer); fbTimer=setTimeout(cloudPush,ms==null?1500:ms); }
+async function cloudPush(){
+  if(!cloudOn())return;
+  if(fbBusy){ fbAgain=true; return; }
+  if(!navigator.onLine){ fbStatus='offline'; renderAccount(); return; }
+  fbBusy=true;
+  try{
+    if(D){ const i=STORE.trips.findIndex(t=>t.id===D.id); if(i>=0)STORE.trips[i]=D; }
+    const me=myEmail(), uid=fbUser.uid, col=fbDb.collection('trips');
+    for(const t of STORE.trips.slice()){
+      const L=syncTrip(t), R=fbRemote[t.id], B=fbBase[t.id];
+      if(!R&&!B){                                   // new on this phone: put it in my account
+        await col.doc(t.id).set({json:JSON.stringify(L),memberEmails:[me],owner:uid,updatedBy:me,updatedAt:fbNow(),v:1});
+        fbBase[t.id]=L; continue; }
+      if(!R||(B&&SJ(L)===SJ(B)))continue;           // removed elsewhere, or nothing new here
+      let merged=null;
+      await fbDb.runTransaction(async tx=>{
+        const ref=col.doc(t.id), snap=await tx.get(ref); merged=null;
+        if(!snap.exists)return;
+        const cur=JSON.parse(snap.data().json); merged=mergeTrip(L,cur,B||{},{conflicts:0});
+        if(SJ(merged)!==SJ(cur))tx.update(ref,{json:JSON.stringify(merged),updatedBy:me,updatedAt:fbNow()});
+      });
+      if(merged){ fbBase[t.id]=merged;
+        if(SJ(merged)!==SJ(L))cloudReplace(STORE.trips.map(x=>x.id===t.id?merged:x)); }
+    }
+    for(const id of Object.keys(fbBase)){            // removed on this phone: delete my trips, leave shared ones
+      if(STORE.trips.some(t=>t.id===id))continue;
+      const R=fbRemote[id];
+      if(R){ if(R.owner===uid)await col.doc(id).delete(); else await col.doc(id).update({memberEmails:firebase.firestore.FieldValue.arrayRemove(me)}); }
+      delete fbBase[id];
+    }
+    fbSaveBase(); fbStatus='ok';
+  }catch(e){ fbStatus='error'; fbErr=e.message||String(e); scheduleCloud(15000); }
+  finally{
+    fbBusy=false; renderAccount();
+    if(fbApplyAgain){ fbApplyAgain=false; cloudApplyRemote(); }
+    if(fbAgain){ fbAgain=false; scheduleCloud(600); }
+  }
+}
+
+/* ---- sharing a trip ---- */
+function renderSharePeople(){
+  const el=document.getElementById('sharePeople'); if(!el)return;
+  if(!D){ el.innerHTML=''; return; }
+  if(!cloudOn()){ el.innerHTML='<div class="so-h">With your travel partner</div><p>Sign in on the You page, and you can share this trip by email. Changes show up on both phones as you make them.</p>'+
+    '<div class="so-btns sheet-actions"><button class="btn-save" onclick="closeExport();openYou()">Sign in</button></div>'; return; }
+  const R=fbRemote[D.id], me=myEmail(), emails=R?R.memberEmails:[me], owner=!R||R.owner===fbUser.uid;
+  el.innerHTML='<div class="so-h">With your travel partner</div><p>People here can see and change this trip. They sign in with the email you add.</p>'+
+    '<ul class="people">'+emails.map(x=>'<li><span class="av av-sm" style="background:'+(x===me?getMe().color:'#2F3A22')+';color:#fff">'+esc(initialsOf(x.split('@')[0].replace(/[._-]+/g,' '))||'?')+'</span><span class="pe">'+esc(x)+(x===me?' (you)':'')+'</span>'+
+      (x!==me&&owner?'<button class="del" aria-label="Remove '+esc(x)+'" data-email="'+esc(x)+'" onclick="shareRemove(this.dataset.email)">×</button>':'')+'</li>').join('')+'</ul>'+
+    '<div class="share-add"><input id="shareEmail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="Their email" aria-label="Their email"><button class="btn-save" onclick="shareAdd()">Share</button></div>'+
+    (!owner?'<button class="link-btn" onclick="shareLeave()">Leave this trip</button>':'');
+}
+async function shareAdd(){
+  const e=(document.getElementById('shareEmail').value||'').trim().toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)){ toast('That email doesn’t look right'); return; }
+  try{
+    if(!fbRemote[D.id]){ await cloudPush(); }
+    await fbDb.collection('trips').doc(D.id).update({memberEmails:firebase.firestore.FieldValue.arrayUnion(e)});
+    toast('Shared with '+e+'. It appears for them once they sign in with that email.');
+  }catch(err){ toast('Couldn’t share just now: '+(err.message||err)); }
+}
+async function shareRemove(e){
+  if(!await uiConfirm(e+' won’t see this trip any more.',{title:'Stop sharing?',ok:'Remove',danger:true}))return;
+  try{ await fbDb.collection('trips').doc(D.id).update({memberEmails:firebase.firestore.FieldValue.arrayRemove(e)}); }catch(err){ toast('Couldn’t remove them: '+(err.message||err)); }
+}
+async function shareLeave(){
+  if(!await uiConfirm('It will disappear from your phones. Whoever shared it keeps it.',{title:'Leave this trip?',ok:'Leave',danger:true}))return;
+  const id=D.id; closeExport(); STORE.trips=STORE.trips.filter(t=>t.id!==id); D=null; persist(); goHome(); cloudPush();
 }
 
 /* ---------- Audra's moments ---------- */
@@ -3403,7 +3620,7 @@ async function fetchCityPhoto(name){
 }
 
 /* ---------- Export ---------- */
-function openExport(){ if(!D)return; document.getElementById('exportBg').classList.add('show'); }
+function openExport(){ if(!D)return; renderSharePeople(); document.getElementById('exportBg').classList.add('show'); }
 function closeExport(){ document.getElementById('exportBg').classList.remove('show'); }
 function exStatus(t,show=true){const s=document.getElementById('exportStatus');s.textContent=t;s.style.display=show?'block':'none';}
 
@@ -3925,6 +4142,10 @@ function renderSyncStatus(){
 function renderHomeSync(){
   const el=document.getElementById('homeSync'); if(!el)return;
   if(!STORE.trips.length){ el.innerHTML=''; return; }
+  if(typeof cloudOn==='function'){
+    if(cloudOn()){ el.innerHTML=''; return; }                                   // trips are safe in the account
+    if(fbReady){ el.innerHTML='<div class="home-sync"><span><b>Keep your trips safe.</b> Sign in so they\u2019re saved to your account and shared with your travel partner.</span><button onclick="openYou()">Sign in</button></div>'; return; }
+  }
   if(syncCfg.token){
     const bad=syncCfg.status==='error';
     el.innerHTML='<div class="home-sync'+(bad?' warn':'')+'"><span>⇅ <b>'+esc(syncStateText())+'</b></span><button onclick="openSync()">'+(bad?'Fix':'Sync')+'</button></div>';
@@ -4051,7 +4272,7 @@ else { goHome(); }
 handleSharedContent();
 handlePairLink();
 renderSyncStatus();
-renderMe(); markBar(); renderOffline();
+renderMe(); markBar(); renderOffline(); initCloud();
 // iOS Safari ignores user-scalable=no, so stop its pinch gesture directly (Leaflet's map zoom uses touch events and keeps working)
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>{ if(!e.target.closest||!e.target.closest('.leaflet-container'))e.preventDefault(); },{passive:false}));
 // loading screen: Audra trots while the app wakes up, then steps aside

@@ -1,5 +1,5 @@
 /* Ace Travel service worker — bulletproof offline */
-const CACHE='ace-travel-v4';
+const CACHE='ace-travel-v5';
 const CORE=[
   './',
   './index.html',
@@ -30,14 +30,14 @@ self.addEventListener('activate',e=>{
 // Fetch strategy:
 //  - Navigations & the app itself: network-first (revalidating past the HTTP cache), fall back to cache (so you get updates online, but it works offline)
 //  - Fonts, the map library & other GET assets: cache-first, update in background
-//  - API calls (anthropic, github sync, openstreetmap, wikipedia, open-meteo, holidays, exchange rates): network-only (never cache; fail gracefully offline)
+//  - API calls (anthropic, firebase, github sync, openstreetmap, wikipedia, open-meteo, holidays, exchange rates): network-only (never cache; fail gracefully offline)
 self.addEventListener('fetch',e=>{
   const req=e.request;
   if(req.method!=='GET')return;
   const url=new URL(req.url);
 
   // never intercept API / tile / photo calls — let them hit network (and fail cleanly offline)
-  if(/api\.anthropic\.com|api\.github\.com|githubusercontent\.com|nominatim\.openstreetmap|tile\.openstreetmap|basemaps\.cartocdn|wikipedia\.org|open-meteo\.com|date\.nager\.at|frankfurter\.app|cloudflare/.test(url.href)){
+  if(/api\.anthropic\.com|api\.github\.com|githubusercontent\.com|nominatim\.openstreetmap|tile\.openstreetmap|basemaps\.cartocdn|wikipedia\.org|open-meteo\.com|date\.nager\.at|frankfurter\.app|cloudflare|firestore\.googleapis|identitytoolkit|securetoken|firebaseapp\.com|firebaseinstallations|googleapis\.com\/(?!css)/.test(url.href)){
     return; // default browser handling
   }
 
