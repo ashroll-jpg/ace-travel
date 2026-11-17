@@ -7,41 +7,42 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ace Travel">
-<meta name="theme-color" content="#2C3520">
+<meta name="theme-color" content="#FDF9F0">
 <meta name="color-scheme" content="light dark">
 <script>try{var th=localStorage.getItem('ace-theme');if(th==='light'||th==='dark')document.documentElement.setAttribute('data-theme',th);}catch(e){}</script>
 <meta http-equiv="Cache-Control" content="no-cache">
 <title>Ace Travel</title>
 <link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2728%27 fill=%27%23C8961F%27/%3E%3Cpath d=%27M14 47C27 21 58 9 82 19%27 fill=%27none%27 stroke=%27%23F7EEDA%27 stroke-width=%276%27 stroke-linecap=%27round%27/%3E%3Ccircle cx=%2783%27 cy=%2719%27 r=%277%27 fill=%27%23F7EEDA%27/%3E%3Ccircle cx=%2745%27 cy=%2758%27 r=%2719%27 fill=%27none%27 stroke=%27%232C3520%27 stroke-width=%2713%27/%3E%3Crect x=%2758%27 y=%2734%27 width=%2713%27 height=%2744%27 rx=%276.5%27 fill=%27%232C3520%27/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 196 196'%3E%3Crect width='196' height='196' rx='44' fill='%232F3A22'/%3E%3Cg transform='translate%2828 0%29'%3E%3Crect x='3' y='3' width='134' height='190' rx='16' fill='%23FFFDF8' stroke='%23C4901C' stroke-width='8'/%3E%3Cpath transform='translate%2830 52%29 scale%28.8%29' d='M50 6C62 24 88 38 88 58C88 72 76 80 63 76C59 75 56 72 54 69C55 80 56 89 50 98C44 89 45 80 46 69C44 72 41 75 37 76C24 80 12 72 12 58C12 38 38 24 50 6Z' fill='%232F3A22'/%3E%3Ccircle cx='70' cy='93.6' r='9' fill='%23C4901C'/%3E%3C/g%3E%3C/svg%3E">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   :root{
     color-scheme:light;
-    /* Brand: cream, deep gold, dark olive. --terra is the accent slot (now deep gold, dark enough for text). */
-    --olive-ink:#2C3520;
-    --olive:#2C3520; --olive-deep:#1F2617; --sage:#666C4B; --sage-soft:#9A9C7E;
-    --cream:#F4ECD8; --cream-dim:#EADFC6; --paper:#F6EFDD; --paper-hi:#FFFAEE;
-    --ink:#1D2214; --ink-soft:#4E5440; --terra:#8C600A;
-    --line:#E2D6B9; --line-soft:#ECE2CA; --gold:#C8961F; --gold-bright:#DDAE3F; --gold-soft:rgba(200,150,31,.16);
+    /* Ace Travel: light cream, deep gold, dark olive, with a warm red pop for Add and alerts. */
+    --olive-ink:#2F3A22;
+    --olive:#2F3A22; --olive-deep:#232C19; --sage:#646B4E; --sage-soft:#9A9C82;
+    --cream:#FDF9F0; --cream-dim:#F3EAD6; --paper:#FDF9F0; --paper-hi:#FFFDF8;
+    --ink:#262E1B; --ink-soft:#4E5440; --terra:#8A5F0B;
+    --line:#E6DBC3; --line-soft:#EFE6D2; --gold:#C4901C; --gold-bright:#D9A436; --gold-soft:rgba(196,144,28,.16);
+    --red:#C2432A; --red-soft:#FBE4DC; --red-ink:#A93822; --flight-soft:#EEF0E4; --flight-ink:#4A5A2E;
     --seat:#2f6fb0; --seat-deep:#245a91;
-    --warn:#A2431C; --warn-bg:#F8E4D8; --warn-line:#EBC4AE;   /* heads-up: rust, so it never reads as the gold accent */
-    --danger:#a8322a; --danger-bg:rgba(168,50,42,.09);         /* destructive actions and errors */
+    --warn:#A93822; --warn-bg:#FBE4DC; --warn-line:#F2C7B8;
+    --danger:#A93822; --danger-bg:rgba(194,67,42,.1);
     --radius:20px; --radius-lg:26px;
-    --shadow-sm:0 1px 3px rgba(43,49,37,.06), 0 1px 2px rgba(43,49,37,.04);
-    --shadow-md:0 4px 16px rgba(43,49,37,.09), 0 2px 5px rgba(43,49,37,.05);
-    --shadow-lg:0 12px 34px rgba(43,49,37,.13), 0 4px 10px rgba(43,49,37,.06);
-    --card-grad:#FFFAEE;
-    --card-grad-hi:#FFFCF4;
+    --shadow-sm:0 1px 3px rgba(47,58,34,.06), 0 1px 2px rgba(47,58,34,.04);
+    --shadow-md:0 6px 20px rgba(47,58,34,.07);
+    --shadow-lg:0 10px 30px rgba(47,58,34,.12);
+    --card-grad:#FFFDF8;
+    --card-grad-hi:#FFFDF8;
     --safe-top:env(safe-area-inset-top,0px);
     --safe-bot:env(safe-area-inset-bottom,0px);
-    --serif:"Bricolage Grotesque","Inter",-apple-system,sans-serif;   /* display face (name kept from the old serif) */
-    --sans:"Inter",-apple-system,BlinkMacSystemFont,sans-serif;
+    --serif:"Nunito",-apple-system,BlinkMacSystemFont,sans-serif;   /* one soft rounded face for everything */
+    --sans:"Nunito",-apple-system,BlinkMacSystemFont,sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{-webkit-text-size-adjust:100%}
@@ -563,7 +564,7 @@
   #home{display:none; position:fixed; inset:0; z-index:50; background:var(--paper); overflow-y:auto;
     background-image:radial-gradient(circle at 15% 12%,rgba(149,153,127,.07),transparent 44%),radial-gradient(circle at 85% 88%,rgba(200,150,31,.06),transparent 42%);}
   body.on-home #home{display:block}
-  body.on-home>header,body.on-home>main,body.on-home>nav{display:none!important}
+  body.on-home>header,body.on-home>main{display:none!important}
   .home-head{background:var(--olive); color:var(--cream); padding:calc(34px + var(--safe-top)) 24px 30px; text-align:center; position:relative; overflow:hidden; border-radius:0 0 var(--radius-lg) var(--radius-lg)}
   .home-head::after{content:""; position:absolute; right:-60px; top:-50px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(200,150,31,.2),transparent 70%)}
   .home-logo{height:64px; width:auto; max-width:78%; object-fit:contain; margin-bottom:12px}
@@ -746,95 +747,206 @@
   body.on-home #toast{bottom:calc(24px + var(--safe-bot))}
 
   /* =========================================================
-     Brand: cream, deep gold, dark olive — bold display type, solid shapes, gold for the fun bits
+     Ace Travel redesign: light cream, deep gold, dark olive, a warm red pop; Nunito; Audra
      ========================================================= */
-  .brand{display:flex;align-items:center;justify-content:center;gap:9px;line-height:1}
-  .brand-mark{width:30px;height:30px;flex-shrink:0;display:block}
-  .brand-word{font-family:var(--serif);font-weight:800;font-size:23px;letter-spacing:-.04em;color:var(--cream);font-variation-settings:"opsz" 48}
-  .brand-word b{color:var(--gold-bright);font-weight:800}
-  .brand-lg{justify-content:flex-start;gap:12px}
-  .brand-lg .brand-mark{width:44px;height:44px}
-  .brand-lg .brand-word{font-size:30px}
+  body{font-family:var(--sans);background:var(--paper);color:var(--ink);padding-bottom:calc(110px + var(--safe-bot))}
+  h1,h2,h3{font-family:var(--sans)}
+  .sheet-bg{z-index:70}
+  .card{border-radius:24px;background:var(--paper-hi);border:1px solid var(--line-soft)}
+  .link-btn{border:none;background:transparent;color:var(--olive-ink);font:inherit;font-size:15px;font-weight:700;padding:6px 2px;cursor:pointer}
+  .red-btn{height:46px;padding:0 22px;border-radius:999px;border:none;background:var(--red);color:#fff;font:inherit;font-size:15px;font-weight:800}
+  .small-btn{flex-shrink:0;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:14px;font-weight:700}
+  .circle-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper-hi);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+  .circle-btn svg{width:20px;height:20px}
+  .pill-btn{height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--paper-hi);color:var(--ink);font:inherit;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+  .pill-btn svg{width:18px;height:18px}
+  .pill-btn.on{background:var(--olive);border-color:var(--olive);color:#FDF9F0}
+  .av{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-weight:800;line-height:1;flex-shrink:0;letter-spacing:-.02em}
+  .av-xs{width:22px;height:22px;font-size:9.5px;margin-left:auto}
+  .av-sm{width:30px;height:30px;font-size:11.5px;border:2px solid var(--paper-hi)}
+  .av-lg{width:56px;height:56px;font-size:20px}
+  .av-stack{display:inline-flex}
+  .av-stack .av+.av{margin-left:-8px}
+  .lockup{display:flex;align-items:center;gap:9px;font-size:24px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+  .lk-card{width:24px;height:34px;transform:rotate(-6deg);flex-shrink:0}
+  .lockup.on-dark{color:#FDF9F0;justify-content:center}
 
-  /* header: a solid dark-olive bar */
-  header{background:var(--olive);border-radius:22px;padding:11px 16px;box-shadow:none}
-  header::before,header::after{display:none}
-  .hdr-btn{width:36px;height:36px;border:none;background:rgba(244,236,216,.1)}
-  .hdr-btn:active{background:var(--gold);color:var(--olive-deep)}
+  /* home */
+  #home{background:var(--paper)}
+  .home-top{display:flex;align-items:center;justify-content:space-between;padding:calc(18px + var(--safe-top)) 20px 0;max-width:640px;margin:0 auto}
+  .me-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:999px;border:1px solid var(--line);background:var(--paper-hi);color:var(--ink);font:inherit;font-size:15px;font-weight:700}
+  .me-chip .av{width:32px;height:32px;font-size:12px}
+  .home-body{padding:18px 20px calc(130px + var(--safe-bot))}
+  .home-bar{display:flex;align-items:baseline;justify-content:space-between;margin:4px 2px 12px}
+  .home-bar h1{margin:0;font-size:32px;font-weight:700;letter-spacing:-.015em;color:var(--ink)}
+  .pills{display:flex;gap:8px;margin-bottom:16px}
+  .pill{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink-soft);font:inherit;font-size:15px;font-weight:700}
+  .pill span{color:var(--sage)}
+  .pill.on{background:var(--olive);border-color:var(--olive);color:#FDF9F0}
+  .pill.on span{color:var(--gold-bright)}
+  #tripGrid .trip-card{position:relative;display:flex;align-items:center;gap:14px;margin:0 0 12px;padding:12px;border-radius:22px;background:var(--paper-hi);border:1px solid var(--line-soft);box-shadow:none;overflow:hidden;cursor:pointer;text-align:left}
+  #tripGrid .trip-card.big{display:block;padding:0;border-radius:26px;box-shadow:var(--shadow-md)}
+  #tripGrid .tc-cover{position:relative;height:132px;background:var(--olive);overflow:hidden}
+  #tripGrid .tc-cover img{width:100%;height:100%;object-fit:cover;display:block}
+  #tripGrid .tc-cover::before,#tripGrid .tc-cover::after{display:none!important}
+  .tc-sun{position:absolute;right:-36px;top:-46px;width:150px;height:150px;border-radius:50%;background:var(--gold)}
+  .tc-path{position:absolute;inset:0;width:100%;height:100%}
+  .tc-chip{position:absolute;left:16px;top:14px;padding:6px 12px;border-radius:999px;background:var(--gold);color:#2F3A22;font-size:13px;font-weight:800}
+  .tc-thumb{position:relative;width:64px;height:64px;border-radius:16px;background:var(--cream-dim);overflow:hidden;flex-shrink:0}
+  .tc-thumb img{width:100%;height:100%;object-fit:cover}
+  .tc-thumb .tc-sun{right:-14px;top:-14px;width:44px;height:44px}
+  #tripGrid .tc-body{padding:0;flex:1;min-width:0}
+  #tripGrid .trip-card.big .tc-body{padding:16px 18px 18px}
+  #tripGrid .tc-name{font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+  #tripGrid .trip-card.big .tc-name{font-size:23px}
+  #tripGrid .tc-meta{display:block;font-size:14px;font-weight:600;color:var(--sage);margin-top:3px}
+  .tc-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+  .tcard-next{font-size:14px;font-weight:600;color:var(--sage);text-align:right}
+  .tc-days{flex-shrink:0;padding:5px 10px;border-radius:999px;background:var(--cream-dim);color:var(--terra);font-size:13px;font-weight:800;white-space:nowrap}
+  #tripGrid .tc-del{display:none;position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:none;background:var(--red);color:#fff;font-size:20px;z-index:2;align-items:center;justify-content:center}
+  #home.editing #tripGrid .tc-del{display:flex}
+  .new-trip-btn{width:100%;margin-top:6px;padding:16px;border-radius:20px;border:1.5px dashed var(--line);background:transparent;color:var(--ink-soft);font:inherit;font-size:15px;font-weight:700}
+  .import-link{display:block;margin:10px auto 0;color:var(--sage)}
+  .moment{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:28px 18px 24px;border-radius:26px;background:var(--paper-hi);border:1px solid var(--line-soft)}
+  .moment-dog{width:190px;height:154px;color:var(--olive-ink)}
+  .moment-h{font-size:21px;font-weight:700;color:var(--ink)}
+  .moment-t{font-size:15px;font-weight:500;color:var(--sage);margin-bottom:8px}
+  .home-sync{border-radius:18px;background:var(--paper-hi);border:1px solid var(--line-soft)}
 
-  /* home: a big, friendly hello */
-  .home-head{text-align:left;padding:calc(22px + var(--safe-top)) 22px 30px;border-radius:0 0 32px 32px;background:var(--olive)}
-  .home-head::after{content:"";position:absolute;right:-96px;top:-84px;width:220px;height:220px;border-radius:50%;background:var(--gold);opacity:.95}
-  .home-head::before{content:"";position:absolute;right:56px;top:44px;width:16px;height:16px;border-radius:50%;background:var(--cream);z-index:1}
-  .home-head>*{position:relative;z-index:2}
-  .home-hello{font-family:var(--serif);font-weight:800;font-size:40px;line-height:1.02;letter-spacing:-.04em;color:var(--cream);margin-top:30px;max-width:5.2em}
-  .home-bar h2{font-family:var(--serif);font-weight:800;font-size:24px;letter-spacing:-.03em}
-
-  /* type: bold display headings, no rules under them */
-  .view-head{border-bottom:none!important;padding-bottom:6px}
-  .view-title{font-family:var(--serif);font-weight:800;font-size:32px;letter-spacing:-.04em;line-height:1.05}
-  .view-count{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--sage)}
-  .view-lead{font-family:var(--serif);font-weight:700;font-size:18px;letter-spacing:-.02em;color:var(--ink);margin:22px 0 6px}
-  .empty .mark{font-family:var(--sans);font-size:15px;color:var(--sage)}
-  .dp-title,.entry-title,.so-h,.set-h,.tc-name,.lodg-name{font-weight:700!important;letter-spacing:-.02em}
-  .sheet h3{font-family:var(--serif);font-weight:800;letter-spacing:-.03em}
-
-  /* trip card */
-  .trip-card{border-radius:24px;border:1px solid var(--line-soft);box-shadow:var(--shadow-md)}
-  .trip-name{font-weight:800;font-size:32px!important;letter-spacing:-.04em;line-height:1.02}
-  .trip-dates{font-family:var(--sans)!important;font-size:12.5px!important;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-top:8px}
-  .trip-countdown{background:var(--gold)!important;color:var(--olive-deep)!important;font-weight:700;letter-spacing:.06em;border-radius:20px}
-  .trip-countdown .dot{background:var(--olive-deep)}
-  .trip-ask{border:none;background:var(--olive);color:var(--cream);font-weight:700}
-  .trip-ask span{color:var(--gold-bright)}
-  .hero-photo,.hero-scrim{border-radius:26px}
-  .hero-photo.no-photo,.tc-cover.no-photo{background:radial-gradient(circle at 92% 0%,var(--gold) 0 70px,transparent 71px),var(--olive)!important}
-  .hero-photo.no-photo::after,.tc-cover.no-photo::before{font-family:var(--serif)!important;font-weight:800!important;letter-spacing:-.04em!important;color:var(--cream)!important;opacity:.92}
-
-  /* buttons: solid, rounded, sentence case */
-  .sheet-actions button,.magic-btn,.wish-add-btn,.wish-imp-btn,.dp-bar button,.home-sync button,.chip,.seg button{text-transform:none!important;letter-spacing:0!important}
-  .sheet-actions button{border-radius:14px;font-size:15px;font-weight:700}
-  .btn-save,.magic-btn:not(.ghost),.wish-add-btn,.dp-done,.home-sync button:not(.later){background:var(--olive)!important;color:var(--cream)!important}
-  .magic-btn{border-radius:14px;font-size:14px;font-weight:700}
-  .magic-btn span{color:var(--gold-bright)}
-  .magic-btn.ghost span{color:var(--terra)}
+  /* trip header */
+  header.trip-top{background:transparent;color:var(--ink);box-shadow:none;border-radius:0;margin:0 auto;max-width:560px;padding:calc(12px + var(--safe-top)) 20px 0;overflow:visible}
+  header.trip-top::before,header.trip-top::after{display:none}
+  .tt-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .tt-actions{display:flex;gap:8px}
+  .trip-top .trip-name{display:block;width:100%;margin:0;padding:0;border:none;background:transparent;font-family:var(--sans);font-style:normal;font-size:32px!important;font-weight:700;letter-spacing:-.015em;line-height:1.15;color:var(--ink);text-align:left;max-height:none;opacity:1}
+  .trip-top .trip-name::placeholder{color:var(--sage-soft);font-style:normal}
+  .tt-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .trip-top .trip-dates{width:auto;flex:0 1 auto;min-width:80px;margin:0;padding:0;border:none;background:transparent;font-family:var(--sans)!important;font-style:normal;font-size:15px!important;font-weight:600;letter-spacing:0;text-transform:none;color:var(--sage);text-align:left;field-sizing:content;max-height:none;opacity:1}
+  .trip-top .trip-countdown{margin:0;padding:4px 10px;border-radius:999px;background:var(--gold)!important;color:#2F3A22!important;font-size:13px;font-weight:800;letter-spacing:0;text-transform:none}
+  .trip-top .trip-countdown .dot{display:none}
+  .tt-meta .av-stack{margin-left:auto}
+  .tt-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .trip-top .trip-next{margin:0;font-size:14px;color:var(--ink);text-align:left}
+  .ask-pill{height:36px;padding:0 14px;border-radius:999px;border:none;background:var(--olive);color:#FDF9F0;font:inherit;font-size:14px;font-weight:700;margin-left:auto}
+  .ask-pill span{color:var(--gold-bright)}
+  .trip-top .trip-localtime{text-align:left;margin-top:6px}
+  .trip-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:4px;margin:16px 0 4px;border-radius:16px;background:var(--cream-dim)}
+  .trip-tabs button{height:40px;border:none;border-radius:12px;background:transparent;color:var(--sage);font:inherit;font-size:15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+  .trip-tabs button.on{background:var(--paper-hi);color:var(--ink);font-weight:800;box-shadow:var(--shadow-sm)}
+  .trip-tabs .seg-n{font-size:12px;color:var(--sage)}
+  .trip-tabs .seg-n:empty{display:none}
+  .sec-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:8px 0 10px}
+  .sec-h{margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+  .prep-gap{margin-top:34px}
+  .ccy-pick{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--sage)}
+  .ccy-pick select{border:1px solid var(--line);background:var(--paper-hi);color:var(--ink);border-radius:10px;padding:6px 8px;font:inherit;font-size:14px;font-weight:700}
+  #view-wishlist,#view-map,#view-bookings,#view-packing,#view-budget{padding:12px 20px 0}
+  #view-itinerary{padding:4px 0 0}
+  .view-intro{margin-top:2px}
+  /* the add box on Days only shows for an empty trip, or while it's reading something */
+  #view-itinerary .magic{margin:12px 16px 18px}
+  #view-itinerary .magic.has-content:not(.busy){display:none}
+  #view-itinerary .magic.busy .magic-text,#view-itinerary .magic.busy .magic-btns,#view-itinerary .magic.busy .no-key-note{display:none}
+  .magic{border-radius:22px;background:var(--paper-hi)}
   .magic::before{background:var(--gold)}
-  .add-btn{border-radius:16px;border-color:var(--line);color:var(--ink-soft);text-transform:none;letter-spacing:0}
-  .add-btn:active{background:var(--gold);border-color:var(--gold);color:var(--olive-deep)}
-  .pack-suggest button,.settings-sync-btn{border-radius:14px}
-  .pack-suggest button span{color:var(--terra)}
-  .chip.on{background:var(--olive);border-color:var(--olive)}
-  .new-trip-btn{border-radius:18px;border:none!important;background:var(--gold);color:var(--olive-deep);font-weight:700;font-size:16px}
-  .new-trip-btn:active{background:var(--olive);color:var(--cream)}
-  .new-trip-btn.secondary{background:transparent;border:1px solid var(--line)!important;color:var(--ink-soft)}
+  .magic-btn{border-radius:14px;text-transform:none;letter-spacing:0;font-size:14px;font-weight:800}
+  .magic-btn:not(.ghost){background:var(--red)}
+  .dp-title{display:flex;align-items:center;gap:8px}
+  .ci-block{position:relative}
+  .ci-head .av-xs{position:absolute;right:10px;bottom:10px;margin:0}
+  .wish-cat .av-xs{margin-left:6px;vertical-align:middle;width:18px;height:18px;font-size:8px}
+  .warn-card{border-radius:20px}
 
-  /* nav: dark olive bar, gold pill for the current tab */
-  nav{background:var(--olive)!important;border:none!important;border-radius:24px!important;padding:6px!important;box-shadow:0 10px 30px rgba(31,38,23,.28)!important;backdrop-filter:none!important}
-  nav button{color:rgba(244,236,216,.62)!important;border-radius:18px!important}
-  nav button .ic{opacity:1}
-  nav button.active{background:var(--gold)!important;color:var(--olive-deep)!important}
+  /* bottom bar: Trips · + · You, everywhere */
+  nav.app-bar{position:fixed;left:16px;right:16px;bottom:calc(16px + var(--safe-bot));z-index:60;height:70px;max-width:528px;margin:0 auto;padding:0 10px;display:flex;align-items:center;justify-content:space-around;border-radius:28px;background:var(--paper-hi);border:1px solid var(--line-soft);box-shadow:0 10px 30px rgba(47,58,34,.12);backdrop-filter:none}
+  nav.app-bar button{flex:0 0 auto;min-width:72px;padding:6px 0;border:none;border-radius:16px;background:transparent;color:var(--sage);font:inherit;font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px}
+  nav.app-bar button svg{width:24px;height:24px}
+  nav.app-bar button.on{color:var(--ink);font-weight:800;background:transparent}
+  nav.app-bar button.on svg{color:var(--red)}
+  nav.app-bar .add-fab{min-width:0;width:64px;height:64px;margin-top:-34px;border-radius:50%;background:var(--red);color:#fff;box-shadow:0 8px 18px rgba(194,67,42,.35);justify-content:center}
+  nav.app-bar .add-fab svg{width:28px;height:28px;color:#fff}
+  nav.app-bar .add-fab:active{transform:scale(.96)}
 
-  /* calendar + money */
-  .cm-num{font-family:var(--serif);font-weight:800;letter-spacing:-.04em}
-  .cal-row.is-today .cm-num,.cal-row.is-today .cm-dow,.cal-row.is-today .cm-mon{color:var(--terra)}
-  .budget-hero{border-radius:24px;box-shadow:none}
-  .budget-hero::before{display:none}
-  .budget-hero::after{content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:var(--gold);opacity:.9}
-  .budget-hero>*{position:relative;z-index:1}
-  .budget-hero .amt{font-weight:800;font-size:54px;letter-spacing:-.045em}
-  .budget-hero .cur{color:var(--gold-bright)}
-  .tc-chip{background:var(--gold-soft);color:var(--terra)}
-  .seg{background:var(--cream-dim)}
-  .today-card{border-radius:24px}
+  /* You */
+  #you{position:fixed;inset:0;z-index:55;background:var(--paper);overflow-y:auto;-webkit-overflow-scrolling:touch}
+  #you[hidden]{display:none}
+  .you-body{max-width:560px;margin:0 auto;padding:calc(22px + var(--safe-top)) 20px calc(130px + var(--safe-bot));display:flex;flex-direction:column;gap:16px}
+  .you-body h1{margin:0 0 2px;font-size:32px;font-weight:700;letter-spacing:-.015em}
+  .you-id{padding:16px;display:flex;flex-direction:column;gap:12px}
+  .you-id-row{display:flex;align-items:center;gap:14px}
+  .fld-block{flex:1;display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--sage)}
+  .fld-block input,.lc-col input{height:44px;border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:16px;font-weight:600;padding:0 12px}
+  .fld-label{font-size:13px;font-weight:700;color:var(--sage)}
+  .fld-note{font-size:13px;font-weight:500;color:var(--sage);margin:0;line-height:1.45}
+  .swatches{display:flex;gap:10px}
+  .swatch{width:38px;height:38px;border-radius:50%;border:3px solid transparent;box-shadow:inset 0 0 0 2px var(--paper-hi)}
+  .swatch.on{border-color:var(--ink)}
+  .list-card{overflow:hidden}
+  .lc-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line-soft);font-size:16px;font-weight:700;color:var(--ink)}
+  .lc-row>svg{width:22px;height:22px;color:var(--flight-ink);flex-shrink:0}
+  .lc-row select{margin-left:auto;border:none;background:transparent;color:var(--sage);font:inherit;font-size:15px;font-weight:600;text-align:right}
+  .lc-col{flex-direction:column;align-items:stretch;gap:8px}
+  .lc-text{flex:1;display:flex;flex-direction:column;gap:1px}
+  .lc-text span{font-size:14px;font-weight:600;color:var(--sage)}
+  .lc-btn{display:block;width:100%;padding:14px 16px;border:none;border-bottom:1px solid var(--line-soft);background:transparent;color:var(--ink);font:inherit;font-size:16px;font-weight:700;text-align:left}
+  .list-card>:last-child{border-bottom:none}
+  .credit{display:flex;align-items:center;gap:12px;padding:4px 6px;color:var(--sage);font-size:14px;font-weight:600}
+  .credit-dog{width:70px;height:57px;color:var(--sage);flex-shrink:0}
+  .build{font-size:12px;color:var(--sage-soft);padding:0 6px}
+
+  /* the + sheet */
+  .add-sheet{display:flex;flex-direction:column;gap:14px;border-radius:32px 32px 0 0;padding-top:12px}
+  .grab{width:44px;height:5px;border-radius:3px;background:var(--line);align-self:center}
+  .add-head{display:flex;align-items:flex-start;justify-content:space-between}
+  .add-head h3{margin:0 0 6px;font-size:26px;font-weight:700}
+  .trip-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--paper-hi);color:var(--ink);font:inherit;font-size:14px;font-weight:700}
+  .trip-chip svg{width:16px;height:16px}
+  .trip-chip:disabled svg{display:none}
+  .drop-card{position:relative;overflow:hidden;border-radius:24px;background:var(--olive);color:#FDF9F0;padding:18px;display:flex;flex-direction:column;gap:6px}
+  .dc-sun{position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:var(--gold)}
+  .dc-h{position:relative;font-size:19px;font-weight:700}
+  .drop-card p{position:relative;margin:0 0 8px!important;max-width:230px;font-size:14px;line-height:1.45;color:#E3DCC7!important}
+  .dc-btns{position:relative;display:flex;gap:10px}
+  .dc-btns button{flex:1;height:48px;border-radius:16px;border:none;background:#FDF9F0;color:#2F3A22;font:inherit;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+  .dc-btns button.ghost{background:transparent;border:1.5px solid rgba(253,249,240,.5);color:#FDF9F0}
+  .dc-btns svg{width:18px;height:18px}
+  .add-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .add-grid button{height:86px;border-radius:20px;border:1px solid var(--line-soft);background:var(--paper-hi);color:var(--ink);font:inherit;font-size:16px;font-weight:700;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;padding:0 16px}
+  .add-grid svg{width:24px;height:24px}
+  .ic-olive{color:var(--flight-ink)} .ic-gold{color:var(--terra)} .ic-red{color:var(--red)}
+  .add-new{align-self:center;color:var(--sage)}
+
+  /* loading screen, cheer, offline */
+  #splash{position:fixed;inset:0;z-index:100;background:#2F3A22;color:#F4ECD8;display:flex;align-items:center;justify-content:center;transition:opacity .4s ease}
+  #splash.out{opacity:0;pointer-events:none}
+  .splash-in{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .audra-trot{width:280px;height:228px}
+  .splash-msg{font-size:16px;font-weight:600;color:#CFC7AE}
+  .splash-msg span{animation:dotblink 1.2s ease-in-out infinite}
+  .splash-msg .d2{animation-delay:.2s} .splash-msg .d3{animation-delay:.4s}
+  @keyframes dotblink{0%,100%{opacity:.25}50%{opacity:1}}
+  #cheer{position:fixed;inset:0;z-index:92;display:flex;align-items:center;justify-content:center;background:rgba(21,24,15,.25);opacity:0;transition:opacity .25s}
+  #cheer.show{opacity:1}
+  #cheer[hidden]{display:none}
+  .cheer-card{width:min(320px,calc(100% - 48px));border-radius:28px;background:#2F3A22;color:#FDF9F0;padding:18px 20px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;box-shadow:var(--shadow-lg)}
+  .audra-party{width:190px;height:154px;color:#F4ECD8}
+  .cheer-h{font-size:22px;font-weight:800}
+  .cheer-t{font-size:14px;font-weight:500;color:#E3DCC7}
+  #offlineBar{position:fixed;left:16px;right:16px;bottom:calc(98px + var(--safe-bot));z-index:58;max-width:528px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:20px;background:var(--red-soft);color:var(--ink);box-shadow:var(--shadow-md)}
+  #offlineBar .off-dog{width:62px;height:50px;color:var(--olive-ink);opacity:.6;flex-shrink:0}
+  #offlineBar b{display:block;font-size:15px}
+  #offlineBar span{font-size:13px;font-weight:500;color:var(--ink-soft);line-height:1.4}
+  @media (prefers-reduced-motion:reduce){.splash-msg span{animation:none}#splash{transition:none}}
 
   /* ---------- Dark mode (Settings → Appearance; Auto follows the phone) ---------- */
-  :root[data-theme="dark"]{--olive-ink:#E8D9AE; --sage:#A9AB8C; --sage-soft:#7E8266; --terra:#E3B24C; --gold:#D9A93A; --gold-bright:#E8BC55; --gold-soft:rgba(217,169,58,.16);
-    --warn:#F0956A; --warn-bg:rgba(240,149,106,.12); --warn-line:rgba(240,149,106,.35); --danger:#EF8B7C; --danger-bg:rgba(239,139,124,.12);
-    --paper:#12150D; --paper-hi:#1B1F14; --ink:#F3EBD7; --ink-soft:#BEB7A0;
-    --line:#343A29; --line-soft:#262B1D; --olive:#2C3520; --cream-dim:#2A3021;
+  :root[data-theme="dark"]{--olive-ink:#E8D9AE; --sage:#A9AB8C; --sage-soft:#7E8266; --terra:#E3B24C; --gold:#D9A436; --gold-bright:#E3B24C; --gold-soft:rgba(217,164,54,.16);
+    --red:#C2432A; --red-soft:rgba(194,67,42,.2); --red-ink:#F0A08C; --flight-soft:rgba(160,180,120,.14); --flight-ink:#C3D09F;
+    --warn:#F0A08C; --warn-bg:rgba(194,67,42,.16); --warn-line:rgba(240,160,140,.35); --danger:#F0A08C; --danger-bg:rgba(240,160,140,.12);
+    --paper:#15180F; --paper-hi:#1E2216; --ink:#F3EBD7; --ink-soft:#C5BEA8;
+    --line:#353B2A; --line-soft:#282D20; --olive:#2F3A22; --cream-dim:#262B1D;
     --shadow-sm:0 1px 3px rgba(0,0,0,.3); --shadow-md:0 4px 16px rgba(0,0,0,.35); --shadow-lg:0 12px 34px rgba(0,0,0,.45);
-    --card-grad:#1B1F14;
-    --card-grad-hi:#20251A;
+    --card-grad:#1E2216;
+    --card-grad-hi:#1E2216;
     color-scheme:dark;}
   :root[data-theme="dark"] .entry.filler{background:linear-gradient(160deg,#20231b 0%,#1c1f18 100%)}
   :root[data-theme="dark"] .leaflet-container{background:#22251d!important}
@@ -842,15 +954,15 @@
   :root[data-theme="dark"] .today-card{background:#2b3125; box-shadow:0 0 0 1px #2C3520}
   :root[data-theme="dark"] img.leaflet-tile{filter:brightness(.75) contrast(1.1)}
   :root[data-theme="dark"] nav{background:rgba(30,33,25,.92)}
-  :root[data-theme="dark"] nav,:root[data-theme="dark"] header,:root[data-theme="dark"] .home-head{background:#262E1A!important}
   @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){--olive-ink:#E8D9AE; --sage:#A9AB8C; --sage-soft:#7E8266; --terra:#E3B24C; --gold:#D9A93A; --gold-bright:#E8BC55; --gold-soft:rgba(217,169,58,.16);
-    --warn:#F0956A; --warn-bg:rgba(240,149,106,.12); --warn-line:rgba(240,149,106,.35); --danger:#EF8B7C; --danger-bg:rgba(239,139,124,.12);
-    --paper:#12150D; --paper-hi:#1B1F14; --ink:#F3EBD7; --ink-soft:#BEB7A0;
-    --line:#343A29; --line-soft:#262B1D; --olive:#2C3520; --cream-dim:#2A3021;
+  :root:not([data-theme="light"]){--olive-ink:#E8D9AE; --sage:#A9AB8C; --sage-soft:#7E8266; --terra:#E3B24C; --gold:#D9A436; --gold-bright:#E3B24C; --gold-soft:rgba(217,164,54,.16);
+    --red:#C2432A; --red-soft:rgba(194,67,42,.2); --red-ink:#F0A08C; --flight-soft:rgba(160,180,120,.14); --flight-ink:#C3D09F;
+    --warn:#F0A08C; --warn-bg:rgba(194,67,42,.16); --warn-line:rgba(240,160,140,.35); --danger:#F0A08C; --danger-bg:rgba(240,160,140,.12);
+    --paper:#15180F; --paper-hi:#1E2216; --ink:#F3EBD7; --ink-soft:#C5BEA8;
+    --line:#353B2A; --line-soft:#282D20; --olive:#2F3A22; --cream-dim:#262B1D;
     --shadow-sm:0 1px 3px rgba(0,0,0,.3); --shadow-md:0 4px 16px rgba(0,0,0,.35); --shadow-lg:0 12px 34px rgba(0,0,0,.45);
-    --card-grad:#1B1F14;
-    --card-grad-hi:#20251A;
+    --card-grad:#1E2216;
+    --card-grad-hi:#1E2216;
     color-scheme:dark;}
   :root:not([data-theme="light"]) .entry.filler{background:linear-gradient(160deg,#20231b 0%,#1c1f18 100%)}
   :root:not([data-theme="light"]) .leaflet-container{background:#22251d!important}
@@ -858,28 +970,40 @@
   :root:not([data-theme="light"]) .today-card{background:#2b3125; box-shadow:0 0 0 1px #2C3520}
   :root:not([data-theme="light"]) img.leaflet-tile{filter:brightness(.75) contrast(1.1)}
   :root:not([data-theme="light"]) nav{background:rgba(30,33,25,.92)}
-  :root:not([data-theme="light"]) nav,:root:not([data-theme="light"]) header,:root:not([data-theme="light"]) .home-head{background:#262E1A!important}
   }
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="brandMark" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="28" fill="#C8961F"/>
-  <path d="M14 47C27 21 58 9 82 19" fill="none" stroke="#F7EEDA" stroke-width="6" stroke-linecap="round"/><circle cx="83" cy="19" r="7" fill="#F7EEDA"/>
-  <circle cx="45" cy="58" r="19" fill="none" stroke="#2C3520" stroke-width="13"/><rect x="58" y="34" width="13" height="44" rx="6.5" fill="#2C3520"/>
-</symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- logo: an ace with our initials, the spade doubling as a map pin -->
+  <symbol id="aceCard" viewBox="0 0 140 196">
+    <rect x="3" y="3" width="134" height="190" rx="16" fill="#FFFDF8" stroke="#C4901C" stroke-width="4"/>
+    <rect x="11" y="11" width="118" height="174" rx="10" fill="none" stroke="#C4901C" stroke-width="1.2" opacity=".55"/>
+    <g font-family="Nunito, sans-serif" font-weight="800" fill="#2F3A22"><text x="22" y="44" font-size="30" text-anchor="middle">A</text><g transform="rotate(180 70 98)"><text x="22" y="44" font-size="30" text-anchor="middle">S</text></g></g>
+    <g fill="#2F3A22"><path transform="translate(14 50) scale(.16)" d="M50 6C62 24 88 38 88 58C88 72 76 80 63 76C59 75 56 72 54 69C55 80 56 89 50 98C44 89 45 80 46 69C44 72 41 75 37 76C24 80 12 72 12 58C12 38 38 24 50 6Z"/><path transform="rotate(180 70 98) translate(14 50) scale(.16)" d="M50 6C62 24 88 38 88 58C88 72 76 80 63 76C59 75 56 72 54 69C55 80 56 89 50 98C44 89 45 80 46 69C44 72 41 75 37 76C24 80 12 72 12 58C12 38 38 24 50 6Z"/></g>
+    <g transform="translate(30 52) scale(.8)"><ellipse cx="50" cy="104" rx="16" ry="4" fill="#C4901C" opacity=".35"/><path d="M50 6C62 24 88 38 88 58C88 72 76 80 63 76C59 75 56 72 54 69C55 80 56 89 50 98C44 89 45 80 46 69C44 72 41 75 37 76C24 80 12 72 12 58C12 38 38 24 50 6Z" fill="#2F3A22"/><circle cx="50" cy="52" r="11" fill="#C4901C"/><circle cx="50" cy="52" r="4.5" fill="#FFFDF8"/></g>
+  </symbol>
+  <symbol id="aceMini" viewBox="0 0 140 196">
+    <rect x="3" y="3" width="134" height="190" rx="16" fill="#FFFDF8" stroke="#C4901C" stroke-width="8"/>
+    <path transform="translate(30 52) scale(.8)" d="M50 6C62 24 88 38 88 58C88 72 76 80 63 76C59 75 56 72 54 69C55 80 56 89 50 98C44 89 45 80 46 69C44 72 41 75 37 76C24 80 12 72 12 58C12 38 38 24 50 6Z" fill="#2F3A22"/><circle cx="70" cy="93.6" r="9" fill="#C4901C"/>
+  </symbol>
+  <!-- Audra, traced from the original drawing, in parts so she can trot; takes the current text colour -->
+  <defs><path id="au-legFarHind" d="M70.99 76.12C72.13 75.90 77.45 75.21 79.34 76.12C81.24 77.04 81.29 80.09 82.38 81.62C83.47 83.16 85.29 84.39 85.88 85.34C86.46 86.29 86.00 87.03 85.88 87.33C85.75 87.63 85.34 87.08 85.10 87.12C84.87 87.17 84.60 87.10 84.49 87.62C84.37 88.15 84.55 89.48 84.41 90.25C84.28 91.02 84.47 90.71 83.68 92.25C82.89 93.79 80.60 98.06 79.68 99.50C78.75 100.94 78.74 100.61 78.12 100.90C77.51 101.18 77.02 101.17 76.00 101.21C74.98 101.26 72.90 101.22 72.00 101.14C71.10 101.06 70.96 100.95 70.62 100.74C70.29 100.53 70.11 100.25 70.00 99.88C69.90 99.50 69.89 98.90 70.00 98.50C70.10 98.10 69.90 97.92 70.62 97.48C71.35 97.03 73.62 96.23 74.38 95.81C75.13 95.40 74.75 95.72 75.15 95.00C75.55 94.28 76.46 92.42 76.79 91.50C77.11 90.58 77.11 90.17 77.11 89.50C77.11 88.83 77.12 88.35 76.77 87.50C76.43 86.65 75.53 85.73 75.02 84.38C74.51 83.02 74.14 80.53 73.72 79.38C73.30 78.22 72.96 77.99 72.50 77.45C72.04 76.91 69.85 76.35 70.99 76.12Z"/><path id="au-legNearHind" d="M91.08 79.12C91.02 78.37 92.23 78.45 92.88 79.12C93.54 79.80 94.00 81.90 95.00 83.15C96.00 84.40 97.61 84.42 98.89 86.62C100.18 88.83 102.03 94.25 102.73 96.38C103.44 98.50 103.10 98.44 103.11 99.38C103.12 100.31 103.04 101.24 102.79 102.00C102.54 102.76 102.01 103.45 101.62 103.91C101.24 104.37 101.73 104.61 100.50 104.77C99.27 104.93 95.51 104.95 94.25 104.87C92.99 104.78 93.31 104.58 92.95 104.25C92.60 103.92 92.26 103.40 92.10 102.88C91.95 102.35 91.88 101.69 92.02 101.12C92.16 100.56 92.49 100.02 92.94 99.50C93.39 98.98 94.43 98.54 94.71 98.00C95.00 97.46 94.85 96.90 94.68 96.25C94.51 95.60 94.17 94.94 93.69 94.12C93.22 93.31 93.14 92.49 91.85 91.38C90.57 90.26 86.98 88.41 86.00 87.42C85.02 86.43 85.04 85.15 86.00 85.45C86.96 85.76 90.52 88.36 91.75 89.23C92.98 90.10 92.90 90.13 93.38 90.68C93.85 91.22 94.04 91.27 94.62 92.49C95.21 93.71 96.58 96.92 96.88 98.00C97.18 99.08 96.91 98.48 96.42 99.00C95.92 99.52 94.34 100.65 93.90 101.12C93.46 101.60 93.72 101.63 93.76 101.88C93.80 102.12 93.88 102.43 94.12 102.62C94.37 102.81 94.46 102.96 95.25 103.04C96.04 103.11 98.08 103.10 98.88 103.08C99.67 103.05 99.70 103.02 100.00 102.90C100.30 102.78 100.43 102.84 100.69 102.38C100.95 101.91 101.41 100.75 101.56 100.12C101.72 99.50 101.75 99.42 101.62 98.62C101.49 97.83 101.29 96.83 100.81 95.38C100.32 93.92 99.27 91.21 98.69 89.88C98.12 88.54 98.27 88.41 97.36 87.38C96.45 86.34 94.30 85.05 93.25 83.67C92.20 82.30 91.14 79.88 91.08 79.12Z"/><path id="au-legFront" d="M38.50 83.12C38.77 82.44 39.84 82.10 40.07 83.12C40.31 84.15 40.10 87.35 39.89 89.25C39.68 91.15 39.19 93.16 38.79 94.50C38.39 95.84 38.01 96.61 37.50 97.31C36.99 98.00 36.40 98.29 35.75 98.66C35.10 99.02 34.11 99.17 33.62 99.50C33.13 99.83 32.95 100.27 32.81 100.62C32.67 100.98 32.57 101.33 32.79 101.62C33.01 101.92 33.19 102.26 34.12 102.40C35.06 102.54 37.46 102.49 38.38 102.45C39.29 102.41 39.25 102.35 39.62 102.18C40.00 102.00 39.95 102.57 40.63 101.38C41.31 100.18 43.14 96.48 43.72 95.00C44.31 93.52 43.63 94.25 44.12 92.50C44.61 90.75 46.26 85.98 46.67 84.50C47.07 83.02 46.68 83.85 46.58 83.62C46.47 83.40 45.66 83.21 46.02 83.12C46.38 83.04 48.73 81.75 48.74 83.12C48.75 84.50 46.75 89.04 46.09 91.38C45.42 93.71 45.36 95.42 44.76 97.12C44.16 98.83 43.21 100.47 42.50 101.58C41.79 102.69 41.08 103.36 40.50 103.77C39.92 104.19 40.33 104.05 39.00 104.08C37.67 104.10 33.81 104.14 32.50 103.91C31.19 103.69 31.37 103.33 31.12 102.74C30.88 102.15 30.82 101.06 31.05 100.38C31.28 99.69 31.76 99.22 32.50 98.63C33.24 98.04 34.78 97.41 35.50 96.85C36.22 96.28 36.42 96.10 36.80 95.25C37.18 94.40 37.52 93.08 37.80 91.75C38.07 90.42 38.34 88.69 38.46 87.25C38.57 85.81 38.23 83.81 38.50 83.12Z"/><path id="au-tail" d="M112.74 57.00C113.02 56.97 113.41 56.98 113.75 57.31C114.09 57.65 114.46 58.14 114.78 59.00C115.10 59.86 115.53 61.50 115.68 62.50C115.83 63.50 115.85 63.96 115.69 65.00C115.53 66.04 115.14 67.77 114.73 68.75C114.33 69.73 113.63 70.19 113.25 70.88C112.87 71.56 112.93 72.22 112.45 72.88C111.97 73.53 111.28 74.19 110.38 74.83C109.47 75.48 108.15 76.34 107.00 76.74C105.85 77.14 104.38 77.07 103.50 77.25C102.62 77.44 102.25 77.77 101.75 77.87C101.25 77.97 100.96 77.95 100.50 77.85C100.04 77.76 99.75 77.47 99.00 77.30C98.25 77.13 97.08 77.20 96.00 76.82C94.92 76.44 93.16 75.26 92.50 75.02C91.84 74.78 92.15 75.17 92.05 75.38C91.96 75.58 91.78 75.50 91.95 76.25C92.12 77.00 93.17 79.27 93.09 79.88C93.00 80.48 91.99 80.94 91.44 79.88C90.89 78.81 90.18 74.81 89.79 73.50C89.41 72.19 89.24 73.12 89.12 72.03C89.01 70.95 88.72 67.42 89.12 66.99C89.53 66.57 90.52 68.73 91.54 69.50C92.56 70.27 93.88 71.18 95.25 71.62C96.62 72.06 98.35 71.82 99.75 72.12C101.15 72.42 102.35 73.28 103.62 73.40C104.90 73.53 106.33 73.18 107.38 72.87C108.42 72.56 108.99 72.25 109.88 71.55C110.76 70.84 112.01 69.59 112.67 68.62C113.33 67.66 113.63 66.88 113.84 65.75C114.04 64.62 113.98 62.67 113.90 61.88C113.82 61.08 113.62 61.12 113.38 61.00C113.13 60.87 112.94 60.49 112.42 61.12C111.90 61.76 111.26 63.73 110.25 64.81C109.24 65.89 107.71 66.93 106.38 67.60C105.04 68.26 103.25 68.58 102.25 68.80C101.25 69.01 101.44 69.07 100.38 68.88C99.31 68.70 97.23 68.24 95.88 67.70C94.52 67.17 93.38 66.48 92.25 65.69C91.12 64.89 89.65 63.77 89.12 62.93C88.60 62.08 88.56 60.45 89.12 60.61C89.69 60.77 91.10 62.89 92.50 63.89C93.90 64.88 96.33 66.08 97.50 66.59C98.67 67.10 98.44 66.88 99.50 66.93C100.56 66.97 102.69 67.08 103.88 66.88C105.06 66.68 105.71 66.36 106.62 65.74C107.54 65.11 108.70 63.89 109.38 63.12C110.06 62.36 110.27 62.06 110.72 61.12C111.16 60.19 111.73 58.19 112.06 57.50C112.40 56.81 112.46 57.03 112.74 57.00Z"/><path id="au-flagTip" d="M100.12 26.62C101.00 26.63 103.90 28.25 105.38 28.77C106.85 29.30 107.65 29.53 109.00 29.78C110.35 30.03 111.88 30.28 113.50 30.29C115.12 30.30 117.08 30.20 118.75 29.84C120.42 29.48 122.54 28.39 123.50 28.11C124.46 27.83 124.27 28.02 124.50 28.17C124.73 28.31 124.85 28.57 124.87 29.00C124.89 29.43 125.33 29.63 124.62 30.76C123.92 31.88 122.00 34.35 120.62 35.75C119.25 37.14 117.15 38.44 116.38 39.13C115.60 39.82 116.00 39.65 115.96 39.88C115.93 40.10 116.04 40.33 116.19 40.50C116.34 40.67 116.12 40.64 116.88 40.87C117.63 41.09 119.50 41.64 120.75 41.84C122.00 42.03 123.68 41.86 124.38 42.04C125.07 42.21 124.86 42.49 124.89 42.88C124.92 43.26 125.20 43.75 124.58 44.38C123.95 45.00 122.11 46.07 121.16 46.62C120.21 47.18 120.19 47.21 118.88 47.73C117.56 48.25 115.10 49.22 113.29 49.75C111.47 50.28 110.19 50.71 108.00 50.90C105.81 51.10 101.44 51.24 100.12 50.92C98.81 50.60 98.58 49.33 100.12 48.97C101.67 48.61 106.69 49.14 109.38 48.77C112.06 48.40 114.42 47.44 116.25 46.76C118.08 46.08 119.65 45.10 120.38 44.66C121.10 44.23 120.66 44.32 120.63 44.12C120.60 43.93 120.91 43.73 120.22 43.50C119.53 43.27 117.64 43.06 116.50 42.75C115.36 42.45 114.12 42.00 113.38 41.69C112.62 41.38 112.28 41.13 112.00 40.89C111.72 40.65 111.66 40.51 111.70 40.25C111.75 39.99 111.48 39.90 112.25 39.31C113.02 38.73 115.34 37.45 116.35 36.75C117.36 36.05 117.62 35.79 118.30 35.12C118.99 34.46 120.06 33.27 120.47 32.75C120.87 32.23 120.79 32.20 120.75 32.00C120.72 31.80 120.90 31.53 120.25 31.53C119.60 31.52 118.85 31.95 116.88 31.98C114.90 32.02 110.81 32.13 108.38 31.75C105.94 31.38 103.62 30.24 102.25 29.74C100.88 29.24 100.48 29.26 100.12 28.74C99.77 28.22 99.25 26.62 100.12 26.62Z"/><path id="au-body" d="M68.18 15.25C68.48 15.07 68.75 15.14 69.00 15.29C69.25 15.43 69.70 15.57 69.66 16.12C69.63 16.68 68.92 18.10 68.78 18.62C68.64 19.15 68.75 19.07 68.83 19.25C68.90 19.43 69.05 19.60 69.25 19.70C69.45 19.79 69.56 19.86 70.00 19.80C70.44 19.73 70.31 19.39 71.88 19.31C73.44 19.22 77.33 19.18 79.38 19.31C81.42 19.44 82.77 19.80 84.12 20.10C85.48 20.39 85.65 20.38 87.50 21.06C89.35 21.73 92.67 23.00 95.25 24.13C97.83 25.26 101.71 26.86 103.00 27.83C104.29 28.80 103.83 29.95 103.00 29.92C102.17 29.90 98.92 28.11 98.00 27.68C97.08 27.26 97.60 27.52 97.50 27.37C97.40 27.22 97.67 26.90 97.38 26.79C97.08 26.69 97.35 27.36 95.74 26.75C94.14 26.14 89.75 23.93 87.75 23.15C85.75 22.37 85.38 22.41 83.75 22.05C82.12 21.69 79.77 21.17 78.00 21.00C76.23 20.82 74.98 20.80 73.12 20.99C71.27 21.18 68.04 21.83 66.88 22.12C65.73 22.42 67.29 20.83 66.18 22.75C65.08 24.67 61.60 31.09 60.25 33.63C58.90 36.17 58.46 37.11 58.06 38.00C57.66 38.89 57.83 38.73 57.85 39.00C57.87 39.27 57.98 39.48 58.17 39.62C58.37 39.77 58.45 39.91 59.00 39.85C59.55 39.78 60.12 39.33 61.50 39.23C62.88 39.14 66.17 39.22 67.25 39.28C68.33 39.33 67.88 39.21 68.00 39.58C68.12 39.95 68.42 41.25 68.00 41.49C67.58 41.73 66.38 41.09 65.50 41.00C64.62 40.92 64.29 40.78 62.75 40.99C61.21 41.20 57.51 41.88 56.25 42.25C54.99 42.63 55.71 42.48 55.20 43.25C54.68 44.02 53.71 45.88 53.18 46.88C52.65 47.88 52.21 48.66 52.01 49.25C51.81 49.84 51.73 50.03 52.00 50.43C52.27 50.83 52.69 51.27 53.62 51.67C54.56 52.07 56.17 52.60 57.62 52.83C59.08 53.06 61.21 52.90 62.38 53.03C63.54 53.17 62.62 53.50 64.62 53.66C66.62 53.82 71.77 53.73 74.38 53.98C76.98 54.24 78.56 54.67 80.25 55.18C81.94 55.70 83.25 56.39 84.50 57.08C85.75 57.77 86.50 58.24 87.75 59.30C89.00 60.36 91.29 62.43 92.00 63.46C92.71 64.49 92.92 66.00 92.00 65.49C91.08 64.97 88.42 61.77 86.50 60.36C84.58 58.95 82.06 57.75 80.50 57.03C78.94 56.31 78.48 56.25 77.12 56.05C75.77 55.85 73.54 55.99 72.38 55.85C71.21 55.71 72.08 55.38 70.12 55.21C68.17 55.05 63.17 55.12 60.62 54.88C58.08 54.65 56.38 54.17 54.88 53.81C53.38 53.45 52.33 52.90 51.62 52.73C50.92 52.55 51.05 52.47 50.62 52.75C50.20 53.02 50.33 52.46 49.09 54.38C47.85 56.29 44.33 62.31 43.17 64.25C42.01 66.19 42.37 65.44 42.14 66.00C41.92 66.56 41.97 67.21 41.82 67.62C41.68 68.04 41.59 68.16 41.28 68.50C40.98 68.84 40.80 69.10 40.00 69.64C39.20 70.17 38.06 71.01 36.50 71.71C34.94 72.40 31.92 73.41 30.62 73.82C29.33 74.23 29.65 73.85 28.75 74.14C27.85 74.44 26.15 75.03 25.25 75.58C24.35 76.12 24.27 76.27 23.38 77.44C22.48 78.61 20.53 81.48 19.88 82.59C19.22 83.70 19.38 83.68 19.42 84.12C19.46 84.57 19.76 84.95 20.13 85.25C20.50 85.55 21.06 85.87 21.62 85.90C22.19 85.94 22.85 85.87 23.50 85.46C24.15 85.04 24.91 84.26 25.50 83.41C26.09 82.57 26.56 81.10 27.04 80.38C27.51 79.65 27.76 79.41 28.38 79.09C28.99 78.78 29.19 78.68 30.75 78.46C32.31 78.24 36.35 78.01 37.75 77.77C39.15 77.54 38.58 77.23 39.12 77.07C39.67 76.90 40.38 76.98 41.00 76.76C41.62 76.54 42.29 75.98 42.88 75.75C43.46 75.52 43.79 75.81 44.50 75.38C45.21 74.95 46.30 73.70 47.12 73.18C47.95 72.65 48.24 73.20 49.45 72.25C50.66 71.30 53.46 68.21 54.38 67.49C55.29 66.76 54.86 67.66 54.94 67.88C55.02 68.09 55.37 68.00 54.86 68.75C54.35 69.50 52.95 71.33 51.88 72.39C50.80 73.45 49.01 74.56 48.41 75.12C47.81 75.69 48.22 75.57 48.28 75.75C48.33 75.93 48.30 76.13 48.75 76.23C49.20 76.32 50.21 76.35 51.00 76.31C51.79 76.27 52.77 75.99 53.50 75.97C54.23 75.96 54.56 76.24 55.38 76.22C56.19 76.19 56.56 76.34 58.38 75.82C60.19 75.29 64.25 73.65 66.25 73.05C68.25 72.45 69.25 72.36 70.38 72.22C71.50 72.07 72.08 72.04 73.00 72.19C73.92 72.35 75.08 72.80 75.88 73.14C76.67 73.49 77.26 73.87 77.76 74.25C78.26 74.63 78.33 74.63 78.88 75.43C79.42 76.22 81.90 78.40 81.01 79.00C80.12 79.60 75.09 79.42 73.52 79.00C71.95 78.58 72.29 77.13 71.58 76.50C70.87 75.87 69.83 75.46 69.25 75.20C68.67 74.94 68.77 74.97 68.12 74.94C67.48 74.90 67.19 74.52 65.38 75.00C63.56 75.49 59.08 77.34 57.25 77.85C55.42 78.35 55.19 77.93 54.38 78.05C53.56 78.17 53.04 78.49 52.38 78.57C51.71 78.65 50.92 78.11 50.38 78.53C49.83 78.95 49.54 79.85 49.12 81.09C48.71 82.34 48.18 85.17 47.87 86.00C47.56 86.83 47.55 86.05 47.25 86.05C46.95 86.05 46.14 86.28 46.05 86.00C45.96 85.72 46.63 84.81 46.69 84.38C46.74 83.94 46.98 83.82 46.39 83.38C45.80 82.93 43.98 82.21 43.12 81.68C42.27 81.14 41.69 80.42 41.25 80.18C40.81 79.94 40.69 80.15 40.50 80.25C40.31 80.34 40.22 79.79 40.14 80.75C40.05 81.71 40.12 85.12 39.97 86.00C39.82 86.88 39.50 86.04 39.25 86.04C39.00 86.04 38.61 86.88 38.48 86.00C38.35 85.12 38.58 81.82 38.48 80.75C38.38 79.68 38.10 79.82 37.88 79.60C37.65 79.37 37.52 79.35 37.12 79.39C36.73 79.44 36.67 79.73 35.50 79.85C34.33 79.97 31.29 79.87 30.12 80.11C28.96 80.34 29.06 80.52 28.50 81.26C27.94 81.99 27.23 83.78 26.75 84.53C26.27 85.28 26.32 85.28 25.61 85.75C24.90 86.22 23.43 87.06 22.50 87.36C21.57 87.65 20.57 87.36 20.00 87.51C19.43 87.66 19.70 87.55 19.10 88.25C18.49 88.95 16.97 91.08 16.38 91.73C15.78 92.38 15.80 92.12 15.50 92.17C15.20 92.21 14.77 92.17 14.58 92.00C14.39 91.83 13.77 92.08 14.35 91.12C14.92 90.17 17.38 87.75 18.02 86.25C18.66 84.75 17.97 83.12 18.17 82.12C18.38 81.13 18.42 81.42 19.25 80.28C20.08 79.14 21.83 76.46 23.12 75.27C24.42 74.08 26.01 73.56 27.03 73.12C28.05 72.69 27.98 73.06 29.25 72.67C30.52 72.28 33.57 71.25 34.62 70.78C35.68 70.32 35.42 70.21 35.58 69.88C35.74 69.54 35.71 69.17 35.59 68.75C35.47 68.33 35.05 67.63 34.85 67.38C34.65 67.12 34.68 67.14 34.38 67.24C34.07 67.33 33.42 67.82 33.00 67.94C32.58 68.06 32.20 68.04 31.88 67.97C31.55 67.90 31.36 67.81 31.08 67.50C30.79 67.19 30.39 66.56 30.17 66.12C29.95 65.69 29.82 65.25 29.77 64.88C29.72 64.50 29.77 64.15 29.88 63.87C29.98 63.58 30.04 63.42 30.38 63.19C30.71 62.96 31.58 62.80 31.88 62.50C32.18 62.20 32.19 61.72 32.17 61.38C32.15 61.03 32.09 60.74 31.75 60.42C31.41 60.11 30.58 60.02 30.12 59.49C29.67 58.97 29.18 57.77 29.02 57.25C28.85 56.73 28.94 56.53 29.12 56.38C29.31 56.24 29.33 55.76 30.12 56.37C30.92 56.98 33.10 59.39 33.88 60.02C34.65 60.66 34.38 60.23 34.75 60.18C35.12 60.13 35.33 60.19 36.12 59.70C36.92 59.22 38.57 58.04 39.50 57.27C40.43 56.51 40.99 55.90 41.69 55.12C42.39 54.35 43.11 53.65 43.70 52.62C44.29 51.60 45.44 50.40 45.25 49.00C45.07 47.60 43.37 45.21 42.58 44.25C41.80 43.29 40.90 43.75 40.52 43.25C40.14 42.75 40.51 41.60 40.29 41.25C40.08 40.90 39.67 40.89 39.25 41.13C38.83 41.37 38.21 42.41 37.75 42.69C37.29 42.97 36.79 42.89 36.50 42.82C36.21 42.74 36.28 42.91 36.00 42.25C35.71 41.59 35.10 39.50 34.81 38.88C34.52 38.25 35.11 38.30 34.25 38.50C33.39 38.71 30.69 39.66 29.62 40.13C28.56 40.60 28.42 40.85 27.88 41.30C27.33 41.76 26.75 42.34 26.37 42.88C26.00 43.41 25.91 44.04 25.62 44.49C25.34 44.95 25.74 44.99 24.66 45.62C23.58 46.26 20.34 47.36 19.12 48.32C17.91 49.28 17.62 50.67 17.38 51.39C17.13 52.11 17.30 52.21 17.65 52.62C18.01 53.04 18.65 53.65 19.50 53.86C20.35 54.07 21.75 54.02 22.75 53.87C23.75 53.72 24.35 53.09 25.50 52.94C26.65 52.78 28.78 52.87 29.62 52.94C30.47 53.02 30.51 53.18 30.59 53.38C30.67 53.57 30.47 53.93 30.12 54.12C29.78 54.31 29.25 54.42 28.50 54.50C27.75 54.57 26.81 54.36 25.62 54.58C24.44 54.80 22.27 55.62 21.38 55.82C20.48 56.01 20.95 56.00 20.25 55.76C19.55 55.52 18.15 55.25 17.15 54.38C16.14 53.50 14.75 51.27 14.23 50.50C13.71 49.73 14.03 49.98 14.04 49.75C14.04 49.52 14.05 49.40 14.27 49.12C14.49 48.85 14.65 48.45 15.38 48.11C16.10 47.77 17.24 47.68 18.62 47.08C20.01 46.48 22.50 45.55 23.68 44.50C24.86 43.45 25.36 41.50 25.69 40.75C26.03 40.00 25.90 40.67 25.72 40.00C25.54 39.33 24.72 37.48 24.61 36.75C24.50 36.02 24.83 35.90 25.06 35.62C25.29 35.35 25.30 35.04 26.00 35.12C26.70 35.20 28.31 35.67 29.25 36.11C30.19 36.55 31.10 37.51 31.62 37.76C32.15 38.01 32.02 37.87 32.38 37.59C32.73 37.30 33.25 36.44 33.75 36.04C34.25 35.63 34.23 35.14 35.38 35.16C36.52 35.18 39.54 35.76 40.62 36.17C41.71 36.58 41.63 36.82 41.87 37.62C42.10 38.43 41.97 40.31 42.05 41.00C42.13 41.69 42.00 41.27 42.36 41.75C42.72 42.23 43.60 43.02 44.21 43.88C44.83 44.73 45.38 46.04 46.07 46.88C46.77 47.71 47.80 48.53 48.38 48.90C48.95 49.26 48.62 50.15 49.50 49.05C50.38 47.94 50.69 47.70 53.64 42.25C56.58 36.80 64.76 20.88 67.18 16.38C69.61 11.88 67.88 15.43 68.18 15.25ZM37.25 36.99C36.79 37.01 36.57 37.15 36.38 37.34C36.18 37.53 35.98 37.59 36.11 38.12C36.23 38.66 36.83 40.10 37.12 40.56C37.42 41.02 37.62 40.89 37.88 40.87C38.12 40.85 38.30 40.91 38.62 40.43C38.95 39.95 39.73 38.54 39.82 38.00C39.90 37.46 39.55 37.36 39.12 37.19C38.70 37.02 37.71 36.97 37.25 36.99ZM27.25 37.10C26.94 37.12 26.78 37.39 26.74 37.62C26.70 37.86 26.84 38.28 27.01 38.50C27.18 38.72 27.48 38.92 27.75 38.96C28.02 39.00 28.45 38.87 28.64 38.75C28.84 38.63 28.92 38.45 28.91 38.25C28.91 38.05 28.90 37.74 28.62 37.55C28.35 37.36 27.56 37.09 27.25 37.10ZM72.68 42.38C72.76 42.09 75.38 41.47 78.73 42.38C82.07 43.28 89.73 46.74 92.75 47.81C95.77 48.88 95.17 48.61 96.88 48.81C98.58 49.00 101.98 48.59 103.00 48.97C104.02 49.35 103.77 50.77 103.00 51.09C102.23 51.41 100.02 51.10 98.38 50.88C96.73 50.66 95.04 50.30 93.12 49.79C91.21 49.27 89.35 48.74 86.88 47.79C84.40 46.84 80.62 44.97 78.25 44.07C75.88 43.17 72.60 42.66 72.68 42.38ZM29.08 44.12C29.47 44.03 30.02 44.13 30.50 44.30C30.98 44.46 31.68 44.90 31.95 45.12C32.21 45.35 32.20 45.49 32.10 45.62C32.01 45.76 31.99 45.92 31.38 45.94C30.76 45.96 28.97 45.93 28.43 45.75C27.89 45.57 28.04 45.15 28.14 44.88C28.25 44.60 28.69 44.22 29.08 44.12ZM38.53 49.12C38.69 49.10 38.92 49.15 39.06 49.25C39.20 49.35 39.41 49.35 39.37 49.75C39.33 50.15 39.12 51.11 38.81 51.62C38.49 52.14 37.93 52.63 37.50 52.83C37.07 53.03 36.47 52.96 36.25 52.84C36.03 52.73 35.96 52.47 36.17 52.12C36.39 51.78 37.22 51.20 37.55 50.75C37.87 50.30 37.96 49.67 38.12 49.40C38.29 49.12 38.38 49.15 38.53 49.12ZM47.25 51.25C47.01 51.41 46.86 51.37 46.29 52.25C45.72 53.13 44.57 55.44 43.82 56.50C43.08 57.56 42.53 57.94 41.81 58.62C41.09 59.31 40.45 59.97 39.50 60.61C38.55 61.26 36.72 61.96 36.14 62.50C35.55 63.04 35.88 63.40 35.99 63.88C36.10 64.35 36.63 64.73 36.79 65.38C36.95 66.02 36.84 67.23 36.94 67.75C37.04 68.27 37.20 68.37 37.38 68.48C37.55 68.60 37.78 68.56 38.00 68.43C38.22 68.31 37.08 70.30 38.69 67.75C40.30 65.20 46.10 55.81 47.65 53.12C49.21 50.44 48.01 51.93 48.03 51.62C48.05 51.32 47.88 51.33 47.75 51.27C47.62 51.20 47.49 51.08 47.25 51.25ZM31.62 64.10C31.19 64.15 31.24 64.33 31.15 64.50C31.06 64.67 30.95 64.84 31.09 65.12C31.23 65.41 31.70 66.00 32.00 66.19C32.30 66.37 32.56 66.36 32.88 66.22C33.19 66.09 33.70 65.62 33.90 65.38C34.10 65.13 34.11 64.94 34.08 64.75C34.06 64.56 34.16 64.32 33.75 64.21C33.34 64.10 32.06 64.05 31.62 64.10ZM86.44 65.12C86.61 65.02 86.91 64.99 87.12 65.02C87.34 65.05 87.31 64.86 87.75 65.31C88.19 65.77 89.06 67.01 89.76 67.75C90.47 68.49 91.62 67.75 92.00 69.78C92.38 71.80 91.85 78.17 92.04 79.88C92.23 81.58 92.79 79.65 93.14 80.00C93.50 80.35 94.31 81.67 94.18 82.00C94.05 82.33 92.72 82.08 92.37 82.00C92.02 81.92 92.29 81.98 92.08 81.50C91.86 81.02 91.46 80.46 91.08 79.12C90.70 77.79 90.19 74.96 89.79 73.50C89.40 72.04 89.08 71.25 88.72 70.38C88.37 69.50 88.08 68.94 87.64 68.25C87.21 67.56 86.39 66.69 86.13 66.25C85.87 65.81 86.02 65.81 86.07 65.62C86.12 65.44 86.26 65.23 86.44 65.12Z"/><g id="au-as"><text x="70.5" y="40.5" font-family="Playfair Display, Georgia, serif" font-size="13" font-weight="700" font-style="italic" letter-spacing="-.3" transform="rotate(8 80 35)">AS</text></g></defs>
+  <symbol id="audra" viewBox="6 8 128 104"><g fill="currentColor" fill-rule="evenodd"><use href="#au-legFarHind"/><use href="#au-legNearHind"/><use href="#au-legFront"/><use href="#au-tail"/><use href="#au-flagTip"/><use href="#au-body"/><use href="#au-as"/></g></symbol>
+</svg>
 <!-- HOME: all trips -->
 <div id="home">
-  <div class="home-head">
-    <div class="brand brand-lg"><svg class="brand-mark" aria-hidden="true"><use href="#brandMark"/></svg><span class="brand-word">ace <b>travel</b></span></div>
-    <div class="home-hello">Where to next?</div>
+  <div class="home-top">
+    <div class="lockup"><svg class="lk-card" aria-hidden="true"><use href="#aceMini"/></svg><span>Ace Travel</span></div>
+    <button class="me-chip" onclick="openYou()" aria-label="You: your name and colour"><span class="av" id="meChipAv">AS</span>You</button>
   </div>
   <div class="home-body">
     <div id="homeSync"></div>
-    <div class="home-bar"><h2>Your trips</h2><button id="homeEdit" onclick="homeEditing=!homeEditing;renderHome()" hidden>Edit</button></div>
+    <div class="home-bar"><h1>Your trips</h1><button id="homeEdit" class="link-btn" onclick="homeEditing=!homeEditing;renderHome()" hidden>Edit</button></div>
+    <div class="pills" id="homePills"></div>
     <div id="tripGrid"></div>
-    <button class="new-trip-btn" onclick="createTrip()">+ New trip</button>
-    <button class="new-trip-btn secondary" onclick="importTripData()">Import a trip file</button>
+    <button class="new-trip-btn" id="newTripBtn" onclick="createTrip()">Start a new trip</button>
+    <button class="link-btn import-link" onclick="importTripData()">Import a trip file</button>
   </div>
 </div>
 
@@ -904,30 +1028,33 @@
 <input type="file" id="tripImportInput" accept=".acetrip,.acebackup,application/json" style="display:none" onchange="handleTripImport(event)">
 
 
-<header>
-  <button class="hdr-btn hdr-home" onclick="goHome()" aria-label="All trips"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-  <button class="hdr-btn hdr-export" onclick="openExport()" aria-label="Share trip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
-  <button class="hdr-btn settings-link" onclick="openSettings()" aria-label="Settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
-  <div class="brand" role="img" aria-label="Ace Travel"><svg class="brand-mark" aria-hidden="true"><use href="#brandMark"/></svg><span class="brand-word">ace <b>travel</b></span></div>
+<header class="trip-top">
+  <div class="tt-row">
+    <button class="circle-btn" onclick="goHome()" aria-label="All trips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="tt-actions">
+      <button class="pill-btn" id="btnMap" onclick="showView('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13L9 17l6 3 6-2.5v-13L15 7 9 4zM9 4v13M15 7v13"/></svg>Map</button>
+      <button class="pill-btn" id="btnMoney" onclick="showView('budget')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M7 15h3"/></svg>Money</button>
+      <button class="circle-btn" onclick="openExport()" aria-label="Share trip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
+    </div>
+  </div>
+  <input class="trip-name" id="tripName" placeholder="Name this trip" aria-label="Trip name">
+  <div class="tt-meta"><input class="trip-dates" id="tripDates" placeholder="Add dates" aria-label="Trip dates"><div class="trip-countdown" id="tripCountdown"></div><div class="av-stack" id="tripAvatars"></div></div>
+  <div class="tt-sub"><div class="trip-next" id="tripNext"></div><button class="ask-pill" onclick="openAsk()"><span aria-hidden="true">✦</span> Ask about this trip</button></div>
+  <div class="trip-localtime" id="tripLocalTime"></div>
+  <div class="trip-tabs" role="tablist" aria-label="Trip sections">
+    <button role="tab" data-tab="days" onclick="showView('itinerary')">Days</button>
+    <button role="tab" data-tab="ideas" onclick="showView('wishlist')">Ideas <span class="seg-n" id="seg-wish"></span></button>
+    <button role="tab" data-tab="bookings" onclick="showView('bookings')">Bookings</button>
+    <button role="tab" data-tab="prep" onclick="showView('packing')">Prep</button>
+  </div>
 </header>
 
 <main>
   <section class="view active" id="view-itinerary">
     <div style="padding:0 14px"><div class="today-card" id="todayCard"></div></div>
-    <div class="hero" id="hero">
-      <div class="hero-photo" id="heroPhoto"></div>
-      <div class="hero-scrim"></div>
-      <div class="trip-card">
-        <input class="trip-name" id="tripName" placeholder="Your trip" />
-        <input class="trip-dates" id="tripDates" placeholder="Add dates" />
-        <div class="trip-chips"><div class="trip-countdown" id="tripCountdown"></div><button class="trip-ask" onclick="openAsk()"><span aria-hidden="true">✦</span> Ask about this trip</button></div>
-        <div class="trip-next" id="tripNext"></div>
-        <div class="trip-localtime" id="tripLocalTime"></div>
-      </div>
-    </div>
-    <div class="view-head sec-head"><div class="seg"><button data-view="itinerary" onclick="showView('itinerary')">Days</button><button data-view="wishlist" onclick="showView('wishlist')">Ideas <span class="seg-n" id="seg-wish"></span></button></div><div class="view-count" id="cnt-days"></div></div>
+    <span id="cnt-days" hidden></span>
     <div class="warn-card" id="warnCard"></div>
-    <div class="magic" style="margin-top:22px">
+    <div class="magic">
       <div class="magic-text">
         <h3>Add a booking or plan</h3>
         <p>From a screenshot, a PDF or pasted text — it files itself.</p>
@@ -944,7 +1071,7 @@
   </section>
 
   <section class="view" id="view-wishlist">
-    <div class="view-head"><div class="seg"><button data-view="itinerary" onclick="showView('itinerary')">Days</button><button data-view="wishlist" onclick="showView('wishlist')">Ideas <span class="seg-n" id="seg-wish2"></span></button></div><div class="view-count" id="cnt-wish"></div></div>
+    <span id="cnt-wish" hidden></span><span id="seg-wish2" hidden></span>
     <p class="view-intro">Places you might want to go — restaurants, cafés, sights. Put one on a day when you decide.</p>
     <div class="wish-add">
       <input id="wishInput" class="wish-input" placeholder="Add an idea, e.g. Septime" aria-label="New idea" />
@@ -960,7 +1087,7 @@
   </section>
 
   <section class="view" id="view-map">
-    <div class="view-head"><h2 class="view-title">Map</h2><div class="view-count" id="cnt-map"></div></div>
+    <div class="sec-row"><h2 class="sec-h">Map</h2><div class="view-count" id="cnt-map"></div></div>
     <div id="mapWrap">
       <div id="leafletMap" style="display:none"></div>
       <svg id="routeDiagram" viewBox="0 0 340 400" style="display:none"></svg>
@@ -976,21 +1103,18 @@
   </section>
 
   <section class="view" id="view-bookings">
-    <div class="view-head"><h2 class="view-title">Bookings</h2><div class="view-count" id="cnt-bookings"></div></div>
+    <span id="cnt-bookings" hidden></span>
     <div id="lodgingSection"></div>
     <div id="bookings"></div>
     <button class="add-btn" onclick="addBooking()">Add a booking</button>
   </section>
 
   <section class="view" id="view-packing">
-    <div class="view-head"><div class="seg"><button data-view="packing" onclick="showView('packing')">Packing</button><button data-view="info" onclick="showView('info')">Good to know</button></div><div class="view-count" id="cnt-packing"></div></div>
+    <div class="sec-row"><h2 class="sec-h">Packing</h2><div class="view-count" id="cnt-packing"></div></div>
     <div class="pack-suggest"><button onclick="suggestPacking()" id="packSuggestBtn"><span>✦</span> Suggest what to pack</button><div id="packStatus"></div></div>
     <div id="packing"></div>
     <button class="add-btn" onclick="addPack()">Add an item</button>
-  </section>
-
-  <section class="view" id="view-info">
-    <div class="view-head"><div class="seg"><button data-view="packing" onclick="showView('packing')">Packing</button><button data-view="info" onclick="showView('info')">Good to know</button></div></div>
+    <h2 class="sec-h prep-gap">Good to know</h2>
     <div class="view-lead">Key phrases</div>
     <div class="say-lang" id="sayLangRow"><span>Tap 🔊 to hear a phrase</span><select id="sayLang" onchange="D.phraseLang=this.value;save();renderPhrases()"></select></div>
     <div id="phrases"></div>
@@ -1008,8 +1132,10 @@
     <input type="file" id="docInput" accept="image/*,application/pdf" style="display:none" onchange="handleDoc(event)">
   </section>
 
+
+
   <section class="view" id="view-budget">
-    <div class="view-head"><h2 class="view-title">Money</h2><div class="view-count" id="cnt-budget"></div></div>
+    <div class="sec-row"><h2 class="sec-h">Money</h2><label class="ccy-pick">Trip currency <select id="curInput" onchange="setTripCcy(this.value)" aria-label="Trip currency"></select></label><span id="cnt-budget" hidden></span></div>
     <div class="budget-hero"><div class="lbl">TOTAL LOGGED</div><div class="amt"><span class="cur" id="curSym">€</span><span id="budTotal">0</span></div></div>
     <div class="fx-note" id="fxNote"></div>
     <div class="bud-summary" id="budSummary"></div>
@@ -1019,13 +1145,69 @@
   </section>
 </main>
 
-<nav aria-label="Trip sections">
-  <button class="active" data-tab="plan" onclick="showView('itinerary')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg></span>Plan</button>
-  <button data-tab="bookings" onclick="showView('bookings')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15.5c-.5.9-1.6 1.2-2.5.7L4 8.2c-.6-.3-1-1-1-1.7V4l2 .5 3 3 5.5 1.5L11 4.5 13 5l4 6 3.2 1.8c.9.5 1.3 1.7.8 2.7z"/></svg></span>Bookings</button>
-  <button data-tab="map" onclick="showView('map')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 5.5v15L9 18l6 3 6-2.5v-15L15 6 9 3zM9 3v15M15 6v15"/></svg></span>Map</button>
-  <button data-tab="money" onclick="showView('budget')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5.5c0-1.4-2.2-2.5-5-2.5S7 4.1 7 5.5 9.2 8 12 8s5 1.1 5 2.5-2.2 2.5-5 2.5-5-1.1-5-2.5"/></svg></span>Money</button>
-  <button data-tab="more" onclick="showView('packing')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="7" width="14" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M5 12h14"/></svg></span>More</button>
+<nav class="app-bar" aria-label="Main">
+  <button data-tab="trips" onclick="navTrips()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span>Trips</span></button>
+  <button class="add-fab" onclick="openAdd()" aria-label="Add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="stroke-width:2.6"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button data-tab="you" onclick="openYou()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 4-5 7-5s5.8 1.4 7 5"/></svg><span>You</span></button>
 </nav>
+
+<!-- YOU: this phone's name and colour, sync, settings -->
+<div id="you" hidden>
+  <div class="you-body">
+    <h1>You</h1>
+    <div class="card you-id">
+      <div class="you-id-row">
+        <span class="av av-lg" id="youAv">AS</span>
+        <label class="fld-block">Your name on this phone<input id="youName" autocomplete="name" placeholder="Your name" oninput="setMe({name:this.value})"></label>
+      </div>
+      <div class="fld-label" id="youColorLabel">Your colour</div>
+      <div class="swatches" id="youColors" role="radiogroup" aria-labelledby="youColorLabel"></div>
+      <p class="fld-note">Shows on what you add and what you pay for.</p>
+    </div>
+    <div class="card list-card">
+      <div class="lc-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><div class="lc-text"><b>Sync</b><span id="youSync">Not set up</span></div><button class="small-btn" onclick="openSync()">Open</button></div>
+      <button class="lc-btn" onclick="syncPair()">Pair another phone</button>
+      <button class="lc-btn" onclick="backupAll()">Save a backup file</button>
+      <button class="lc-btn" onclick="importTripData()">Restore or import a file</button>
+    </div>
+    <div class="card list-card">
+      <label class="lc-row">Appearance<select id="themeSel" onchange="setTheme(this.value)"><option value="">Match phone</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+      <label class="lc-row lc-col">Claude API key<input type="password" id="apiKeyInput" placeholder="sk-ant-…" autocomplete="off" onchange="saveApiKey(this.value)"><span class="fld-note">Optional. Turns on reading screenshots and PDFs, Ask, and packing ideas. Stored only on this phone and sent only to Anthropic.</span></label>
+    </div>
+    <div class="credit"><svg class="credit-dog" aria-hidden="true"><use href="#audra"/></svg><span>Drawn by AS. Starring AS.</span></div>
+    <div class="build">Build 2026.11.17</div>
+  </div>
+</div>
+
+<!-- ADD: the + button -->
+<div class="sheet-bg" id="addBg" onclick="if(event.target===this)closeAdd()">
+  <div class="sheet add-sheet" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+    <div class="grab" aria-hidden="true"></div>
+    <div class="add-head">
+      <div><h3 id="addTitle">Add to a trip</h3><button class="trip-chip" id="addTripChip" onclick="addPickTrip()"><span id="addTripName">Pick a trip</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
+      <button class="circle-btn" onclick="closeAdd()" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="drop-card" id="addDrop">
+      <div class="dc-sun" aria-hidden="true"></div>
+      <div class="dc-h">Drop in a booking</div>
+      <p>A screenshot, a PDF or a pasted email. It sorts itself onto the right day.</p>
+      <div class="dc-btns"><button onclick="addAction('upload')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Upload</button><button class="ghost" onclick="addAction('paste')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="4" width="11" height="15" rx="2"/><path d="M5 8v11a2 2 0 0 0 2 2h8"/></svg>Paste</button></div>
+    </div>
+    <div class="fld-label">Or add by hand</div>
+    <div class="add-grid">
+      <button onclick="addAction('booking')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ic-olive" aria-hidden="true"><path d="M3 9h18v10H3zM7 9V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3"/></svg>Booking</button>
+      <button onclick="addAction('plan')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ic-gold" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Plan for a day</button>
+      <button onclick="addAction('idea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ic-red" aria-hidden="true"><path d="M12 20s-7-4.4-9-8.6C1.6 8.4 3.3 5 6.6 5c2 0 3.3 1.2 4.1 2.3h2.6C14.1 6.2 15.4 5 17.4 5c3.3 0 5 3.4 3.6 6.4C19 15.6 12 20 12 20z"/></svg>Idea</button>
+      <button onclick="addAction('expense')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ic-olive" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M7 15h3"/></svg>Expense</button>
+    </div>
+    <button class="link-btn add-new" onclick="closeAdd();createTrip()">Start a new trip instead</button>
+  </div>
+</div>
+
+<!-- Loading screen and Audra's moments -->
+<div id="splash" aria-hidden="true"><div class="splash-in"><svg class="audra-trot" viewBox="6 8 128 104" role="img" aria-label="Audra trotting with the AS flag"><path d="M10 106.5 L130 106.5" stroke="currentColor" stroke-opacity=".3" stroke-width="1.3" stroke-dasharray="7 6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="0" to="13" dur="0.5s" repeatCount="indefinite"/></path><g fill="currentColor" fill-rule="evenodd"><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0;0 -1.4;0 0" keyTimes="0;0.25;0.5;0.75;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1"/><g><animateTransform attributeName="transform" type="rotate" values="-8 76 77;8 76 77;-8 76 77" keyTimes="0;0.5;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-legFarHind"/></g><g><animateTransform attributeName="transform" type="rotate" values="8 93 80;-8 93 80;8 93 80" keyTimes="0;0.5;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-legNearHind"/></g><g><animateTransform attributeName="transform" type="rotate" values="-7 41 85;7 41 85;-7 41 85" keyTimes="0;0.5;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-legFront"/></g><g><animateTransform attributeName="transform" type="rotate" values="-9 91 67;9 91 67;-9 91 67" keyTimes="0;0.5;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-tail"/></g><g><animateTransform attributeName="transform" type="rotate" values="-2.5 103 37;3 103 37;-2.5 103 37" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-flagTip"/></g><use href="#au-body"/><use href="#au-as"/></g></svg><div class="lockup on-dark"><svg class="lk-card"><use href="#aceMini"/></svg><span>Ace Travel</span></div><div class="splash-msg">Fetching your trips<span class="d1">.</span><span class="d2">.</span><span class="d3">.</span></div></div></div>
+<div id="cheer" role="status" aria-live="polite" hidden><div class="cheer-card"><svg class="audra-party" viewBox="6 8 128 104" role="img" aria-label="Audra trotting happily, tail wagging fast"><path d="M10 106.5 L130 106.5" stroke="currentColor" stroke-opacity=".3" stroke-width="1.3" stroke-dasharray="7 6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="0" to="13" dur="0.5s" repeatCount="indefinite"/></path><g fill="currentColor" fill-rule="evenodd"><animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0;0 -1.4;0 0" keyTimes="0;0.25;0.5;0.75;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1;.45 0 .55 1"/><g><animateTransform attributeName="transform" type="rotate" values="-8 76 77;8 76 77;-8 76 77" keyTimes="0;0.5;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-legFarHind"/></g><g><animateTransform attributeName="transform" type="rotate" values="8 93 80;-8 93 80;8 93 80" keyTimes="0;0.5;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-legNearHind"/></g><g><animateTransform attributeName="transform" type="rotate" values="-7 41 85;7 41 85;-7 41 85" keyTimes="0;0.5;1" dur="0.5s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-legFront"/></g><g><animateTransform attributeName="transform" type="rotate" values="-9 91 67;9 91 67;-9 91 67" keyTimes="0;0.5;1" dur="0.2s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-tail"/></g><g><animateTransform attributeName="transform" type="rotate" values="-2.5 103 37;3 103 37;-2.5 103 37" keyTimes="0;0.5;1" dur="1s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1"/><use href="#au-flagTip"/></g><use href="#au-body"/><use href="#au-as"/></g></svg><div class="cheer-h" id="cheerH">All packed!</div><div class="cheer-t" id="cheerT"></div></div></div>
+
 
 <div class="sheet-bg" id="pasteBg" onclick="if(event.target===this)closePaste()">
   <div class="sheet">
@@ -1084,28 +1266,7 @@
   </div>
 </div>
 
-<div class="sheet-bg" id="sheetBg" onclick="if(event.target===this)closeSettings()">
-  <div class="sheet settings-sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
-    <h3 id="setTitle">Settings <span class="build">Build 2026.11.16</span></h3>
-    <div class="set-sec" id="setTrip">
-      <div class="set-h">This trip</div>
-      <label for="curInput">Currency</label>
-      <select id="curInput" class="set-select" onchange="setTripCcy(this.value)"></select>
-      <label for="heroCitySel">Photo</label>
-      <select id="heroCitySel" style="width:100%;padding:13px;border:1px solid var(--line);background:var(--paper-hi);font-size:15px;color:var(--ink);border-radius:8px;margin-bottom:18px;font-family:var(--sans)" onchange="setHeroCity(this.value)"></select>
-    </div>
-    <div class="set-sec">
-      <div class="set-h">App</div>
-      <button class="settings-sync-btn" onclick="closeSettings();openSync()">⇅ Sync &amp; backup <span id="settingsSyncState" style="float:right;font-weight:500;color:var(--sage)"></span></button>
-      <label for="themeSel">Appearance</label>
-      <select id="themeSel" onchange="setTheme(this.value)" style="width:100%;padding:13px;border:1px solid var(--line);background:var(--paper-hi);font-size:15px;color:var(--ink);border-radius:8px;margin-bottom:18px;font-family:var(--sans)"><option value="">Auto (match phone)</option><option value="light">Light</option><option value="dark">Dark</option></select>
-      <label for="apiKeyInput">Anthropic API key</label>
-      <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autocomplete="off" onchange="saveApiKey(this.value)">
-      <p class="set-note">Optional. Turns on reading screenshots, Ask, and packing suggestions. Stored only on this phone and sent only to Anthropic.</p>
-    </div>
-    <div class="sheet-actions"><button class="btn-save" onclick="closeSettings()">Done</button></div>
-  </div>
-</div>
+
 
 <script>
 /* ---------- Multi-trip storage ---------- */
@@ -1142,7 +1303,7 @@ function openTrip(id){
   if(!D)return;
   stampAnchor(D);
   STORE.activeId=id; persist();
-  document.body.classList.remove('on-home');
+  document.body.classList.remove('on-home'); closeYou(); markBar();
   applySmartExpand();
   bindHeader();
   renderDays();renderBookings();renderPacking();renderPhrases();renderNumbers();renderAddresses();renderBudget();renderDocs();renderWishlist();
@@ -1163,7 +1324,7 @@ function applySmartExpand(){
     d._open = dk>=t0; // today & future open, past collapsed
   });
 }
-function goHome(){ D=null; document.body.classList.add('on-home'); renderHome(); renderHomeSync(); }
+function goHome(){ D=null; closeYou(); document.body.classList.add('on-home'); renderHome(); renderHomeSync(); markBar(); }
 function createTrip(){
   const t=fresh(''); STORE.trips.push(t); persist(); openTrip(t.id);
   // jump straight into editing the name
@@ -1240,13 +1401,17 @@ async function setHeroCity(name){
 }
 
 // each bottom tab owns one or two views; the second is reached from the switch at the top
-const VIEW_TAB={itinerary:'plan',wishlist:'plan',bookings:'bookings',map:'map',budget:'money',packing:'more',info:'more'};
+// the switch under the trip header; Map and Money are header buttons
+const VIEW_TAB={itinerary:'days',wishlist:'ideas',bookings:'bookings',packing:'prep',info:'prep',map:'map',budget:'money'};
 function showView(v,btn){
+  if(v==='info')v='packing';
   document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   const tab=VIEW_TAB[v]||v;
-  document.querySelectorAll('nav button').forEach(b=>{ const on=b.dataset.tab===tab; b.classList.toggle('active',on); if(on)b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
-  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+  document.querySelectorAll('.trip-tabs button').forEach(b=>{ const on=b.dataset.tab===tab; b.classList.toggle('on',on); b.setAttribute('aria-selected',on); });
+  document.getElementById('btnMap').classList.toggle('on',tab==='map');
+  document.getElementById('btnMoney').classList.toggle('on',tab==='money');
+  closeYou();
   window.scrollTo(0,0);
   requestAnimationFrame(()=>document.querySelectorAll('#view-'+v+' textarea').forEach(grow));   // sizes are only known once visible
   if(v==='map')renderMap();
@@ -1531,7 +1696,7 @@ let dayEditing=null;   // id of the plan open for editing
 function dayPlanEl(d){
   const el=document.createElement('div');el.className='day-plan';
   if(dayEditing!==d.id){
-    el.innerHTML=(d.title?'<div class="dp-title">'+esc(d.title)+'</div>':'')+(d.plan?'<div class="dp-text">'+esc(d.plan)+'</div>':'');
+    el.innerHTML=(d.title||d.by?'<div class="dp-title"><span>'+esc(d.title||'')+'</span>'+avHtml(d.by,'xs')+'</div>':'')+(d.plan?'<div class="dp-text">'+esc(d.plan)+'</div>':'');
     el.setAttribute('role','button'); el.tabIndex=0; el.setAttribute('aria-label','Edit plan'+(d.title?' for '+d.title:''));
     el.onclick=()=>{ dayEditing=d.id; renderDays(); };
     el.onkeydown=e=>{ if(e.key==='Enter'){ dayEditing=d.id; renderDays(); } };
@@ -1573,11 +1738,11 @@ function renderDays(){
   const c=document.getElementById('days'); if(!c)return; c.innerHTML='';
   const span=timelineSpan();
   const magic=document.querySelector('#view-itinerary .magic');
-  if(magic){ if(span)c.after(magic); else c.before(magic); }
+  if(magic){ c.before(magic); magic.classList.toggle('has-content',!!span); }
   if(!span){
     c.innerHTML='<div class="empty"><div class="mark">Your days appear here.<br>Add a plan, or upload a booking above.</div></div>';
     const add=document.createElement('button');add.className='add-btn';add.textContent='Add a plan';
-    add.onclick=()=>{ const d={id:uid(),title:'',date:'',plan:''}; D.days.push(d); dayEditing=d.id; save(); renderDays(); };
+    add.onclick=()=>{ const d={id:uid(),title:'',date:'',plan:'',by:meStamp()}; D.days.push(d); dayEditing=d.id; save(); renderDays(); };
     c.appendChild(add); renderUndatedPlans(c); counts(); renderLodgingSection(); renderExtras(); return;
   }
   const timeline=buildTimeline();
@@ -1634,7 +1799,7 @@ function renderDays(){
       open.innerHTML=(g&&g.items.length)?'<span>+ Add a plan</span>':(L?'Free day':'Open')+' <span>· Add a plan</span>';
       open.onclick=()=>{
         let d=(D.days||[]).find(x=>!x.title&&!x.plan&&dayKeyOf(x.date)===key);
-        if(!d){ d={id:uid(),title:'',date:fmtDate(key),plan:''}; D.days.push(d); }
+        if(!d){ d={id:uid(),title:'',date:fmtDate(key),plan:'',by:meStamp()}; D.days.push(d); }
         dayEditing=d.id; save(); renderDays();
       };
       col.appendChild(open);
@@ -1679,7 +1844,7 @@ function calItem(b, hasNext){
   const known=b.cat==='flight'||b.duration;
   const st=timeToMin(bookingTime(b));
   const timeLabel=span&&known?span.label:(st<9999?fmtClock(st):'');
-  body.innerHTML='<div class="ci-head"><span class="ci-ic">'+t.icon+'</span><span class="ci-kind">'+kindLabel+'</span>'+(timeLabel?'<span class="ci-span">'+esc(timeLabel)+'</span>':'')+'</div><div class="ci-title">'+esc(b.title||'')+'</div>';
+  body.innerHTML='<div class="ci-head"><span class="ci-ic">'+t.icon+'</span><span class="ci-kind">'+kindLabel+'</span>'+(timeLabel?'<span class="ci-span">'+esc(timeLabel)+'</span>':'')+avHtml(b.by,'xs')+'</div><div class="ci-title">'+esc(b.title||'')+'</div>';
   if(b.cat==='flight'){
     if(b.fromCode||b.toCode){const r=document.createElement('div');r.className='ci-sub';r.textContent=[(b.fromCode||'')+' → '+(b.toCode||''),b.flightNo,b.arrTime?'lands '+b.arrTime+(b.arrDate?' (+1 day)':''):''].filter(Boolean).join('  ·  ');body.appendChild(r);}
     if(b.seats){ body.appendChild(miniSeats(b.seats,b.cat)); }
@@ -1729,7 +1894,7 @@ function miniSeats(seatsStr,cat){
 }
 // lodging lookup by day-key (ms)
 function lodgingForDayKey(key){
-  if(!D.lodging||!D.lodging.length)return null;
+  if(!D||!D.lodging||!D.lodging.length)return null;
   const by=baseYear();
   for(const L of D.lodging){
     const ci=parseLoose(L.checkIn),co=parseLoose(L.checkOut); if(!ci)continue;
@@ -1781,7 +1946,7 @@ function updateHouseRoom(L){
     }
   });
 }
-function addDay(d){D.days.push(Object.assign({id:uid(),title:'',date:'',plan:''},d||{}));save();renderDays();if(typeof updateCountdown==='function')updateCountdown();if(typeof loadHero==='function')loadHero();}
+function addDay(d){D.days.push(Object.assign({id:uid(),title:'',date:'',plan:'',by:meStamp()},d||{}));save();renderDays();if(typeof updateCountdown==='function')updateCountdown();if(typeof loadHero==='function')loadHero();}
 
 /* ---------- Wishlist ---------- */
 // Detect a wishlist item's type from its text (reuses the type registry)
@@ -1799,7 +1964,7 @@ function wishType(text){
 function addWishFromInput(){
   const el=document.getElementById('wishInput'); const v=el.value.trim(); if(!v)return;
   D.wishlist=D.wishlist||[];
-  D.wishlist.push({id:uid(), text:v, cat:wishType(v), note:''});
+  D.wishlist.push({id:uid(), text:v, cat:wishType(v), note:'', by:meStamp()});
   el.value=''; save(); renderWishlist();
 }
 function wishStatus(html,show=true){const s=document.getElementById('wishStatus');if(!s)return;s.innerHTML=html;s.style.display=show?'block':'none';}
@@ -1834,7 +1999,7 @@ async function parseWish(contentBlocks){ return claudeJSON(contentBlocks.concat(
 function applyWish(r){
   D.wishlist=D.wishlist||[];
   const items=(r&&r.items)||[];
-  items.forEach(it=>{ if(it&&it.text)D.wishlist.push({id:uid(),text:it.text,cat:(it.cat||wishType(it.text)),note:''}); });
+  items.forEach(it=>{ if(it&&it.text)D.wishlist.push({id:uid(),text:it.text,cat:(it.cat||wishType(it.text)),note:'',by:meStamp()}); });
   save(); renderWishlist();
 }
 function renderWishlist(){
@@ -1849,7 +2014,7 @@ function renderWishlist(){
     card.style.setProperty('--type-color',t.color);card.style.setProperty('--type-soft',t.soft);
     const icon=document.createElement('div');icon.className='wish-ic';icon.innerHTML=t.icon;card.appendChild(icon);
     const mid=document.createElement('div');mid.className='wish-mid';
-    mid.innerHTML='<div class="wish-cat">'+t.label+'</div><div class="wish-text">'+esc(w.text)+'</div>';
+    mid.innerHTML='<div class="wish-cat">'+t.label+' '+avHtml(w.by,'xs')+'</div><div class="wish-text">'+esc(w.text)+'</div>';
     card.appendChild(mid);
     // action buttons: tentative "to day" + confirmed "book it"
     const btns=document.createElement('div');btns.className='wish-btns';
@@ -2148,7 +2313,7 @@ function downloadICS(b){
   const a=document.createElement('a');a.href=url;a.download=(b.title||'event').replace(/[^\w]+/g,'_')+'.ics';
   document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function addBooking(b){D.bookings.push(Object.assign({id:uid(),kind:'',title:'',when:'',details:''},b||{}));save();renderBookings()}
+function addBooking(b){D.bookings.push(Object.assign({id:uid(),kind:'',title:'',when:'',details:'',by:meStamp()},b||{}));save();renderBookings()}
 
 function renderPacking(){
   const c=document.getElementById('packing');c.innerHTML='';
@@ -2157,13 +2322,14 @@ function renderPacking(){
     const r=document.createElement('div');r.className='check-row'+(p.done?' done':'');
     const box=document.createElement('button');box.className='check-box';box.textContent=p.done?'✓':'';
     box.setAttribute('role','checkbox');box.setAttribute('aria-checked',!!p.done);box.setAttribute('aria-label',(p.text||'Item')+' packed');
-    box.onclick=()=>{p.done=!p.done;save();renderPacking()};r.appendChild(box);
+    box.onclick=()=>{p.done=!p.done;save();renderPacking();
+      if(p.done&&D.packing.length>2&&D.packing.every(x=>x.done))cheer('All packed!',D.packing.length+' of '+D.packing.length+' ticked off. Audra\u2019s tail is officially wagging.');};r.appendChild(box);
     r.appendChild(inp(p.text,'check-text','Item',v=>{p.text=v;save()},'Packing item'));
     r.appendChild(delB(()=>removeWithUndo(D.packing,p,'Item',renderPacking),'Remove '+(p.text||'item')));
     c.appendChild(r);
   });counts();
 }
-function addPack(t){D.packing.push({id:uid(),text:t||'',done:false});save();renderPacking();
+function addPack(t){D.packing.push({id:uid(),text:t||'',done:false,by:meStamp()});save();renderPacking();
   if(!t)setTimeout(()=>{const r=document.querySelectorAll('#packing .check-text');r[r.length-1]?.focus()},50)}
 
 const SAY_LANGS={'fr-FR':'French','it-IT':'Italian','es-ES':'Spanish (Spain)','es-MX':'Spanish (Latin America)','de-DE':'German','pt-PT':'Portuguese (Portugal)','pt-BR':'Portuguese (Brazil)','nl-NL':'Dutch','el-GR':'Greek','ja-JP':'Japanese','ko-KR':'Korean','zh-CN':'Chinese (Mandarin)','zh-HK':'Cantonese','th-TH':'Thai','vi-VN':'Vietnamese','id-ID':'Indonesian','tr-TR':'Turkish','pl-PL':'Polish','cs-CZ':'Czech','hu-HU':'Hungarian','sv-SE':'Swedish','da-DK':'Danish','nb-NO':'Norwegian','fi-FI':'Finnish','ru-RU':'Russian','ar-SA':'Arabic','he-IL':'Hebrew','hi-IN':'Hindi','hr-HR':'Croatian','ro-RO':'Romanian','en-GB':'English (UK)','en-US':'English (US)'};
@@ -2290,6 +2456,7 @@ function renderBudget(){
     c.appendChild(r); renderBudgetRowHint(r,b);
   });
   updTotal(); document.getElementById('curSym').textContent=ccySym(base).trim();
+  const ci=document.getElementById('curInput'); if(ci&&!ci.options.length)ci.innerHTML=Object.keys(CCY).map(k=>'<option value="'+k+'">'+k+' ('+CCY[k].trim()+')</option>').join(''); if(ci)ci.value=base;
   const note=document.getElementById('fxNote'), fx=fxCached(base);
   if(note)note.textContent=foreign?(fx?'Converted to '+base+' at European Central Bank rates from '+new Date(fx.date+'T12:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})+'.':'Other currencies will be converted to '+base+' once this phone is online.'):'';
   const ti=document.getElementById('budTravelers'); if(ti&&document.activeElement!==ti)ti.value=(D.travelers||[]).join(', ');
@@ -2340,32 +2507,19 @@ function renderBudgetRowHint(r,b){
   const v=amountIn(b); h.textContent=v==null?'Not converted yet':'\u2248 '+ccySym(base)+fmt(Math.round(v*100)/100);
 }
 function fmt(n){return n%1===0?n.toLocaleString():n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
-function addBudget(b){D.budget.push(Object.assign({id:uid(),desc:'',cost:'',day:todayISO()},b||{}));save();renderBudget()}
+function addBudget(b){D.budget.push(Object.assign({id:uid(),desc:'',cost:'',day:todayISO(),by:meStamp(),who:meName()},b||{}));save();renderBudget()}
 
-function openSettings(){
-  document.getElementById('apiKeyInput').value=getKey();
-  try{ document.getElementById('themeSel').value=localStorage.getItem('ace-theme')||''; }catch(e){}
-  document.getElementById('setTrip').hidden=!D;
-  if(D){ const ci=document.getElementById('curInput'); ci.innerHTML=Object.keys(CCY).map(k=>'<option value="'+k+'">'+k+' ('+CCY[k].trim()+')</option>').join(''); ci.value=tripCcy(); }
-  // populate hero city dropdown from itinerary stops
-  const sel=document.getElementById('heroCitySel');
-  if(sel&&D){
-    const stops=(typeof getStops==='function')?getStops():[];
-    sel.innerHTML='<option value="">First stop on the trip</option>'+
-      stops.map(s=>'<option value="'+esc(s.name)+'"'+(D.heroCity===s.name?' selected':'')+'>'+esc(s.name)+'</option>').join('');
-  }
-  document.getElementById('sheetBg').classList.add('show');
-}
-function closeSettings(){ const k=document.getElementById('apiKeyInput'); if(k.value.trim()!==getKey())saveApiKey(k.value); document.getElementById('sheetBg').classList.remove('show'); }
-function saveApiKey(v){ localStorage.setItem('trip_api_key',(v||'').trim()); if(D)refreshKeyNote(); }
+function openSettings(){ openYou('key'); }
+function closeSettings(){}
+function saveApiKey(v){ localStorage.setItem('trip_api_key',(v||'').trim()); if(D)refreshKeyNote(); toast((v||'').trim()?'API key saved':'API key removed'); }
 function setTheme(v){
   try{ if(v)localStorage.setItem('ace-theme',v); else localStorage.removeItem('ace-theme'); }catch(e){}
   if(v)document.documentElement.setAttribute('data-theme',v); else document.documentElement.removeAttribute('data-theme');
 }
 function refreshKeyNote(){document.getElementById('noKeyNote').classList.toggle('show',!getKey())}
 
-function pickImage(){if(!getKey()){refreshKeyNote();openSettings();return}document.getElementById('fileInput').click()}
-function setStatus(html,show=true){const s=document.getElementById('magicStatus');s.innerHTML=html;s.classList.toggle('show',show)}
+function pickImage(){if(!getKey()){refreshKeyNote();openSettings();return}if(D&&!document.getElementById('view-itinerary').classList.contains('active'))showView('itinerary');document.getElementById('fileInput').click()}
+function setStatus(html,show=true){const s=document.getElementById('magicStatus');s.innerHTML=html;s.classList.toggle('show',show);document.querySelector('#view-itinerary .magic').classList.toggle('busy',show)}
 let convertTargetId=null;
 async function handleImage(ev){
   const files=Array.from(ev.target.files||[]);ev.target.value='';if(!files.length)return;
@@ -2703,54 +2857,157 @@ function tripSpanOf(t){
   let a=parts[0], b=parts[parts.length-1]; if(b<a)b=a;
   return {start:a,end:b};
 }
-let homeEditing=false;
+/* ---------- You: this phone's name and colour (stamped on what you add) ---------- */
+const ME_KEY='ace-me';
+const ME_COLORS=[['#C2432A','Warm red'],['#C4901C','Deep gold'],['#2F3A22','Dark olive'],['#3E6E8C','Lake blue'],['#8A5A7A','Plum']];
+function getMe(){ let m={}; try{ m=JSON.parse(localStorage.getItem(ME_KEY))||{}; }catch(e){} return {name:m.name||'',color:m.color||ME_COLORS[0][0]}; }
+function initialsOf(name){ const w=(name||'').trim().split(/\s+/).filter(Boolean); if(!w.length)return ''; return (w[0][0]+(w.length>1?w[w.length-1][0]:'')).toUpperCase(); }
+const meName=()=>getMe().name.trim().split(/\s+/)[0]||'';
+function meStamp(){ const m=getMe(); const i=initialsOf(m.name); return i?{i,c:m.color}:undefined; }
+function setMe(patch){ const m=Object.assign(getMe(),patch); try{ localStorage.setItem(ME_KEY,JSON.stringify(m)); }catch(e){} renderMe(); }
+// a coloured initials bubble; text is white on red/olive/blue/plum, olive on gold
+function avHtml(by,size){ if(!by||!by.i)return ''; const light=by.c==='#C4901C';
+  return '<span class="av av-'+(size||'sm')+'" style="background:'+esc(by.c)+';color:'+(light?'#2F3A22':'#FFFFFF')+'" title="Added by '+esc(by.i)+'">'+esc(by.i)+'</span>'; }
+function renderMe(){
+  const m=getMe(), ini=initialsOf(m.name)||'?', light=m.color==='#C4901C';
+  ['meChipAv','youAv'].forEach(id=>{ const e=document.getElementById(id); if(e){ e.textContent=ini; e.style.background=m.color; e.style.color=light?'#2F3A22':'#FFFFFF'; } });
+  const sw=document.getElementById('youColors');
+  if(sw){ sw.innerHTML=''; ME_COLORS.forEach(([c,label])=>{ const b=document.createElement('button'); b.className='swatch'+(c===m.color?' on':''); b.style.background=c;
+    b.setAttribute('role','radio'); b.setAttribute('aria-checked',c===m.color); b.setAttribute('aria-label',label); b.onclick=()=>setMe({color:c}); sw.appendChild(b); }); }
+}
+function openYou(focus){
+  const y=document.getElementById('you'); y.hidden=false; document.body.classList.add('on-you');
+  document.getElementById('youName').value=getMe().name;
+  document.getElementById('apiKeyInput').value=getKey();
+  try{ document.getElementById('themeSel').value=localStorage.getItem('ace-theme')||''; }catch(e){}
+  const ys=document.getElementById('youSync'); if(ys)ys.textContent=syncCfg.token?(syncCfg.key?'Encrypted · ':'')+syncStateText():'Not set up — trips are only on this phone';
+  renderMe(); markBar(); y.scrollTop=0;
+  if(focus==='key')setTimeout(()=>document.getElementById('apiKeyInput').focus(),60);
+}
+function closeYou(){ const y=document.getElementById('you'); if(!y||y.hidden)return; y.hidden=true; document.body.classList.remove('on-you'); markBar(); }
+// the Trips button: back to the trip you were in, else all trips
+function navTrips(){ if(!document.getElementById('you').hidden){ closeYou(); if(!D)goHome(); return; } if(D)goHome(); }
+function markBar(){ const you=!document.getElementById('you').hidden;
+  document.querySelectorAll('.app-bar [data-tab]').forEach(b=>{ const on=b.dataset.tab===(you?'you':'trips'); b.classList.toggle('on',on); if(on)b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); }); }
+
+/* ---------- The + sheet ---------- */
+let addTripId=null;
+function openAdd(){
+  if(!STORE.trips.length){ createTrip(); return; }
+  addTripId=D?D.id:(STORE.activeId&&STORE.trips.some(t=>t.id===STORE.activeId)?STORE.activeId:upcomingTrips()[0].id);
+  const t=STORE.trips.find(x=>x.id===addTripId); document.getElementById('addTripName').textContent=t.name||'Untitled trip';
+  document.getElementById('addTripChip').disabled=STORE.trips.length<2;
+  document.getElementById('addBg').classList.add('show');
+}
+function closeAdd(){ document.getElementById('addBg').classList.remove('show'); }
+async function addPickTrip(){
+  const list=upcomingTrips().concat(STORE.trips.filter(t=>!upcomingTrips().includes(t)));
+  const i=await uiChoose('Add to which trip?',list.map(t=>t.name||'Untitled trip')); if(i==null)return;
+  addTripId=list[i].id; document.getElementById('addTripName').textContent=list[i].name||'Untitled trip';
+}
+function addAction(kind){
+  closeAdd(); closeYou();
+  if(!D||D.id!==addTripId)openTrip(addTripId);
+  if(kind==='upload')return pickImage();
+  if(kind==='paste')return openPaste();
+  if(kind==='booking'){ showView('bookings'); addBooking({_open:true}); const nb=D.bookings[D.bookings.length-1];
+    setTimeout(()=>{ const el=document.getElementById('bk-'+nb.id); if(el){ const ed=el.querySelector('.icon-btn'); if(ed&&!el.classList.contains('editing'))ed.click(); el.scrollIntoView({behavior:'smooth',block:'center'}); } },200); return; }
+  if(kind==='plan'){ showView('itinerary'); const d={id:uid(),title:'',date:'',plan:'',by:meStamp()}; D.days.push(d); dayEditing=d.id; save(); renderDays();
+    setTimeout(()=>{ const e=document.querySelector('.day-plan.editing'); if(e)e.scrollIntoView({behavior:'smooth',block:'center'}); },120); return; }
+  if(kind==='idea'){ showView('wishlist'); setTimeout(()=>document.getElementById('wishInput').focus(),80); return; }
+  if(kind==='expense'){ showView('budget'); addBudget(); setTimeout(()=>{ const r=document.querySelectorAll('#budget .desc'); r[r.length-1]?.focus(); },80); }
+}
+
+/* ---------- Home ---------- */
+// a trip's date range: from its calendar, else from the dates the user typed ("Apr 2 – Apr 9")
+function tripSpanOf(t){
+  const sp=timelineSpan(t); if(sp)return sp;
+  const parts=(t.dates||'').split(/\s+[–—-]\s+|\s*[–—]\s*/).map(x=>dayKeyOf(x,t)).filter(x=>x!=null);
+  if(!parts.length)return null;
+  let a=parts[0], b=parts[parts.length-1]; if(b<a)b=a;
+  return {start:a,end:b};
+}
+const todayKey=()=>{ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()).getTime(); };
+function upcomingTrips(){ const t0=todayKey(); return STORE.trips.map(t=>({t,sp:tripSpanOf(t)})).filter(r=>!r.sp||r.sp.end>=t0).sort((a,b)=>(a.sp?a.sp.start:Infinity)-(b.sp?b.sp.start:Infinity)).map(r=>r.t); }
+// everyone who has added something to a trip, by their stamp
+function tripPeople(t){ const seen={}, out=[];
+  ['bookings','days','wishlist','budget','packing'].forEach(k=>(t[k]||[]).forEach(x=>{ if(x&&x.by&&x.by.i){ const key=x.by.i+x.by.c; if(!seen[key]){ seen[key]=1; out.push(x.by); } } }));
+  return out.slice(0,4); }
+let homeEditing=false, homeFilter='upcoming';
 function renderHome(){
   const g=document.getElementById('tripGrid'); g.innerHTML='';
-  const eb=document.getElementById('homeEdit');
+  const eb=document.getElementById('homeEdit'), pills=document.getElementById('homePills'), nb=document.getElementById('newTripBtn');
+  renderMe();
   if(!STORE.trips.length){
-    homeEditing=false; if(eb)eb.hidden=true;
-    g.innerHTML='<div class="home-empty"><div class="mark">No trips yet.<br>Create your first one below.</div></div>';
+    homeEditing=false; if(eb)eb.hidden=true; pills.innerHTML=''; nb.hidden=true;
+    g.innerHTML='<div class="moment"><svg class="moment-dog" role="img" aria-label="Audra holding the AS flag"><use href="#audra"/></svg><div class="moment-h">No trips yet</div><div class="moment-t">Audra’s got the flag. Where are we going?</div><button class="red-btn" onclick="createTrip()">Start a trip</button></div>';
     return;
   }
+  nb.hidden=false;
   if(eb){ eb.hidden=false; eb.textContent=homeEditing?'Done':'Edit'; }
   document.getElementById('home').classList.toggle('editing',homeEditing);
-  const now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
+  const t0=todayKey();
   const rows=STORE.trips.map(t=>({t,sp:tripSpanOf(t)}));
-  const upcoming=rows.filter(r=>!r.sp||r.sp.end>=today).sort((a,b)=>(a.sp?a.sp.start:Infinity)-(b.sp?b.sp.start:Infinity));
-  const past=rows.filter(r=>r.sp&&r.sp.end<today).sort((a,b)=>b.sp.start-a.sp.start);
-  const section=(label,list)=>{ if(!list.length)return; if(label){const h=document.createElement('div');h.className='home-sec';h.textContent=label;g.appendChild(h);} list.forEach(r=>g.appendChild(tripCard(r.t,r.sp,today))); };
-  section(past.length?'Upcoming':'',upcoming);
-  section('Past trips',past);
+  const upcoming=rows.filter(r=>!r.sp||r.sp.end>=t0).sort((a,b)=>(a.sp?a.sp.start:Infinity)-(b.sp?b.sp.start:Infinity));
+  const past=rows.filter(r=>r.sp&&r.sp.end<t0).sort((a,b)=>b.sp.start-a.sp.start);
+  if(homeFilter==='past'&&!past.length)homeFilter='upcoming';
+  pills.innerHTML='';
+  [['upcoming','Upcoming',upcoming.length],['past','Past',past.length]].forEach(([k,label,n])=>{ if(k==='past'&&!n)return;
+    const b=document.createElement('button'); b.className='pill'+(homeFilter===k?' on':''); b.setAttribute('aria-pressed',homeFilter===k);
+    b.innerHTML=label+' <span>'+n+'</span>'; b.onclick=()=>{homeFilter=k;renderHome();}; pills.appendChild(b); });
+  const list=homeFilter==='past'?past:upcoming;
+  if(!list.length)g.innerHTML='<div class="empty"><div class="mark">Nothing coming up. Start a new trip below.</div></div>';
+  list.forEach((r,i)=>g.appendChild(tripCard(r.t,r.sp,t0,i===0&&homeFilter==='upcoming')));
 }
-function tripCard(t,sp,today){
-  const card=document.createElement('div');card.className='trip-card';
+function tripCard(t,sp,today,big){
+  const card=document.createElement('div');card.className='trip-card'+(big?' big':'');
   card.setAttribute('role','button');card.tabIndex=0;
   card.onclick=(e)=>{ if(e.target.closest('.tc-del'))return; if(homeEditing){ homeEditing=false; renderHome(); } openTrip(t.id); };
   card.onkeydown=e=>{ if(e.key==='Enter')card.onclick(e); };
-  const stops=tripStops(t);
-  const cover=document.createElement('div');cover.className='tc-cover';
-  if(t.cover){const im=document.createElement('img');im.src=t.cover;im.alt='';im.loading='lazy';cover.appendChild(im);}
-  else{ cover.classList.add('no-photo'); cover.dataset.city=stops[0]||t.name||''; }
-  card.appendChild(cover);
-  const nd=sp?Math.round((sp.end-sp.start)/864e5)+1:0;
+  const stops=tripStops(t), nd=sp?Math.round((sp.end-sp.start)/864e5)+1:0;
   let chip='';
   if(sp){ const diff=Math.round((sp.start-today)/864e5);
-    if(diff>1)chip='In '+diff+' days'; else if(diff===1)chip='Tomorrow'; else if(diff===0)chip='Starts today';
+    if(diff>1)chip=big?'In '+diff+' days':diff+' days'; else if(diff===1)chip='Tomorrow'; else if(diff===0)chip='Starts today';
     else if(today<=sp.end)chip='Now · day '+(Math.round((today-sp.start)/864e5)+1); }
-  const body=document.createElement('div');body.className='tc-body';
   const dates=t.datesManual&&t.dates?t.dates:(sp?spanLabel(sp):t.dates);
-  body.innerHTML=(chip?'<div class="tc-chip">'+chip+'</div>':'')+'<div class="tc-name">'+esc(t.name||'Untitled trip')+'</div>'+
-    '<div class="tc-meta">'+(dates?'<span>'+esc(dates)+'</span>':'')+
-    (nd?'<span>'+nd+' day'+(nd>1?'s':'')+'</span>':'')+
-    (stops.length?'<span>'+esc(stops.slice(0,3).join(' · '))+'</span>':'')+'</div>';
-  card.appendChild(body);
+  const people=tripPeople(t).map(b=>avHtml(b,'sm')).join('');
+  if(big){
+    const cover=document.createElement('div');cover.className='tc-cover';
+    if(t.cover){ const im=document.createElement('img');im.src=t.cover;im.alt='';im.loading='lazy';cover.appendChild(im); }
+    else cover.innerHTML='<span class="tc-sun"></span><svg class="tc-path" viewBox="0 0 390 132" aria-hidden="true"><path d="M28 104 C90 50 170 40 250 66" fill="none" stroke="#FDF9F0" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/><circle cx="28" cy="104" r="5" fill="#FDF9F0"/></svg>';
+    if(chip)cover.insertAdjacentHTML('beforeend','<span class="tc-chip">'+chip+'</span>');
+    card.appendChild(cover);
+  } else {
+    card.insertAdjacentHTML('beforeend','<div class="tc-thumb">'+(t.cover?'<img src="'+esc(t.cover)+'" alt="" loading="lazy">':'<span class="tc-sun"></span>')+'</div>');
+  }
+  const next=big&&sp&&sp.start>today?(()=>{ const save=D; D=t; let txt=''; try{ const tl=buildTimeline(); const k=Object.keys(tl).map(Number).filter(x=>x>=today).sort((a,b)=>a-b)[0]; const it=k!=null&&tl[k].items[0]; if(it)txt='Next: '+bookingLabel(it.b)+', '+shortDay(k); }catch(e){} D=save; return txt; })():'';
+  card.insertAdjacentHTML('beforeend','<div class="tc-body"><div class="tc-name">'+esc(t.name||'Untitled trip')+'</div>'+
+    '<div class="tc-meta">'+[dates&&esc(dates),nd&&(nd+' day'+(nd>1?'s':'')),big&&stops.length&&esc(stops.slice(0,3).join(', '))].filter(Boolean).join(' · ')+'</div>'+
+    (big?'<div class="tc-foot"><span class="av-stack">'+people+'</span><span class="tcard-next">'+esc(next)+'</span></div>':'')+'</div>'+
+    (!big&&chip?'<span class="tc-days">'+chip+'</span>':''));
   const del=document.createElement('button');del.className='tc-del';del.textContent='×';del.setAttribute('aria-label','Delete '+(t.name||'trip'));
-  del.onclick=()=>deleteTrip(t.id);
-  card.appendChild(del);
-  // lazily fetch a cover if online and none saved
-  if(!t.cover && stops.length && navigator.onLine){ fetchCityPhoto(stops[0]).then(url=>{ if(url){t.cover=url;persist(); const im=document.createElement('img');im.src=url;im.alt='';cover.classList.remove('no-photo');cover.insertBefore(im,cover.firstChild);} }); }
+  del.onclick=()=>deleteTrip(t.id); card.appendChild(del);
+  if(!t.cover && stops.length && navigator.onLine){ fetchCityPhoto(stops[0]).then(url=>{ if(url){ t.cover=url; persist(); if(document.body.classList.contains('on-home'))renderHome(); } }); }
   return card;
 }
+
+/* ---------- Audra's moments ---------- */
+function cheer(h,t){
+  const c=document.getElementById('cheer'); document.getElementById('cheerH').textContent=h; document.getElementById('cheerT').textContent=t||'';
+  c.hidden=false; c.classList.add('show'); clearTimeout(c._t);
+  if(reducedMotion())c.querySelectorAll('svg').forEach(s=>s.pauseAnimations&&s.pauseAnimations());
+  c._t=setTimeout(()=>{ c.classList.remove('show'); setTimeout(()=>{c.hidden=true;},300); },2600);
+  c.onclick=()=>{ clearTimeout(c._t); c.classList.remove('show'); c.hidden=true; };
+}
+const reducedMotion=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function renderOffline(){
+  let b=document.getElementById('offlineBar');
+  if(navigator.onLine){ if(b)b.remove(); return; }
+  if(!b){ b=document.createElement('div'); b.id='offlineBar'; b.setAttribute('role','status');
+    b.innerHTML='<svg class="off-dog" aria-hidden="true"><use href="#audra"/></svg><div><b>No signal</b><span>Your trips are safe on this phone. We’ll sync the moment you’re back online.</span></div>';
+    document.body.appendChild(b); }
+}
+window.addEventListener('online',renderOffline); window.addEventListener('offline',renderOffline);
 
 /* ---------- Documents vault (IndexedDB, offline file storage) ---------- */
 let _db=null;
@@ -3045,11 +3302,14 @@ async function fetchWeather(p,dateStr){
   return wxCache[key];
 }
 async function loadWeather(){
+  const trip=D; if(!trip)return;                     // stop if the person leaves this trip while we're fetching
   const slots=[...document.querySelectorAll('.cm-sky[data-key]')];
   const now=new Date(); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
   for(const slot of slots){
+    if(D!==trip)return;
     const key=+slot.dataset.key; const d=new Date(key);
     const p=await placeForQueries(dayPlaceQueries(key));
+    if(D!==trip)return;
     if(!p||!slot.isConnected)continue;
     const st=sunTimes(d.getFullYear(),d.getMonth(),d.getDate(),p.lat,p.lon);
     const sun=st?'<div title="Sunrise / sunset in '+esc(p.city)+'">☀︎ '+fmtTimeIn(st.rise,p.tz)+' · ☾ '+fmtTimeIn(st.set,p.tz)+'</div>':'';
@@ -3066,7 +3326,7 @@ async function loadWeather(){
       if(wx&&slot.isConnected)slot.innerHTML=holHTML+'<div>'+wx+'</div>'+sun;
     }
   }
-  updateLocalTime();
+  if(D===trip)updateLocalTime();
   renderToday();
   renderSayLang();   // the destination's language is known now
 }
@@ -3177,19 +3437,19 @@ async function buildExportHTML(){
   S.style.cssText='width:720px;background:#F6EFDD;font-family:Inter,sans-serif;color:#1D2214;padding:0;margin:0';
   let h='';
   h+='<div style="background:#2C3520;color:#F4ECD8;padding:44px 44px 38px;text-align:center">'+
-     '<div style="font-family:Bricolage Grotesque,sans-serif;font-size:14px;letter-spacing:.24em;color:#DDAE3F;margin-bottom:16px">ACE TRAVEL</div>'+
-     '<div style="font-family:Bricolage Grotesque,sans-serif;font-size:44px;font-weight:800;line-height:1.05">'+esc(D.name||'My Trip')+'</div>'+
-     (D.dates?'<div style="font-family:Bricolage Grotesque,sans-serif;font-size:18px;color:rgba(244,239,226,.8);margin-top:10px">'+esc(D.dates)+'</div>':'')+'</div>';
+     '<div style="font-family:Nunito,sans-serif;font-size:14px;letter-spacing:.24em;color:#DDAE3F;margin-bottom:16px">ACE TRAVEL</div>'+
+     '<div style="font-family:Nunito,sans-serif;font-size:44px;font-weight:800;line-height:1.05">'+esc(D.name||'My Trip')+'</div>'+
+     (D.dates?'<div style="font-family:Nunito,sans-serif;font-size:18px;color:rgba(244,239,226,.8);margin-top:10px">'+esc(D.dates)+'</div>':'')+'</div>';
   // itinerary
   h+='<div style="padding:36px 44px">';
-  h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:26px;font-weight:800;letter-spacing:-.02em;border-bottom:2px solid #2C3520;padding-bottom:10px;margin-bottom:22px">Itinerary</div>';
+  h+='<div style="font-family:Nunito,sans-serif;font-size:26px;font-weight:700;letter-spacing:-.01em;border-bottom:2px solid #2C3520;padding-bottom:10px;margin-bottom:22px">Itinerary</div>';
   D.days.forEach((d,i)=>{
     const filler=!d.title&&!d.plan;
     h+='<div style="display:flex;gap:18px;margin-bottom:20px;'+(filler?'opacity:.6':'')+'">';
     if(dayPhotos[d.id]){ h+='<div style="width:120px;height:88px;border-radius:12px;overflow:hidden;flex-shrink:0"><img src="'+dayPhotos[d.id]+'" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover"/></div>'; }
     h+='<div style="flex:1">';
     h+='<div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8C600A">Day '+(i+1)+(d.date?' — '+esc(d.date):'')+'</div>';
-    h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:20px;margin-top:3px">'+esc(d.title||'Open day')+'</div>';
+    h+='<div style="font-family:Nunito,sans-serif;font-size:20px;margin-top:3px">'+esc(d.title||'Open day')+'</div>';
     if(d.plan)h+='<div style="font-size:14px;color:#4E5440;margin-top:5px;line-height:1.5">'+esc(d.plan)+'</div>';
     h+='</div></div>';
   });
@@ -3197,11 +3457,11 @@ async function buildExportHTML(){
   // bookings
   if(D.bookings.length){
     h+='<div style="padding:0 44px 36px">';
-    h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:26px;font-weight:800;letter-spacing:-.02em;border-bottom:2px solid #2C3520;padding-bottom:10px;margin-bottom:22px">Bookings</div>';
+    h+='<div style="font-family:Nunito,sans-serif;font-size:26px;font-weight:700;letter-spacing:-.01em;border-bottom:2px solid #2C3520;padding-bottom:10px;margin-bottom:22px">Bookings</div>';
     D.bookings.forEach(b=>{
       h+='<div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid #ECE2CA">';
       h+='<div style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8C600A">'+esc(b.kind||'Booking')+'</div>';
-      h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:19px;margin-top:3px">'+esc(b.title||'')+'</div>';
+      h+='<div style="font-family:Nunito,sans-serif;font-size:19px;margin-top:3px">'+esc(b.title||'')+'</div>';
       if(b.when)h+='<div style="font-size:13px;color:#666C4B;margin-top:2px">'+esc(b.when)+'</div>';
       const bits=[];
       if(b.flightNo)bits.push('Flight '+b.flightNo); if(b.confirmation)bits.push('Conf '+b.confirmation);
@@ -3214,9 +3474,9 @@ async function buildExportHTML(){
   // budget
   if(D.budget.length){
     h+='<div style="padding:0 44px 40px">';
-    h+='<div style="font-family:Bricolage Grotesque,sans-serif;font-size:26px;font-weight:800;letter-spacing:-.02em;border-bottom:2px solid #2C3520;padding-bottom:10px;margin-bottom:18px">Budget</div>';
-    D.budget.forEach(b=>{ h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ECE2CA;font-size:15px"><span>'+esc(b.desc||'')+'</span><span style="font-family:Bricolage Grotesque,sans-serif;font-weight:800;color:#2C3520">'+esc(ccySym(b.ccy||tripCcy()))+esc(b.cost||'0')+'</span></div>'; });
-    h+='<div style="display:flex;justify-content:space-between;padding:14px 0 0;font-family:Bricolage Grotesque,sans-serif;font-size:20px;font-weight:800"><span>Total</span><span>'+cur+total.toLocaleString()+'</span></div>';
+    h+='<div style="font-family:Nunito,sans-serif;font-size:26px;font-weight:700;letter-spacing:-.01em;border-bottom:2px solid #2C3520;padding-bottom:10px;margin-bottom:18px">Budget</div>';
+    D.budget.forEach(b=>{ h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ECE2CA;font-size:15px"><span>'+esc(b.desc||'')+'</span><span style="font-family:Nunito,sans-serif;font-weight:800;color:#2C3520">'+esc(ccySym(b.ccy||tripCcy()))+esc(b.cost||'0')+'</span></div>'; });
+    h+='<div style="display:flex;justify-content:space-between;padding:14px 0 0;font-family:Nunito,sans-serif;font-size:20px;font-weight:800"><span>Total</span><span>'+cur+total.toLocaleString()+'</span></div>';
     h+='</div>';
   }
   h+='<div style="background:#2C3520;color:#95997f;text-align:center;padding:20px;font-size:12px;letter-spacing:.1em">MADE WITH ACE TRAVEL</div>';
@@ -3763,6 +4023,12 @@ else { goHome(); }
 handleSharedContent();
 handlePairLink();
 renderSyncStatus();
+renderMe(); markBar(); renderOffline();
+// loading screen: Audra trots while the app wakes up, then steps aside
+(function(){ const sp=document.getElementById('splash'); if(!sp)return;
+  const rm=reducedMotion(); if(rm)sp.querySelectorAll('svg').forEach(x=>x.pauseAnimations&&x.pauseAnimations());
+  setTimeout(()=>{ sp.classList.add('out'); setTimeout(()=>{ sp.querySelectorAll('svg').forEach(x=>x.pauseAnimations&&x.pauseAnimations()); sp.remove(); },450); }, rm?350:1300);
+})();
 if(syncCfg.token)syncNow();
 
 /* ---------- Service worker: bulletproof offline ---------- */

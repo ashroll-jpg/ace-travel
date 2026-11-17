@@ -1,5 +1,5 @@
 /* Ace Travel service worker — bulletproof offline */
-const CACHE='ace-travel-v3';
+const CACHE='ace-travel-v4';
 const CORE=[
   './',
   './index.html',
@@ -10,7 +10,7 @@ const CORE=[
   // the map library, so the Map tab works with no signal (map tiles still need a connection)
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-  'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400;500;600;700&display=swap'
+  'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,700&display=swap'
 ];
 
 // Install: pre-cache the app shell
