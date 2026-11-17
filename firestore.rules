@@ -1,0 +1,45 @@
+rules_version = '2';
+
+// Ace Travel: who can see and change a trip.
+// Paste this into Firebase console → Firestore Database → Rules, then Publish.
+//
+// A trip is trips/{tripId} = { json, memberEmails, owner, updatedBy, updatedAt, v }.
+// People get in by email, and only once they've confirmed that email (so nobody can
+// sign up with someone else's address and see their trips).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function me() {
+      return request.auth.token.email.lower();
+    }
+    function wellFormed(d) {
+      return d.json is string && d.json.size() < 900000
+        && d.memberEmails is list && d.memberEmails.size() >= 1 && d.memberEmails.size() <= 20
+        && d.owner is string;
+    }
+
+    match /trips/{tripId} {
+      // members can read; the app's query is "trips where memberEmails contains my email"
+      allow read: if signedIn() && me() in resource.data.memberEmails;
+
+      // anyone signed in can create a trip they own and belong to
+      allow create: if signedIn() && wellFormed(request.resource.data)
+        && request.resource.data.owner == request.auth.uid
+        && me() in request.resource.data.memberEmails;
+
+      // members can edit and share it; the owner can't change; a member may also leave
+      // (remove only themselves)
+      allow update: if signedIn() && me() in resource.data.memberEmails
+        && wellFormed(request.resource.data)
+        && request.resource.data.owner == resource.data.owner
+        && (me() in request.resource.data.memberEmails
+            || request.resource.data.memberEmails == resource.data.memberEmails.removeAll([me()]));
+
+      // only the owner can delete it
+      allow delete: if signedIn() && resource.data.owner == request.auth.uid;
+    }
+  }
+}
