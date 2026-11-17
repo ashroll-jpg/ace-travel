@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -45,7 +45,8 @@
     --sans:"Nunito",-apple-system,BlinkMacSystemFont,sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html{-webkit-text-size-adjust:100%}
+  html{-webkit-text-size-adjust:100%;touch-action:pan-x pan-y}   /* it's an app: no pinch or double-tap zoom (the map handles its own) */
+  button,a,input,select,textarea,label{touch-action:manipulation}
   html,body{margin:0;padding:0;background:var(--paper);width:100%;max-width:100vw;overflow-x:hidden}
   body{
     font-family:var(--sans); color:var(--ink); font-size:16px; line-height:1.5;
@@ -863,8 +864,8 @@
   nav.app-bar button svg{width:24px;height:24px}
   nav.app-bar button.on{color:var(--ink);font-weight:800;background:transparent}
   nav.app-bar button.on svg{color:var(--red)}
-  nav.app-bar .add-fab{min-width:0;width:64px;height:64px;margin-top:-34px;border-radius:50%;background:var(--red);color:#fff;box-shadow:0 8px 18px rgba(194,67,42,.35);justify-content:center}
-  nav.app-bar .add-fab svg{width:28px;height:28px;color:#fff}
+  nav.app-bar .add-fab{min-width:0;width:62px;height:62px;padding:0;margin-top:-22px;border-radius:50%;border:4px solid var(--paper);background:var(--red);color:#fff;box-shadow:0 6px 14px rgba(194,67,42,.3);display:grid;place-items:center;gap:0;line-height:0;font-size:0;box-sizing:border-box}
+  nav.app-bar .add-fab svg{display:block;width:26px;height:26px;color:#fff;margin:0}
   nav.app-bar .add-fab:active{transform:scale(.96)}
 
   /* You */
@@ -1364,7 +1365,7 @@ function updateCountdown(){
   if(diff>1)txt=diff+' days to go';
   else if(diff===1)txt='Tomorrow';
   else if(diff===0)txt='Starts today';
-  else if(today<=sp.end)txt='Day '+(Math.round((today-sp.start)/86400000)+1)+' of '+total;
+  else if(today<=sp.end&&total<=90)txt='Day '+(Math.round((today-sp.start)/86400000)+1)+' of '+total;
   if(txt)el.innerHTML='<span class="dot"></span>'+txt;
 }
 // the next booking before the trip starts (during the trip the Today card does this job)
@@ -1485,38 +1486,64 @@ function counts(){
 const MONTHS={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
 const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MON3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WEEKDAY_RE=/\b(sun|sunday|mon|monday|tue|tues|tuesday|wed|weds|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday)\b/;
+const WEEKDAY_N={sun:0,mon:1,tue:2,wed:3,thu:4,fri:5,sat:6};
 function parseLoose(s){
   if(!s)return null; s=(''+s).toLowerCase();
+  // YYYY-MM-DD comes from the app's own date pickers, whose year was often the old app's guess:
+  // keep the month and day, but resolve the year like any other date
   const iso=s.match(/(\d{4})-(\d{2})-(\d{2})/);
-  if(iso)return {mon:+iso[2]-1,day:+iso[3],year:+iso[1]};
+  if(iso)return {mon:+iso[2]-1,day:+iso[3],isoYear:+iso[1]};
   // numeric M/D/YYYY or M/D/YY or M/D
   const num=s.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
   if(num){ let y=num[3]?+num[3]:null; if(y&&y<100)y+=2000; return {mon:+num[1]-1, day:+num[2], year:y}; }
   let mon=null; for(const k in MONTHS){if(s.includes(k)){mon=MONTHS[k];break}}
   if(mon===null)return null;
   const dm=s.match(/\b(\d{1,2})\b/), yr=s.match(/\b(20\d{2})\b/);   // keep a written year ("14 Mar 2026")
-  return yr?{mon,day:dm?+dm[1]:1,year:+yr[1]}:{mon,day:dm?+dm[1]:1};
+  const wd=s.match(WEEKDAY_RE);                                          // and a weekday ("Sat, 26 Dec") pins the year too
+  const out={mon,day:dm?+dm[1]:1}; if(yr)out.year=+yr[1]; if(wd)out.dow=WEEKDAY_N[wd[1].slice(0,3)];
+  return out;
 }
 // Dates are often written without a year ("Dec 20"). Each trip has an anchor moment; a yearless date
 // means its first occurrence from two months before the anchor onward. The anchor is stamped on the trip
 // once, so its dates never drift into next year as time passes. (Name kept from when this returned a year.)
 function baseYear(T){ return tripAnchor(T===undefined?D:T); }
+// the trip's own date strings, for working out which year it's in
+function tripDateStrings(T){ const out=[];
+  (T.bookings||[]).forEach(b=>['when','date','depDate','arrDate','checkIn','checkOut'].forEach(k=>b[k]&&out.push(b[k])));
+  (T.days||[]).forEach(d=>d.date&&out.push(d.date)); (T.lodging||[]).forEach(L=>{ L.checkIn&&out.push(L.checkIn); L.checkOut&&out.push(L.checkOut); });
+  if(T.dates)out.push(T.dates); return out; }
+// the year (near today) in which a month/day falls on the given weekday
+function weekdayYear(p){ const y0=new Date().getFullYear(); let best=null;
+  for(let y=y0-3;y<=y0+3;y++){ const t=new Date(y,p.mon,p.day); if(t.getDay()!==p.dow)continue; if(best==null||Math.abs(t-Date.now())<Math.abs(best-Date.now()))best=t.getTime(); }
+  return best; }
 function tripAnchor(T){
   if(!T)return Date.now();
-  if(T.anchor)return T.anchor;
-  // a date with a real year anywhere in the trip is the best guide
-  let best=Infinity;
-  const look=s=>{ const p=parseLoose(s); if(p&&p.year){ const t=new Date(p.year,p.mon,p.day).getTime(); if(t<best)best=t; } };
-  (T.bookings||[]).forEach(b=>{ look(b.when); look(b.date); look(b.depDate); look(b.checkIn); });
-  (T.days||[]).forEach(d=>look(d.date)); (T.lodging||[]).forEach(L=>look(L.checkIn)); look(T.dates);
-  return best<Infinity?best:Date.now();
+  if(T.anchor&&T.anchorV===2)return T.anchor;
+  const ps=tripDateStrings(T).map(parseLoose).filter(Boolean);
+  // a year someone wrote ("25 Dec 2026") is the best guide
+  const written=ps.filter(p=>p.year).map(p=>new Date(p.year,p.mon,p.day).getTime());
+  if(written.length)return Math.min(...written);
+  // then weekdays ("Sat, 26 Dec"): take the year most of them agree on
+  const votes=ps.filter(p=>p.dow!=null).map(weekdayYear).filter(Boolean);
+  if(votes.length){ const byYear={}; votes.forEach(t=>{ const y=new Date(t).getFullYear(); (byYear[y]=byYear[y]||[]).push(t); });
+    const top=Object.values(byYear).sort((a,b)=>b.length-a.length)[0]; return Math.min(...top); }
+  // last resort: a date picker's year (only a hint: the old app guessed it)
+  const picked=ps.filter(p=>p.isoYear).map(p=>new Date(p.isoYear,p.mon,p.day).getTime());
+  if(picked.length&&!T.anchor)return Math.min(...picked);
+  return T.anchor||Date.now();
 }
-// stamp the anchor the first time a trip is opened, so it stays put
-function stampAnchor(T){ if(T&&!T.anchor){ T.anchor=tripAnchor(T); return true; } return false; }
+// stamp the anchor the first time a trip is opened (and once more for trips stamped by the first version)
+function stampAnchor(T){ if(T&&!(T.anchor&&T.anchorV===2)){ T.anchor=tripAnchor(Object.assign({},T,{anchor:T.anchor,anchorV:0})); T.anchorV=2; return true; } return false; }
 function toSortable(p,a){
   if(p.year)return new Date(p.year,p.mon,p.day).getTime();
   const from=(a>3000?a:Date.now())-61*864e5, y=new Date(from).getFullYear();
   let t=new Date(y,p.mon,p.day).getTime(); if(t<from)t=new Date(y+1,p.mon,p.day).getTime();
+  // a weekday settles it: take the nearest year in which the date falls on that day
+  if(p.dow!=null&&new Date(t).getDay()!==p.dow){
+    const Y=new Date(t).getFullYear();
+    for(const y2 of [Y+1,Y-1,Y+2,Y-2]){ const t2=new Date(y2,p.mon,p.day); if(t2.getDay()===p.dow){ t=t2.getTime(); break; } }
+  }
   return t;
 }
 const yearOf=(p,a)=>new Date(toSortable(p,a)).getFullYear();
@@ -1763,7 +1790,8 @@ function renderDays(){
     const dnum=d.getDate();
 
     // one continuous day-row on the calendar spine
-    const row=document.createElement('div');row.className='cal-row'+(isToday?' is-today':'')+(key<todayKey?' is-past':'')+(L?' has-lodg':'');
+    const underway=todayKey>=span.start&&todayKey<=span.end;   // fade earlier days only while the trip is on
+    const row=document.createElement('div');row.className='cal-row'+(isToday?' is-today':'')+(underway&&key<todayKey?' is-past':'')+(L?' has-lodg':'');
 
     // subtle alternating date marker
     const marker=document.createElement('div');marker.className='cal-marker';
@@ -3131,7 +3159,7 @@ function renderToday(){
   const c=document.getElementById('todayCard'); if(!c||!D)return;
   const span=timelineSpan();
   const now=nowMinIn(todayPlace&&todayPlace.tz);
-  if(!span||now.key<span.start-DAYMS||now.key>span.end){ c.innerHTML=''; return; }
+  if(!span||now.key<span.start-DAYMS||now.key>span.end||span.end-span.start>90*DAYMS){ c.innerHTML=''; return; }
   // flights leaving in the next 24 hours: online check-in is open
   const dev=nowMinIn(null), nowAbs=dev.key/6e4+dev.min;   // departure times are local to the airport you're leaving from
   const checkins=(D.bookings||[]).filter(b=>{ if(b.cat!=='flight')return false; const k=dayKeyOf(bookingDate(b)), m=timeToMin(bookingTime(b)); if(!k||m>=9999)return false;
@@ -4024,6 +4052,8 @@ handleSharedContent();
 handlePairLink();
 renderSyncStatus();
 renderMe(); markBar(); renderOffline();
+// iOS Safari ignores user-scalable=no, so stop its pinch gesture directly (Leaflet's map zoom uses touch events and keeps working)
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>{ if(!e.target.closest||!e.target.closest('.leaflet-container'))e.preventDefault(); },{passive:false}));
 // loading screen: Audra trots while the app wakes up, then steps aside
 (function(){ const sp=document.getElementById('splash'); if(!sp)return;
   const rm=reducedMotion(); if(rm)sp.querySelectorAll('svg').forEach(x=>x.pauseAnimations&&x.pauseAnimations());
