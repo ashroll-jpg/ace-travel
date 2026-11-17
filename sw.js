@@ -1,8 +1,14 @@
 /* Ace Travel service worker — bulletproof offline */
-const CACHE='ace-travel-v1';
+const CACHE='ace-travel-v2';
 const CORE=[
   './',
   './index.html',
+  './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png',
+  // the map library, so the Map tab works with no signal (map tiles still need a connection)
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap'
 ];
 
@@ -22,15 +28,15 @@ self.addEventListener('activate',e=>{
 
 // Fetch strategy:
 //  - Navigations & the app itself: network-first (revalidating past the HTTP cache), fall back to cache (so you get updates online, but it works offline)
-//  - Fonts & other GET assets: cache-first, update in background
-//  - API calls (anthropic, github sync, openstreetmap, wikipedia, open-meteo, holidays): network-only (never cache; fail gracefully offline)
+//  - Fonts, the map library & other GET assets: cache-first, update in background
+//  - API calls (anthropic, github sync, openstreetmap, wikipedia, open-meteo, holidays, exchange rates): network-only (never cache; fail gracefully offline)
 self.addEventListener('fetch',e=>{
   const req=e.request;
   if(req.method!=='GET')return;
   const url=new URL(req.url);
 
   // never intercept API / tile / photo calls — let them hit network (and fail cleanly offline)
-  if(/api\.anthropic\.com|api\.github\.com|githubusercontent\.com|nominatim\.openstreetmap|tile\.openstreetmap|basemaps\.cartocdn|wikipedia\.org|open-meteo\.com|date\.nager\.at|cloudflare|unpkg\.com/.test(url.href)){
+  if(/api\.anthropic\.com|api\.github\.com|githubusercontent\.com|nominatim\.openstreetmap|tile\.openstreetmap|basemaps\.cartocdn|wikipedia\.org|open-meteo\.com|date\.nager\.at|frankfurter\.app|cloudflare/.test(url.href)){
     return; // default browser handling
   }
 

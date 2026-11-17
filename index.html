@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ace Travel">
@@ -700,6 +701,20 @@
   .hs-btns{display:flex;gap:6px;flex-shrink:0}
   .home-sync button.later{background:transparent;color:var(--olive-ink);border:1px solid var(--line)}
 
+  /* ---------- Sync: encryption state ---------- */
+  .enc{font-weight:600}
+  .enc.on{color:var(--olive-ink)}
+  .enc.off{color:var(--warn)}
+  .linkish{border:none;background:transparent;padding:0;font:inherit;font-weight:600;color:var(--olive-ink);text-decoration:underline;text-underline-offset:2px}
+  .sync-or{display:block;font-size:13px;color:var(--ink-soft);margin-top:2px}
+
+  /* ---------- Money: currencies ---------- */
+  .bud-ccy{border:1px solid var(--line-soft);background:var(--paper-hi);color:var(--sage);border-radius:8px;padding:3px 2px;font-family:var(--sans);font-size:12px;max-width:64px;flex-shrink:0}
+  .bud-hint{font-size:12px;color:var(--sage);text-align:right;margin:-8px 46px 6px 0}
+  .fx-note{font-size:12.5px;color:var(--sage);margin:8px 2px 0}
+  .fx-note:empty{display:none}
+  .set-select{width:100%;padding:13px;border:1px solid var(--line);background:var(--paper-hi);font-size:15px;color:var(--ink);border-radius:8px;margin-bottom:18px;font-family:var(--sans)}
+
   /* ---------- Share panel ---------- */
   .share-opt{padding:14px 0;border-top:1px solid var(--line-soft)}
   .share-opt:first-of-type{border-top:none;padding-top:4px}
@@ -826,13 +841,13 @@
     <div class="magic" style="margin-top:22px">
       <div class="magic-text">
         <h3>Add a booking or plan</h3>
-        <p>From a screenshot or pasted text — it files itself.</p>
+        <p>From a screenshot, a PDF or pasted text — it files itself.</p>
       </div>
       <div class="magic-btns">
         <button class="magic-btn" onclick="pickImage()"><span>✦</span> Upload</button>
         <button class="magic-btn ghost" onclick="openPaste()"><span>⧉</span> Paste</button>
       </div>
-      <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleImage(event)">
+      <input type="file" id="fileInput" accept="image/*,application/pdf" multiple style="display:none" onchange="handleImage(event)">
       <div class="magic-status" id="magicStatus"></div>
       <div class="no-key-note" id="noKeyNote">Reading screenshots needs an Anthropic API key. <button onclick="openSettings()">Set it up</button></div>
     </div>
@@ -907,6 +922,7 @@
   <section class="view" id="view-budget">
     <div class="view-head"><h2 class="view-title">Money</h2><div class="view-count" id="cnt-budget"></div></div>
     <div class="budget-hero"><div class="lbl">TOTAL LOGGED</div><div class="amt"><span class="cur" id="curSym">€</span><span id="budTotal">0</span></div></div>
+    <div class="fx-note" id="fxNote"></div>
     <div class="bud-summary" id="budSummary"></div>
     <div class="bud-split"><span>Split between</span><input id="budTravelers" placeholder="Names, e.g. Ash, Sam" aria-label="Split between" onchange="setTravelers(this.value)"></div>
     <div id="budget"></div>
@@ -952,15 +968,15 @@
       <p>Keep your trips the same on every phone — yours and your travel partner's — free, through your GitHub account.</p>
       <ol class="sync-steps">
         <li><a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=Ace%20Travel%20sync" target="_blank" rel="noopener">Create a GitHub token</a>. It opens with only <b>gist</b> checked. Set Expiration to <b>No expiration</b>, tap <b>Generate token</b>, and copy it.</li>
-        <li>Paste it here and tap Connect.<div class="sync-in"><input id="syncToken" type="password" placeholder="ghp_…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="GitHub token"><button class="btn-save" onclick="syncConnect()">Connect</button></div></li>
-        <li>On the other phone, open Ace Travel and paste the <b>same token</b>.</li>
+        <li>Paste it here and tap Connect. <span class="sync-or">Got a pairing code from another phone? Paste that instead.</span><div class="sync-in"><input id="syncToken" type="password" placeholder="ghp_… or ace1.…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="GitHub token or pairing code"><button class="btn-save" onclick="syncConnect()">Connect</button></div></li>
+        <li>Then tap <b>Pair another phone</b> and paste the code into Ace Travel on your partner’s phone. It carries the key that unlocks your trips.</li>
       </ol>
-      <p class="sync-note">The token can only read and write gists. Your trips are saved to a secret gist in your GitHub account — unlisted, but not encrypted. Documents (passport photos, PDFs) stay on the phone they were added to.</p>
+      <p class="sync-note">Your trips are encrypted on this phone before they’re saved to a secret gist in your GitHub account, so GitHub (or anyone who finds the gist) can’t read them. The token can read and write all the gists on that account, so keep it to your own phones. Documents (passport photos, PDFs) stay on the phone they were added to.</p>
     </div>
     <div id="syncOn" hidden>
       <div class="sync-btns">
         <button class="btn-save" onclick="syncNow(true)">Sync now</button>
-        <button class="btn-cancel" onclick="syncCopyToken()">Copy token for another phone</button>
+        <button class="btn-cancel" onclick="syncPair()">Pair another phone</button>
         <button class="btn-cancel" onclick="syncShowHistory()">Sync history</button>
         <button class="btn-cancel" onclick="syncOff()">Turn off</button>
       </div>
@@ -984,8 +1000,8 @@
     <h3 id="setTitle">Settings <span class="build">Build 2026.11.16</span></h3>
     <div class="set-sec" id="setTrip">
       <div class="set-h">This trip</div>
-      <label for="curInput">Currency symbol</label>
-      <input type="text" id="curInput" placeholder="€" maxlength="3" oninput="D.cur=this.value.trim()||'€';save();renderBudget()">
+      <label for="curInput">Currency</label>
+      <select id="curInput" class="set-select" onchange="setTripCcy(this.value)"></select>
       <label for="heroCitySel">Photo</label>
       <select id="heroCitySel" style="width:100%;padding:13px;border:1px solid var(--line);background:var(--paper-hi);font-size:15px;color:var(--ink);border-radius:8px;margin-bottom:18px;font-family:var(--sans)" onchange="setHeroCity(this.value)"></select>
     </div>
@@ -1008,7 +1024,7 @@ const STORE_KEY='ace_trips_v1';       // {trips:[...], activeId}
 const LEGACY_KEY='trip_data_v2';      // old single-trip
 const uid=()=>Math.random().toString(36).slice(2,9);
 function getKey(){return localStorage.getItem('trip_api_key')||''}
-function fresh(name){return {id:uid(),name:name||'',dates:'',cur:'€',cover:'',days:[],lodging:[],bookings:[],wishlist:[],packing:[],phrases:[],numbers:[],addresses:[],budget:[],docs:[]}}
+function fresh(name){return {id:uid(),anchor:Date.now(),name:name||'',dates:'',cur:'€',cover:'',days:[],lodging:[],bookings:[],wishlist:[],packing:[],phrases:[],numbers:[],addresses:[],budget:[],docs:[]}}
 
 function loadStore(){
   let store;
@@ -1035,6 +1051,7 @@ function persist(){
 function openTrip(id){
   D=STORE.trips.find(t=>t.id===id)||null;
   if(!D)return;
+  stampAnchor(D);
   STORE.activeId=id; persist();
   document.body.classList.remove('on-home');
   applySmartExpand();
@@ -1052,7 +1069,7 @@ function applySmartExpand(){
   (D.days||[]).forEach(d=>{
     const p=parseLoose(d.date);
     if(!p){ d._open=true; return; }
-    const y=p.year||(p.mon<=5?by+1:by);
+    const y=yearOf(p,by);
     const dk=new Date(y,p.mon,p.day).getTime();
     d._open = dk>=t0; // today & future open, past collapsed
   });
@@ -1226,8 +1243,29 @@ function parseLoose(s){
   const dm=s.match(/\b(\d{1,2})\b/), yr=s.match(/\b(20\d{2})\b/);   // keep a written year ("14 Mar 2026")
   return yr?{mon,day:dm?+dm[1]:1,year:+yr[1]}:{mon,day:dm?+dm[1]:1};
 }
-function baseYear(){ const y=new Date().getFullYear(); return y; }
-function toSortable(p,by){ if(p.year)return new Date(p.year,p.mon,p.day).getTime(); let y=by; if(p.mon<=5)y=by+1; return new Date(y,p.mon,p.day).getTime(); }
+// Dates are often written without a year ("Dec 20"). Each trip has an anchor moment; a yearless date
+// means its first occurrence from two months before the anchor onward. The anchor is stamped on the trip
+// once, so its dates never drift into next year as time passes. (Name kept from when this returned a year.)
+function baseYear(T){ return tripAnchor(T===undefined?D:T); }
+function tripAnchor(T){
+  if(!T)return Date.now();
+  if(T.anchor)return T.anchor;
+  // a date with a real year anywhere in the trip is the best guide
+  let best=Infinity;
+  const look=s=>{ const p=parseLoose(s); if(p&&p.year){ const t=new Date(p.year,p.mon,p.day).getTime(); if(t<best)best=t; } };
+  (T.bookings||[]).forEach(b=>{ look(b.when); look(b.date); look(b.depDate); look(b.checkIn); });
+  (T.days||[]).forEach(d=>look(d.date)); (T.lodging||[]).forEach(L=>look(L.checkIn)); look(T.dates);
+  return best<Infinity?best:Date.now();
+}
+// stamp the anchor the first time a trip is opened, so it stays put
+function stampAnchor(T){ if(T&&!T.anchor){ T.anchor=tripAnchor(T); return true; } return false; }
+function toSortable(p,a){
+  if(p.year)return new Date(p.year,p.mon,p.day).getTime();
+  const from=(a>3000?a:Date.now())-61*864e5, y=new Date(from).getFullYear();
+  let t=new Date(y,p.mon,p.day).getTime(); if(t<from)t=new Date(y+1,p.mon,p.day).getTime();
+  return t;
+}
+const yearOf=(p,a)=>new Date(toSortable(p,a)).getFullYear();
 function fmtDate(ts){const d=new Date(ts);return DOW[d.getDay()]+', '+String(d.getDate()).padStart(2,'0')+' '+MON3[d.getMonth()];}
 function normDay(ts){const d=new Date(ts);return new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime();}
 
@@ -1301,7 +1339,7 @@ function todayIndex(){
   const now=new Date(); const t0=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
   for(let i=0;i<D.days.length;i++){
     const p=parseLoose(D.days[i].date); if(!p)continue;
-    const y=p.year||(p.mon<=5?by+1:by);
+    const y=yearOf(p,by);
     if(new Date(y,p.mon,p.day).getTime()===t0)return i;
   }
   return null;
@@ -1391,10 +1429,10 @@ function buildTimeline(){
   return daysMap;
 }
 function timelineSpan(T){
-  T=T||D; const by=baseYear(); const keys=[];
+  T=T||D; const by=baseYear(T); const keys=[];
   (T.bookings||[]).forEach(b=>{ if(b.cat==='hotel')return; const p=parseLoose(bookingDate(b)); if(p)keys.push(normDay(toSortable(p,by))); });
   (T.lodging||[]).forEach(L=>{ const ci=parseLoose(L.checkIn),co=parseLoose(L.checkOut); if(ci)keys.push(normDay(toSortable(ci,by))); if(co)keys.push(normDay(toSortable(co,by)-86400000)); });
-  (T.days||[]).forEach(d=>{ if(!(d.title||d.plan))return; const k=dayKeyOf(d.date); if(k!=null)keys.push(k); });
+  (T.days||[]).forEach(d=>{ if(!(d.title||d.plan))return; const k=dayKeyOf(d.date,T); if(k!=null)keys.push(k); });
   if(!keys.length)return null;
   return {start:Math.min.apply(null,keys), end:Math.max.apply(null,keys)};
 }
@@ -1700,20 +1738,10 @@ async function openWishPaste(){
     applyWish(r); wishStatus('Added to wishlist ✓'); setTimeout(()=>wishStatus('',false),3000);
   }).catch(e=>wishStatus('Couldn\'t read that: '+(e.message||'error')));
 }
-const WISH_PROMPT=`You are extracting place/activity IDEAS for a travel wishlist from an image or text (e.g. a screenshot of a restaurant, an Instagram post, a list of recommendations, a maps pin). Return ONLY a JSON object:
-{"items":[{"text":"short name of the place/idea","cat":"<one of: restaurant, coffee, event, museum, spa, shopping, activity>"}]}
-Include every distinct place/idea you can identify (could be one or several). Keep names short. Return JSON only.`;
-async function parseWish(contentBlocks){
-  const resp=await fetch("https://api.anthropic.com/v1/messages",{
-    method:"POST",
-    headers:{"Content-Type":"application/json","x-api-key":getKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:contentBlocks.concat([{type:'text',text:WISH_PROMPT}])}]})
-  });
-  if(!resp.ok){let m='HTTP '+resp.status;try{const e=await resp.json();if(e.error&&e.error.message)m=resp.status+': '+e.error.message}catch(_){ }throw new Error(m);}
-  const data=await resp.json();
-  const text=(data.content||[]).map(i=>i.type==='text'?i.text:'').join('').trim();
-  return JSON.parse(text.replace(/```json|```/g,'').trim());
-}
+const WISH_PROMPT=`List the places and activities in this image or text as travel ideas — it might be a screenshot of a restaurant, a social post, a list of recommendations or a map pin. Include every distinct place or idea (one or several). text is a short name for it; cat is what kind of place it is (a bar counts as coffee).`;
+const WISH_SCHEMA={type:'object',additionalProperties:false,required:['items'],properties:{items:{type:'array',items:{type:'object',additionalProperties:false,required:['text','cat'],
+  properties:{text:{type:'string'},cat:{type:'string',enum:['restaurant','coffee','event','museum','spa','shopping','activity']}}}}}};
+async function parseWish(contentBlocks){ return claudeJSON(contentBlocks.concat([{type:'text',text:WISH_PROMPT}]),WISH_SCHEMA); }
 function applyWish(r){
   D.wishlist=D.wishlist||[];
   const items=(r&&r.items)||[];
@@ -1896,7 +1924,7 @@ function dateInput(b){
   const i=document.createElement('input');i.type='date';i.className='ef-input ef-date';
   // seed from existing date
   const p=parseLoose(b.date||b.when||'');
-  if(p){ const by=baseYear(); const y=p.year||(p.mon<=5?by+1:by); i.value=y+'-'+String(p.mon+1).padStart(2,'0')+'-'+String(p.day).padStart(2,'0'); }
+  if(p){ const by=baseYear(); const y=yearOf(p,by); i.value=y+'-'+String(p.mon+1).padStart(2,'0')+'-'+String(p.day).padStart(2,'0'); }
   i.onchange=e=>{
     const v=e.target.value; if(!v)return;
     const [Y,M,Dd]=v.split('-').map(Number);
@@ -2011,7 +2039,7 @@ function downloadICS(b){
   // Try to parse a start datetime from structured fields; fall back to all-day today-less event
   const p=parseLoose(b.depDate||b.when||'');
   let dt;
-  if(p){ const by=baseYear(); const y=p.year||(p.mon<=5?by+1:by); dt=new Date(y,p.mon,p.day, 9,0,0);
+  if(p){ const by=baseYear(); const y=yearOf(p,by); dt=new Date(y,p.mon,p.day, 9,0,0);
     const tm=(b.depTime||'').match(/(\d{1,2}):?(\d{2})?\s*(am|pm)?/i);
     if(tm){let hh=+tm[1];const mm=tm[2]?+tm[2]:0;const ap=(tm[3]||'').toLowerCase();if(ap==='pm'&&hh<12)hh+=12;if(ap==='am'&&hh===12)hh=0;dt.setHours(hh,mm,0,0);}
   } else { dt=new Date(); }
@@ -2120,16 +2148,48 @@ function renderAddresses(){
 }
 function addAddress(a){D.addresses.push(Object.assign({id:uid(),title:'',body:''},a||{}));save();renderAddresses()}
 
+/* ---------- Currencies: each trip has one; any expense can be in another, converted at ECB rates ---------- */
+const CCY={EUR:'€',USD:'$',GBP:'£',JPY:'¥',CHF:'CHF ',CAD:'CA$',AUD:'A$',NZD:'NZ$',MXN:'MX$',BRL:'R$',SEK:'kr ',NOK:'kr ',DKK:'kr ',ISK:'kr ',
+  CZK:'Kč ',PLN:'zł ',HUF:'Ft ',RON:'lei ',BGN:'лв ',TRY:'₺',ILS:'₪',ZAR:'R ',INR:'₹',CNY:'CN¥',HKD:'HK$',KRW:'₩',SGD:'S$',THB:'฿',MYR:'RM ',IDR:'Rp ',PHP:'₱'};
+const SYM_CCY={'€':'EUR','$':'USD','£':'GBP','¥':'JPY','₹':'INR','₩':'KRW','₺':'TRY','₪':'ILS','฿':'THB','₱':'PHP'};
+function tripCcy(T){ T=T||D; return (T&&T.ccy&&CCY[T.ccy])?T.ccy:(SYM_CCY[(T&&T.cur||'').trim()]||'EUR'); }
+function setTripCcy(code){ D.ccy=code; D.cur=CCY[code].trim(); save(); renderBudget(); }
+const ccySym=code=>CCY[code]||code+' ';
+// rates are cached per base currency, so totals still add up offline
+function fxCached(base){ try{ return JSON.parse(localStorage.getItem('ace-fx-'+base)||'null'); }catch(e){ return null; } }
+const fxInflight={};
+function fxRefresh(base){
+  const c=fxCached(base);
+  if((c&&Date.now()-c.fetched<12*36e5)||!navigator.onLine||fxInflight[base])return;
+  fxInflight[base]=fetch('https://api.frankfurter.app/latest?from='+base).then(r=>r.ok?r.json():null).then(j=>{
+    if(j&&j.rates){ try{ localStorage.setItem('ace-fx-'+base,JSON.stringify({date:j.date,rates:j.rates,fetched:Date.now()})); }catch(e){}
+      if(D&&tripCcy()===base&&document.getElementById('view-budget').classList.contains('active'))renderBudget(); }
+  }).catch(()=>{}).finally(()=>{ delete fxInflight[base]; });
+}
+// an expense in the trip's currency; null if it's foreign and there's no rate yet
+function amountIn(b){
+  const n=parseFloat(b.cost)||0, base=tripCcy(), from=b.ccy||base;
+  if(!n||from===base)return n;
+  const c=fxCached(base); const rate=c&&c.rates&&c.rates[from];
+  return rate?n/rate:null;
+}
+function spendTotal(){ let t=0,missing=0; (D.budget||[]).forEach(b=>{ const v=amountIn(b); if(v==null)missing++; else t+=v; }); return {t,missing}; }
+
 function renderBudget(){
-  const c=document.getElementById('budget');c.innerHTML='';let t=0;
+  const c=document.getElementById('budget');c.innerHTML='';
+  const base=tripCcy(), foreign=(D.budget||[]).some(b=>b.ccy&&b.ccy!==base);
+  if(foreign)fxRefresh(base);
   if(!D.budget.length){c.innerHTML='<div class="empty"><div class="mark">Log expenses to track your spend.</div></div>'}
   else c.appendChild(colHead('bud-cols'+((D.travelers||[]).length>1?' with-who':''),['What','Amount'].concat((D.travelers||[]).length>1?['Paid by']:[])));
   D.budget.forEach(b=>{
     const r=document.createElement('div');r.className='bud-row';
     r.appendChild(inp(b.desc,'desc','e.g. Dinner',v=>{b.desc=v;save()},'What'));
-    const cm=document.createElement('span');cm.className='cur-mini';cm.textContent=D.cur||'€';r.appendChild(cm);
+    const cc=document.createElement('select');cc.className='bud-ccy';cc.setAttribute('aria-label','Currency');
+    cc.innerHTML=Object.keys(CCY).map(k=>'<option value="'+k+'"'+((b.ccy||base)===k?' selected':'')+'>'+k+'</option>').join('');
+    cc.onchange=e=>{ b.ccy=e.target.value===base?'':e.target.value; save(); renderBudget(); };
+    r.appendChild(cc);
     const cost=document.createElement('input');cost.className='cost';cost.value=b.cost||'';cost.placeholder='0';cost.inputMode='decimal';cost.setAttribute('aria-label','Amount');
-    cost.oninput=e=>{b.cost=e.target.value;save();updTotal()};r.appendChild(cost);
+    cost.oninput=e=>{b.cost=e.target.value;save();updTotal();renderBudgetRowHint(r,b);};r.appendChild(cost);
     const tv=D.travelers||[];
     if(tv.length>1){
       const who=document.createElement('select');who.className='bud-who';who.setAttribute('aria-label','Paid by');
@@ -2138,10 +2198,11 @@ function renderBudget(){
       r.appendChild(who);
     }
     r.appendChild(delB(()=>removeWithUndo(D.budget,b,'Expense',renderBudget),'Remove expense'));
-    c.appendChild(r);t+=parseFloat(b.cost)||0;
+    c.appendChild(r); renderBudgetRowHint(r,b);
   });
-  document.getElementById('budTotal').textContent=fmt(t);
-  document.getElementById('curSym').textContent=D.cur||'€';counts();
+  updTotal(); document.getElementById('curSym').textContent=ccySym(base).trim();
+  const note=document.getElementById('fxNote'), fx=fxCached(base);
+  if(note)note.textContent=foreign?(fx?'Converted to '+base+' at European Central Bank rates from '+new Date(fx.date+'T12:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})+'.':'Other currencies will be converted to '+base+' once this phone is online.'):'';
   const ti=document.getElementById('budTravelers'); if(ti&&document.activeElement!==ti)ti.value=(D.travelers||[]).join(', ');
   renderBudgetSummary();
 }
@@ -2152,8 +2213,8 @@ function setTravelers(v){
 function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function renderBudgetSummary(){
   const el=document.getElementById('budSummary'); if(!el||!D)return;
-  const cur=D.cur||'€', money=n=>cur+fmt(Math.round(n*100)/100);
-  const rows=(D.budget||[]).map(b=>({b,c:parseFloat(b.cost)||0})).filter(x=>x.c);
+  const cur=ccySym(tripCcy()), money=n=>cur+fmt(Math.round(n*100)/100);
+  const rows=(D.budget||[]).map(b=>({b,c:amountIn(b)||0})).filter(x=>x.c);
   if(!rows.length){ el.innerHTML=''; return; }
   const total=rows.reduce((a,x)=>a+x.c,0);
   const lines=[];
@@ -2166,7 +2227,9 @@ function renderBudgetSummary(){
     const share=total/tv.length, paid={}; tv.forEach(n=>paid[n]=0);
     let unassigned=0; rows.forEach(x=>{ if(x.b.who&&x.b.who in paid)paid[x.b.who]+=x.c; else unassigned+=x.c; });
     lines.push('Each person’s share: <b>'+money(share)+'</b> · '+tv.map(n=>esc(n)+' paid '+money(paid[n])).join(', '));
-    if(unassigned)lines.push('<span style="color:var(--sage)">'+money(unassigned)+' has no “paid by” yet.</span>');
+    const missing=spendTotal().missing;
+    if(missing)lines.push('<span style="color:var(--sage)">'+missing+' expense'+(missing>1?'s':'')+' in another currency '+(missing>1?'aren\u2019t':'isn\u2019t')+' counted until this phone is online.</span>');
+    else if(unassigned)lines.push('<span style="color:var(--sage)">'+money(unassigned)+' has no “paid by” yet.</span>');
     else{
       // settle up: people who paid less than their share pay those who paid more
       const bal=tv.map(n=>({n,v:paid[n]-share}));
@@ -2178,7 +2241,15 @@ function renderBudgetSummary(){
   }
   el.innerHTML=lines.join('<br>');
 }
-function updTotal(){let t=0;D.budget.forEach(b=>t+=parseFloat(b.cost)||0);document.getElementById('budTotal').textContent=fmt(t);counts();renderBudgetSummary()}
+function updTotal(){ const {t,missing}=spendTotal(); document.getElementById('budTotal').textContent=fmt(Math.round(t*100)/100)+(missing?'+':''); counts(); renderBudgetSummary(); }
+// "≈ €12.40" under an expense paid in another currency
+function renderBudgetRowHint(r,b){
+  let h=r.nextElementSibling&&r.nextElementSibling.classList.contains('bud-hint')?r.nextElementSibling:null;
+  const base=tripCcy(), from=b.ccy||base;
+  if(from===base||!(parseFloat(b.cost)>0)){ if(h)h.remove(); return; }
+  if(!h){ h=document.createElement('div'); h.className='bud-hint'; r.after(h); }
+  const v=amountIn(b); h.textContent=v==null?'Not converted yet':'\u2248 '+ccySym(base)+fmt(Math.round(v*100)/100);
+}
 function fmt(n){return n%1===0?n.toLocaleString():n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
 function addBudget(b){D.budget.push(Object.assign({id:uid(),desc:'',cost:'',day:todayISO()},b||{}));save();renderBudget()}
 
@@ -2186,7 +2257,7 @@ function openSettings(){
   document.getElementById('apiKeyInput').value=getKey();
   try{ document.getElementById('themeSel').value=localStorage.getItem('ace-theme')||''; }catch(e){}
   document.getElementById('setTrip').hidden=!D;
-  if(D)document.getElementById('curInput').value=D.cur||'€';
+  if(D){ const ci=document.getElementById('curInput'); ci.innerHTML=Object.keys(CCY).map(k=>'<option value="'+k+'">'+k+' ('+CCY[k].trim()+')</option>').join(''); ci.value=tripCcy(); }
   // populate hero city dropdown from itinerary stops
   const sel=document.getElementById('heroCitySel');
   if(sel&&D){
@@ -2215,7 +2286,7 @@ async function handleImage(ev){
     if(target){
       try{
         const b64=await toB64(files[0]);
-        const r=await parseContent([{type:'image',source:{type:'base64',media_type:files[0].type||'image/jpeg',data:b64}}]);
+        const r=(await parseContent([fileBlock(files[0],b64)]))[0];
         // merge parsed fields into the existing booking (keep its title if parse is vague)
         if(r){
           if(r.cat)target.cat=r.cat, target.kind=(TYPES[r.cat]||TYPES.booking).label;
@@ -2232,11 +2303,11 @@ async function handleImage(ev){
   const btns=document.querySelectorAll('.magic-btn');btns.forEach(b=>b.disabled=true);
   let added=0, failed=0, lastErr='';
   for(let i=0;i<files.length;i++){
-    setStatus('<span class="spinner"></span>Reading '+(files.length>1?('screenshot '+(i+1)+' of '+files.length):'your screenshot')+'…');
+    setStatus('<span class="spinner"></span>Reading '+(files.length>1?('file '+(i+1)+' of '+files.length):'your file')+'…');
     try{
       const b64=await toB64(files[i]);
-      const result=await parseContent([{type:'image',source:{type:'base64',media_type:files[i].type||'image/jpeg',data:b64}}]);
-      applyResult(result); added++;
+      const result=await parseContent([fileBlock(files[i],b64)]);
+      result.forEach(applyResult); added+=result.length;
     }catch(err){ failed++; lastErr=err.message||String(err); }
   }
   let msg;
@@ -2258,7 +2329,7 @@ async function doPaste(){
   st.style.display='block'; st.innerHTML='<span class="spinner"></span>Reading…';
   try{
     const result=await parseContent([{type:'text',text:'Here is trip text to parse:\n\n'+txt}]);
-    const summary=applyResult(result);
+    const summary=applyResults(result);
     st.textContent=summary;
     setTimeout(closePaste,1100);
   }catch(err){ st.textContent="Couldn't read that: "+(err.message||'unknown error'); }
@@ -2283,52 +2354,35 @@ const TYPES={
 };
 function typeOf(b){ return TYPES[(b.cat||'').toLowerCase()] || (b.kind==='Flight'?TYPES.flight:null) || TYPES.booking; }
 
-const PARSE_PROMPT=`You are reading travel content (a booking, ticket, reservation, itinerary, or address) given as an image or text. Return ONLY a JSON object — no markdown, no prose.
+const PARSE_PROMPT=`Read this travel content — a booking confirmation, ticket, reservation, itinerary or address, given as an image, a PDF or pasted text — and list every distinct item in it: each flight leg, each hotel stay, each reservation or ticket, each itinerary day, each address. A round trip is two flights; a confirmation email with a flight and a hotel is two items.
 
-If it is a FLIGHT, use this schema exactly:
-{"type":"flight","flightNo":"e.g. DL0016","confirmation":"booking/confirmation code if shown, else empty","fromCode":"DTW","fromCity":"Detroit, MI","toCode":"LHR","toCity":"London-Heathrow, UK","depDate":"Fri, 25 Dec","depTime":"7:15pm","arrDate":"Sat, 26 Dec (ONLY if arrival is a DIFFERENT day than departure, else empty string)","arrTime":"7:45am","fromTerminal":"McNamara Terminal","toTerminal":"Terminal 3","aircraft":"Airbus A330-900neo","seats":"35A, 35B","cabin":"Comfort Classic","duration":"7h 30m","destCity":"London (short arrival-city name for a title)"}
-CRITICAL: look for a next-day arrival marker (a second date near the arrival time). If arrival is a later day than departure you MUST fill arrDate. If seats are unassigned (shown as "--") set seats to "".
-
-For any OTHER booking/reservation/ticket, use:
-{"type":"booking","cat":"<one of: hotel, restaurant, event, spa, car, train, museum, coffee, shopping, activity>","title":"short label (e.g. 'Hôtel Caron' or 'Dinner at Le Comptoir' or 'Chelsea vs Arsenal')","when":"date and time","checkIn":"for hotels: check-in date e.g. 'Fri, 26 Dec'","checkOut":"for hotels: check-out date e.g. 'Mon, 29 Dec'","confirmation":"conf/booking code if any","seats":"seat/section/row if any (events, trains)","room":"room type or room number if shown","address":"street address if any","phone":"phone if any","party":"party size or guests if any","details":"anything else useful, newline-separated","destCity":"city if applicable"}
-Pick "cat" by what it is: a match/concert/show/game ticket = event; a table booking = restaurant; a massage/treatment = spa; a rental car = car; a rail ticket = train; a gallery/exhibit = museum; a café = coffee; a store/retail = shopping; anything else = activity. For HOTELS always fill checkIn and checkOut with the stay dates.
-
-For a day-by-day ITINERARY use {"type":"day","title":"place","when":"date","details":"plan"}.
-For an ADDRESS use {"type":"address","title":"place","details":"address"}.
-Extract real values only; leave a field empty if absent. Return JSON only.`;
-
+Fill only what the content shows and use "" for anything absent. Write dates like "Fri, 25 Dec" (add the year only if shown) and times like "7:15pm".
+- type "flight": flight legs. Look for a next-day arrival marker (a second date near the arrival time); if arrival is a later day than departure, fill arrDate, otherwise leave it "". Seats shown as "--" are unassigned: use "". destCity is a short arrival-city name for a title, e.g. "London".
+- type "booking": anything else booked. Pick cat by what it is: a match/concert/show/game ticket = event; a table booking = restaurant; a massage or treatment = spa; a rental car = car; a rail ticket = train; a gallery or exhibit = museum; a café = coffee; a store = shopping; anything else = activity; a place to stay = hotel. For hotels always fill checkIn and checkOut. title is a short label, e.g. "Hôtel Caron", "Dinner at Le Comptoir", "Chelsea vs Arsenal". details holds anything else useful, newline-separated.
+- type "day": one day of a day-by-day itinerary: title = the place, when = the date, details = the plan.
+- type "address": a place to remember: title = the place, details = the address.`;
+const S=()=>({type:'string'});
+const PARSE_FIELDS=['flightNo','confirmation','fromCode','fromCity','toCode','toCity','depDate','depTime','arrDate','arrTime','fromTerminal','toTerminal','aircraft','seats','cabin','duration','destCity','title','when','checkIn','checkOut','room','address','phone','party','details'];
+const PARSE_SCHEMA={type:'object',additionalProperties:false,required:['items'],properties:{items:{type:'array',items:{
+  type:'object',additionalProperties:false,required:['type','cat'].concat(PARSE_FIELDS),
+  properties:Object.assign({type:{type:'string',enum:['flight','booking','day','address']},
+    cat:{type:'string',enum:['','hotel','restaurant','event','spa','car','train','museum','coffee','shopping','activity']}},
+    Object.fromEntries(PARSE_FIELDS.map(k=>[k,S()])))}}}};
+// every item Claude finds in a screenshot, PDF or text, in the shape applyResult expects
 async function parseContent(contentBlocks){
-  let resp;
-  try{
-    resp=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "x-api-key":getKey(),
-        "anthropic-version":"2023-06-01",
-        "anthropic-dangerous-direct-browser-access":"true"
-      },
-      body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1000,messages:[{role:"user",content:contentBlocks.concat([{type:'text',text:PARSE_PROMPT}])}]})
-    });
-  }catch(netErr){
-    throw new Error('Network/CORS blocked ('+(netErr.message||'fetch failed')+')');
-  }
-  if(!resp.ok){
-    let m='HTTP '+resp.status;
-    try{const e=await resp.json();if(e.error&&e.error.message)m=resp.status+': '+e.error.message}catch(_){}
-    if(resp.status===401)m='401: API key rejected — check it in Settings';
-    if(resp.status===400)m='400: '+m+' (often a model or request issue)';
-    throw new Error(m);
-  }
-  const data=await resp.json();
-  const text=(data.content||[]).map(i=>i.type==='text'?i.text:'').join('').trim();
-  try{ return JSON.parse(text.replace(/```json|```/g,'').trim()); }
-  catch(parseErr){ throw new Error('Got a reply but could not parse it'); }
+  const r=await claudeJSON(contentBlocks.concat([{type:'text',text:PARSE_PROMPT}]),PARSE_SCHEMA);
+  const items=(r.items||[]).filter(x=>x&&x.type);
+  if(!items.length)throw new Error('Didn’t find a booking, plan or address in that');
+  return items;
 }
-
-async function readScreenshot(b64,media){
-  return parseContent([{type:'image',source:{type:'base64',media_type:media,data:b64}}]);
+// an image or a PDF as a content block
+function fileBlock(file,b64){
+  const t=file.type||'';
+  if(t==='application/pdf'||/\.pdf$/i.test(file.name||''))return {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}};
+  return {type:'image',source:{type:'base64',media_type:t||'image/jpeg',data:b64}};
 }
+// add each item, and say what was added
+function applyResults(items){ const out=items.map(applyResult); return items.length>1?'Added '+items.length+' items. ✓':out[0]; }
 
 // returns a human summary string for the status line
 function applyResult(r){
@@ -2555,7 +2609,7 @@ function tripStops(t){
 // a trip's date range: from its calendar, else from the dates the user typed ("Apr 2 – Apr 9")
 function tripSpanOf(t){
   const sp=timelineSpan(t); if(sp)return sp;
-  const parts=(t.dates||'').split(/\s+[–—-]\s+|\s*[–—]\s*/).map(x=>dayKeyOf(x)).filter(x=>x!=null);
+  const parts=(t.dates||'').split(/\s+[–—-]\s+|\s*[–—]\s*/).map(x=>dayKeyOf(x,t)).filter(x=>x!=null);
   if(!parts.length)return null;
   let a=parts[0], b=parts[parts.length-1]; if(b<a)b=a;
   return {start:a,end:b};
@@ -2655,7 +2709,7 @@ async function openDoc(id){
 
 /* ---------- Heads-up: gaps and clashes in the plan ---------- */
 const DAYMS=864e5;
-function dayKeyOf(str){ const p=parseLoose(str); return p?normDay(toSortable(p,baseYear())):null; }
+function dayKeyOf(str,T){ const p=parseLoose(str); return p?normDay(toSortable(p,baseYear(T))):null; }
 function shortDay(k){ const d=new Date(k); return MON3[d.getMonth()]+' '+d.getDate(); }
 function dayRange(a,b){ return a===b?shortDay(a):shortDay(a)+'–'+(new Date(a).getMonth()===new Date(b).getMonth()?new Date(b).getDate():shortDay(b)); }
 function bookingLabel(b){ return b.cat==='flight'?('Flight'+(b.flightNo?' '+b.flightNo:'')+(b.toCity?' to '+b.toCity.split(',')[0]:'')):(b.title||typeOf(b).label); }
@@ -3022,14 +3076,14 @@ async function handleTripImport(ev){
 }
 
 async function buildExportHTML(){
-  const cur=D.cur||'€';
+  const cur=ccySym(tripCcy());
   const stops=getStops();
   // fetch photos for dated real days if online
   const dayPhotos={};
   if(navigator.onLine){
     for(const d of D.days){ const c=extractCity(d.title); if(c){ const u=await fetchCityPhoto(c.name); if(u)dayPhotos[d.id]=u; } }
   }
-  let total=0; D.budget.forEach(b=>total+=parseFloat(b.cost)||0);
+  const total=Math.round(spendTotal().t*100)/100;
   const S=document.createElement('div');
   S.style.cssText='width:720px;background:#f7f2e8;font-family:Inter,sans-serif;color:#252318;padding:0;margin:0';
   let h='';
@@ -3072,7 +3126,7 @@ async function buildExportHTML(){
   if(D.budget.length){
     h+='<div style="padding:0 44px 40px">';
     h+='<div style="font-family:Fraunces,serif;font-size:26px;border-bottom:2px solid #3a4231;padding-bottom:10px;margin-bottom:18px">Budget</div>';
-    D.budget.forEach(b=>{ h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e7dfcb;font-size:15px"><span>'+esc(b.desc||'')+'</span><span style="font-family:Fraunces,serif;font-weight:500;color:#3a4231">'+cur+esc(b.cost||'0')+'</span></div>'; });
+    D.budget.forEach(b=>{ h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e7dfcb;font-size:15px"><span>'+esc(b.desc||'')+'</span><span style="font-family:Fraunces,serif;font-weight:500;color:#3a4231">'+esc(ccySym(b.ccy||tripCcy()))+esc(b.cost||'0')+'</span></div>'; });
     h+='<div style="display:flex;justify-content:space-between;padding:14px 0 0;font-family:Fraunces,serif;font-size:20px;font-weight:500"><span>Total</span><span>'+cur+total.toLocaleString()+'</span></div>';
     h+='</div>';
   }
@@ -3118,19 +3172,11 @@ async function suggestPacking(){
   const wx=[...document.querySelectorAll('.cm-sky[data-key]')].map(el=>{ const t=el.innerText.replace(/\s+/g,' ').trim(); return t?fmtDate(+el.dataset.key)+': '+t:''; }).filter(Boolean).join('\n');
   const have=D.packing.map(p=>p.text).filter(Boolean);
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
-        'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01',
-        'anthropic-beta':'server-side-fallback-2026-07-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:ASK_MODEL,max_tokens:4000,fallbacks:'default',
-        output_config:{effort:'low',format:{type:'json_schema',schema:{type:'object',properties:{items:{type:'array',items:{type:'string'}}},required:['items'],additionalProperties:false}}},
-        messages:[{role:'user',content:askTripContext()+(wx?'\n\nForecast / daylight shown in the app:\n'+wx:'')+
+    const res=await claudeJSON(askTripContext()+(wx?'\n\nForecast / daylight shown in the app:\n'+wx:'')+
           '\n\nAlready on the packing list: '+(have.length?have.join('; '):'(nothing yet)')+
-          '\n\nSuggest a packing list for this trip: things the bookings, activities, length, destination and weather call for (e.g. a nice outfit for a fancy dinner, walking shoes for a long tour day, plug adapters for the country, an umbrella if rain is likely). Skip anything already listed. Short item names, most important first, 12–25 items.'}]})});
-    if(!r.ok){ let m='HTTP '+r.status; try{const e=await r.json(); if(e.error&&e.error.message)m=e.error.message;}catch(_){} throw new Error(r.status===401?'API key rejected — check it in Settings':m); }
-    const res=await r.json();
-    if(res.stop_reason==='refusal')throw new Error('Claude couldn’t make a list for this trip');
-    const txt=(res.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    const items=(JSON.parse(txt).items||[]).map(x=>(''+x).trim()).filter(Boolean);
+          '\n\nSuggest a packing list for this trip: things the bookings, activities, length, destination and weather call for (e.g. a nice outfit for a fancy dinner, walking shoes for a long tour day, plug adapters for the country, an umbrella if rain is likely). Skip anything already listed. Short item names, most important first, 12–25 items.',
+      {type:'object',properties:{items:{type:'array',items:{type:'string'}}},required:['items'],additionalProperties:false});
+    const items=(res.items||[]).map(x=>(''+x).trim()).filter(Boolean);
     const seen=new Set(have.map(x=>x.toLowerCase()));
     let added=0;
     items.forEach(t=>{ if(seen.has(t.toLowerCase()))return; seen.add(t.toLowerCase()); D.packing.push({id:uid(),text:t,done:false}); added++; });
@@ -3141,7 +3187,30 @@ async function suggestPacking(){
 }
 
 /* ---------- Ask your trip: Claude answers from the itinerary (and can search the web) ---------- */
-const ASK_MODEL='claude-opus-5-5';
+/* ---------- Claude: every request goes through here ---------- */
+// The API key is the user's own, sent straight from this page to Anthropic.
+const CLAUDE_MODEL='claude-opus-5-5';
+async function claude(body){
+  let r;
+  try{
+    r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+      'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01',
+      // on a safety decline, the API re-runs the request on a fallback model instead of stopping
+      'anthropic-beta':'server-side-fallback-2026-07-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify(Object.assign({model:CLAUDE_MODEL,max_tokens:16000,fallbacks:'default'},body))});
+  }catch(e){ throw new Error(navigator.onLine?'Couldn\u2019t reach Claude':'You\u2019re offline'); }
+  if(!r.ok){ let m='HTTP '+r.status; try{const e=await r.json(); if(e.error&&e.error.message)m=e.error.message;}catch(_){}
+    if(r.status===401)m='Your API key was rejected — check it in Settings.'; throw new Error(m); }
+  return r.json();
+}
+// a JSON answer guaranteed to match `schema` (structured output)
+async function claudeJSON(content,schema,{effort='low'}={}){
+  const res=await claude({output_config:{effort,format:{type:'json_schema',schema}},messages:[{role:'user',content}]});
+  if(res.stop_reason==='refusal')throw new Error('Claude declined to read this');
+  if(res.stop_reason==='max_tokens')throw new Error('That was too long to read in one go — try a smaller piece');
+  const txt=(res.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+  try{ return JSON.parse(txt); }catch(e){ throw new Error('Got a reply but couldn\u2019t read it'); }
+}
 const askHist={};   // tripId -> messages (this session only)
 let askBusy=false, askErr='';
 const ASK_SUGG=['What’s our plan tomorrow?','When should we leave for the airport?','Good dinner near our hotel?','What are we forgetting?'];
@@ -3173,16 +3242,10 @@ async function askCall(messages){
   const tz=todayPlace&&todayPlace.tz;
   const search={type:'web_search_20260209',name:'web_search',max_uses:4};
   if(todayPlace&&todayPlace.city)search.user_location={type:'approximate',city:todayPlace.city,timezone:tz||undefined};
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
-      'Content-Type':'application/json','x-api-key':getKey(),'anthropic-version':'2023-06-01',
-      'anthropic-beta':'server-side-fallback-2026-07-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:ASK_MODEL,max_tokens:8000,fallbacks:'default',output_config:{effort:'low'},
+  return claude({max_tokens:8000,output_config:{effort:'low'},
       system:[{type:'text',text:'You are the travel assistant inside Ace Travel, a trip-planning app. Answer questions about the traveler’s trip using the saved trip data below, and search the web when a question needs current outside information (restaurants, opening hours, transit, events). Be brief and practical — this is read on a phone mid-trip. Use plain text with short lines; **bold** is fine, no tables or headings. Times in the trip data are local to where each event happens. If something isn’t in the trip data, say so rather than guessing.'},
               {type:'text',text:askTripContext(),cache_control:{type:'ephemeral'}}],
-      tools:[search],messages})});
-  if(!r.ok){ let m='HTTP '+r.status; try{const e=await r.json(); if(e.error&&e.error.message)m=e.error.message;}catch(_){}
-    if(r.status===401)m='Your API key was rejected — check it in Settings.'; throw new Error(m); }
-  return r.json();
+      tools:[search],messages});
 }
 async function sendAsk(){
   const inp=document.getElementById('askInput'); const q=inp.value.trim();
@@ -3314,12 +3377,86 @@ async function listSyncGists(){
   }
   return all.sort((a,b)=>(Date.parse(a.created_at)||0)-(Date.parse(b.created_at)||0));
 }
+async function createSyncGist(){
+  const r=await ghFetch('https://api.github.com/gists',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({description:'Ace Travel sync (trips, encrypted)',public:false,files:{[SYNC_FILE]:{content:await sealPayload(syncPayload())}}})});
+  return (await r.json()).id;
+}
 async function findOrCreateGist(){
   const found=await listSyncGists();
   if(found.length)return found[0].id;
-  const r=await ghFetch('https://api.github.com/gists',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({description:'Ace Travel sync (trips)',public:false,files:{[SYNC_FILE]:{content:JSON.stringify(syncPayload())}}})});
-  return (await r.json()).id;
+  // first phone on a fresh account: make the key now, so nothing readable ever reaches GitHub
+  if(!syncCfg.key&&canEncrypt){ syncCfg.key=newSyncKey(); syncKeyObj=null; syncSaveCfg(); }
+  return createSyncGist();
+}
+
+/* ---- Encryption. The gist only holds ciphertext (AES-256-GCM). The key is random, made on one
+   phone, and reaches other phones only inside the pairing code — GitHub never sees it. ---- */
+let syncKeyObj=null;
+const canEncrypt=!!(window.isSecureContext&&window.crypto&&crypto.subtle);   // Web Crypto only exists on https pages
+const b64u={
+  enc(buf){ const a=new Uint8Array(buf); let s=''; for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));
+    return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); },
+  dec(str){ const t=str.replace(/-/g,'+').replace(/_/g,'/'); const bin=atob(t+'='.repeat((4-t.length%4)%4));
+    const a=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i); return a; }
+};
+function newSyncKey(){ return b64u.enc(crypto.getRandomValues(new Uint8Array(32))); }
+async function syncKey(){
+  if(!syncCfg.key||!canEncrypt)return null;
+  if(!syncKeyObj)syncKeyObj=await crypto.subtle.importKey('raw',b64u.dec(syncCfg.key),'AES-GCM',false,['encrypt','decrypt']);
+  return syncKeyObj;
+}
+async function sealPayload(obj){
+  const k=await syncKey(); if(!k)return JSON.stringify(obj);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(JSON.stringify(obj)));
+  return JSON.stringify({ace:'sync',v:2,alg:'A256GCM',iv:b64u.enc(iv),ct:b64u.enc(ct)});
+}
+const isSealed=o=>!!(o&&o.ace==='sync'&&o.ct);
+async function openPayload(o){
+  if(!isSealed(o))return o;
+  const k=await syncKey(); if(!k)throw Object.assign(new Error('locked'),{code:'locked'});
+  try{ return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64u.dec(o.iv)},k,b64u.dec(o.ct)))); }
+  catch(e){ throw Object.assign(new Error('wrong key'),{code:'badkey'}); }
+}
+// one string that sets up another phone: token, which gist, and the key
+function pairingCode(){ return 'ace1.'+b64u.enc(new TextEncoder().encode(JSON.stringify({t:syncCfg.token,g:syncCfg.gistId,k:syncCfg.key}))); }
+function readPairingCode(str){
+  const m=(str||'').trim().match(/ace1\.([A-Za-z0-9_-]+)/); if(!m)return null;
+  try{ const o=JSON.parse(new TextDecoder().decode(b64u.dec(m[1]))); return o&&o.t&&o.k?o:null; }catch(e){ return null; }
+}
+// Turn on encryption for a gist that still holds readable data. Old revisions in the gist's
+// history would stay readable, so the data moves to a new gist and the old one is deleted.
+async function syncEncryptNow(){
+  if(syncCfg.key||!syncCfg.token)return;
+  if(!canEncrypt){ uiAlert('Encryption needs the app to be opened from its https address.'); return; }
+  if(!await uiConfirm('Your trips move to a new, encrypted gist and the old one (with its readable history) is deleted. Your other phone will need the pairing code from here once.',{title:'Encrypt your synced trips?',ok:'Encrypt'}))return;
+  let created=false;
+  try{
+    await syncNow(true); if(syncCfg.status==='error')return;
+    const oldId=syncCfg.gistId;
+    syncCfg.key=newSyncKey(); syncKeyObj=null;
+    let base=null; try{ base=JSON.parse(localStorage.getItem(SYNC_BASE)); }catch(e){}
+    const r=await ghFetch('https://api.github.com/gists',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({description:'Ace Travel sync (trips, encrypted)',public:false,files:{[SYNC_FILE]:{content:await sealPayload(base||syncPayload())}}})});
+    syncCfg.gistId=(await r.json()).id; created=true; syncSaveCfg();
+    if(oldId)try{ await ghFetch('https://api.github.com/gists/'+oldId,{method:'DELETE'}); }catch(e){}
+    await syncNow(true);
+    renderSyncStatus(); syncPair();
+  }catch(e){
+    if(!created){ syncCfg.key=''; syncKeyObj=null; syncSaveCfg(); syncMsg('Couldn\u2019t encrypt right now. Nothing was changed.'); }
+    else{ syncSaveCfg(); renderSyncStatus(); }   // the encrypted gist exists: keep the key, the next sync finishes the job
+  }
+}
+async function syncPair(){
+  if(!syncCfg.key){ await syncEncryptNow(); return; }
+  const code=pairingCode(), link=location.origin+location.pathname+'#pair='+code;
+  const i=await uiDialog({title:'Pair another phone',message:'On the other phone, open Ace Travel → Sync & backup and paste the code. (A link works too, but on iPhone it opens in Safari rather than the home-screen app.) Anyone with the code can read and change your trips, so only send it to your own devices.',
+    options:['Copy the code',navigator.share?'Send a link…':'Copy a link'],cancel:'Done'});
+  if(i==null)return;
+  if(i===1&&navigator.share){ try{ await navigator.share({title:'Ace Travel pairing',url:link}); }catch(e){} return; }
+  try{ await navigator.clipboard.writeText(i===1?link:code); toast(i===1?'Link copied':'Code copied'); }
+  catch(e){ uiPrompt('Copy this and paste it on the other phone.',{title:'Pairing code',ok:'Done',cancel:null,input:{value:code}}); }
 }
 async function gistFileJSON(g){
   const f=g.files&&g.files[SYNC_FILE]; if(!f)return null;
@@ -3347,24 +3484,27 @@ async function syncNow(manual){
     syncGistChecked=true;
     if(!syncCfg.login){ try{ syncCfg.login=(await (await ghFetch('https://api.github.com/user')).json()).login||''; syncSaveCfg(); }catch(e){} }
     const local=syncPayload();
-    const remote=await gistFileJSON(await (await ghFetch('https://api.github.com/gists/'+syncCfg.gistId)).json());
+    const remoteRaw=await gistFileJSON(await (await ghFetch('https://api.github.com/gists/'+syncCfg.gistId)).json());
+    const remote=await openPayload(remoteRaw);   // throws if it's encrypted and this phone can't read it — never overwrite it
     let base=null; try{ base=JSON.parse(localStorage.getItem(SYNC_BASE)); }catch(e){}
     const {merged,conflicts}=mergePayloads(local,remote,base);
     const changesHere=SJ(merged)!==SJ(local);
     // don't swap data out from under someone mid-edit, or if they changed something while we were fetching
     if((changesHere&&userTyping()&&!manual)||SJ(syncPayload())!==SJ(local)){ syncAgain=true; syncCfg.status=syncCfg.last?'ok':'connected'; if(manual)syncMsg('Saving your latest edit first — syncing again in a moment.'); return; }
-    if(SJ(merged)!==SJ(remote)){
+    if(SJ(merged)!==SJ(remote)||(syncCfg.key&&!isSealed(remoteRaw))){
       await ghFetch('https://api.github.com/gists/'+syncCfg.gistId,{method:'PATCH',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({files:{[SYNC_FILE]:{content:JSON.stringify(merged)}}})});
+        body:JSON.stringify({files:{[SYNC_FILE]:{content:await sealPayload(merged)}}})});
     }
     if(changesHere)applyMerged(merged);
     localStorage.setItem(SYNC_BASE,JSON.stringify(merged));
-    Object.assign(syncCfg,{last:Date.now(),status:'ok',dirty:false,error:''}); syncSaveCfg();
+    Object.assign(syncCfg,{last:Date.now(),status:'ok',dirty:false,error:'',errCode:''}); syncSaveCfg();
     if(joined)syncMsg('Synced — this phone had its own copy, so it joined the shared one and combined the trips.');
     else if(manual)syncMsg(conflicts?'Synced — combined changes from both phones.':changesHere?'Synced — pulled in new changes.':'Synced — everything’s up to date.');
   }catch(err){
-    syncCfg.status='error'; syncCfg.dirty=true;
-    syncCfg.error=err.code===401?'GitHub didn’t accept the token. It may have expired — paste a new one.':err.code===404?'Couldn’t find the sync gist. Tap Sync now to make a new one.':navigator.onLine?'Couldn’t reach GitHub. Will try again.':'Offline. Will sync when you’re back online.';
+    syncCfg.status='error'; syncCfg.dirty=true; syncCfg.errCode=err.code||'';
+    syncCfg.error=err.code==='locked'?'Your synced trips are encrypted. On the phone that set up sync, tap Pair another phone, and paste that code here.':
+      err.code==='badkey'?'This phone’s pairing doesn’t match your synced trips. Pair it again from the other phone.':
+      err.code===401?'GitHub didn’t accept the token. It may have expired — paste a new one.':err.code===404?'Couldn’t find the sync gist. Tap Sync now to make a new one.':navigator.onLine?'Couldn’t reach GitHub. Will try again.':'Offline. Will sync when you’re back online.';
     if(err.code===404)syncCfg.gistId='';
     syncSaveCfg();
   }finally{
@@ -3392,10 +3532,12 @@ function renderSyncStatus(){
   if(line){
     line.textContent=syncMsgText||(on?syncStateText():'Not syncing — trips are only on this phone.');
     line.classList.toggle('err',on&&(syncCfg.status==='error'));
-    document.getElementById('syncSetup').hidden=on;
+    const needsPair=on&&(syncCfg.errCode==='locked'||syncCfg.errCode==='badkey');
+    document.getElementById('syncSetup').hidden=on&&!needsPair;
     document.getElementById('syncOn').hidden=!on;
     const who=document.getElementById('syncWho');
-    if(who)who.innerHTML=on&&syncCfg.gistId?'Syncing to '+(syncCfg.login?'<b>@'+esc(syncCfg.login)+'</b>, ':'')+'gist <b>'+esc(syncCfg.gistId.slice(0,7))+'</b>. Every phone should show the same — if one doesn’t, it’s on a different GitHub account: tap <b>Copy token for another phone</b> here and paste it there.':'';
+    if(who)who.innerHTML=on&&syncCfg.gistId?(syncCfg.key?'<span class="enc on">🔒 Encrypted</span> ':'<span class="enc off">Not encrypted</span> '+(canEncrypt?'<button class="linkish" onclick="syncEncryptNow()">Encrypt now</button>':'')+'<br>')+
+      'Syncing to '+(syncCfg.login?'<b>@'+esc(syncCfg.login)+'</b>, ':'')+'gist <b>'+esc(syncCfg.gistId.slice(0,7))+'</b>. Every phone should show the same — if one doesn’t, tap <b>Pair another phone</b> here and paste the code there.':'';
   }
   const ss=document.getElementById('settingsSyncState'); if(ss)ss.textContent=on?(syncCfg.status==='error'?'Needs attention':'On'):'Off';
   const bl=document.getElementById('backupLine');
@@ -3418,17 +3560,23 @@ function renderHomeSync(){
 }
 function openSync(){ renderSyncStatus(); document.getElementById('syncHist').innerHTML=''; document.getElementById('syncBg').classList.add('show'); }
 function closeSync(){ document.getElementById('syncBg').classList.remove('show'); }
-async function syncConnect(){
-  const tok=(document.getElementById('syncToken').value||'').trim();
-  if(!/^(ghp_|github_pat_|gho_)/.test(tok)&&tok.length<30){ syncMsg('That doesn’t look like a GitHub token.'); return; }
-  syncCfg={token:tok}; syncSaveCfg(); document.getElementById('syncToken').value='';
+async function syncConnect(given){
+  const raw=(given||document.getElementById('syncToken').value||'').trim();
+  const pair=readPairingCode(raw);
+  if(!pair&&!/^(ghp_|github_pat_|gho_)/.test(raw)&&raw.length<30){ syncMsg('That doesn’t look like a pairing code or a GitHub token.'); return; }
+  syncCfg=pair?{token:pair.t,gistId:pair.g||'',key:pair.k}:{token:raw}; syncKeyObj=null; syncSaveCfg(); document.getElementById('syncToken').value='';
   localStorage.removeItem(SYNC_BASE); syncGistChecked=false;
   renderSyncStatus(); await syncNow(true);
   if(syncCfg.status==='error'&&/token/.test(syncCfg.error||'')){ const e=syncCfg.error; syncCfg={}; syncSaveCfg(); renderSyncStatus(); syncMsg(e); }
 }
-async function syncCopyToken(){
-  try{ await navigator.clipboard.writeText(syncCfg.token); syncMsg('Token copied — paste it into Ace Travel on the other phone.'); }
-  catch(e){ uiPrompt('Copy this token and paste it on the other phone.',{title:'Your sync token',ok:'Done',cancel:null,input:{value:syncCfg.token}}); }
+// opened from a pairing link (#pair=…): the code stays in the fragment, which browsers never send to a server
+async function handlePairLink(){
+  const m=location.hash.match(/pair=([^&]+)/); if(!m)return;
+  history.replaceState(null,'',location.pathname+location.search);
+  const code=decodeURIComponent(m[1]); if(!readPairingCode(code)){ uiAlert('That pairing link is incomplete. Copy the code instead and paste it in Sync & backup.'); return; }
+  if(syncCfg.token&&syncCfg.key){ toast('This phone is already paired'); return; }
+  if(!await uiConfirm('This phone will sync trips with your other phone. Trips already here are kept and combined.',{title:'Pair this phone?',ok:'Pair'}))return;
+  openSync(); await syncConnect(code);
 }
 async function syncOff(){
   if(!await uiConfirm('Your trips stay on this phone and in your gist.',{title:'Stop syncing this phone?',ok:'Turn off'}))return;
@@ -3454,7 +3602,7 @@ async function syncShowHistory(){
 async function syncRestore(ver,when){
   if(!await uiConfirm('This changes every synced phone. You can restore today\u2019s version again from history.',{title:'Go back to '+when.toLocaleString()+'?',ok:'Restore'}))return;
   try{
-    const data=await gistFileJSON(await (await ghFetch('https://api.github.com/gists/'+syncCfg.gistId+'/'+ver)).json());
+    const data=await openPayload(await gistFileJSON(await (await ghFetch('https://api.github.com/gists/'+syncCfg.gistId+'/'+ver)).json()));
     if(!data||!Array.isArray(data.trips))throw new Error('empty');
     // the restored copy counts as this phone's change, so it wins on the next merge
     applyMerged(data);
@@ -3517,7 +3665,7 @@ async function handleSharedContent(){
   setStatus('<span class="spinner"></span>Reading shared item…');
   try{
     const result=await parseContent([{type:'text',text:'Here is trip text to parse:\n\n'+decodeURIComponent(shared)}]);
-    const summary=applyResult(result);
+    const summary=applyResults(result);
     setStatus(summary); setTimeout(()=>setStatus('',false),4500);
   }catch(e){ setStatus("Couldn't read the shared item: "+(e.message||'error')); }
 }
@@ -3525,6 +3673,7 @@ async function handleSharedContent(){
 if(STORE.activeId && STORE.trips.find(t=>t.id===STORE.activeId)){ openTrip(STORE.activeId); }
 else { goHome(); }
 handleSharedContent();
+handlePairLink();
 renderSyncStatus();
 if(syncCfg.token)syncNow();
 
