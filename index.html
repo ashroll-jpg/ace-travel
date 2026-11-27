@@ -918,6 +918,89 @@
   .ic-olive{color:var(--flight-ink)} .ic-gold{color:var(--terra)} .ic-red{color:var(--red)}
   .add-new{align-self:center;color:var(--sage)}
 
+  /* Days: toggle, date strip, swipeable cards */
+  .days-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 20px 10px}
+  .dv-toggle{display:inline-flex;padding:3px;border-radius:14px;background:var(--cream-dim)}
+  .dv-toggle button{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:none;border-radius:11px;background:transparent;color:var(--sage);font:inherit;font-size:14px;font-weight:700}
+  .dv-toggle button svg{width:18px;height:18px}
+  .dv-toggle button[aria-pressed="true"]{background:var(--paper-hi);color:var(--ink);box-shadow:var(--shadow-sm)}
+  .dv-nav{display:flex;gap:8px}
+  .dv-nav .circle-btn{width:40px;height:40px}
+  .day-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 20px 12px;scrollbar-width:none}
+  .day-strip::-webkit-scrollbar{display:none}
+  .ds-b{flex:0 0 auto;width:50px;height:60px;border-radius:16px;border:1px solid var(--line-soft);background:var(--paper-hi);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:inherit}
+  .ds-b span{font-size:11px;font-weight:700;color:var(--sage);text-transform:uppercase}
+  .ds-b b{font-size:19px;font-weight:800;line-height:1}
+  .ds-b svg{width:22px;height:22px;color:var(--terra)}
+  .ds-b.today{border-color:var(--gold)}
+  .ds-b.on{background:var(--olive);border-color:var(--olive);color:#FDF9F0}
+  .ds-b.on span{color:var(--gold-bright)}
+  .ds-b.on svg{color:var(--gold-bright)}
+  .day-track{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 20px 20px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .day-track::-webkit-scrollbar{display:none}
+  .dcard{flex:0 0 calc(100% - 28px);scroll-snap-align:center;scroll-snap-stop:always;min-height:440px;border-radius:30px;background:var(--paper-hi);border:1px solid var(--line-soft);box-shadow:var(--shadow-md);padding:20px 18px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
+  .dcard.is-today{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),var(--shadow-md)}
+  .dc-top{display:flex;align-items:center;justify-content:space-between}
+  .dc-k{font-size:13px;font-weight:800;color:var(--sage);text-transform:uppercase;letter-spacing:.04em}
+  .dc-today{padding:4px 10px;border-radius:999px;background:var(--gold);color:#2F3A22;font-size:12px;font-weight:800}
+  .dc-date{display:flex;align-items:center;gap:12px}
+  .dc-num{font-size:64px;font-weight:800;line-height:.9;letter-spacing:-.04em;color:var(--ink)}
+  .dc-rest{display:flex;flex-direction:column}
+  .dc-rest b{font-size:22px;font-weight:800;color:var(--ink)}
+  .dc-rest span{font-size:15px;font-weight:600;color:var(--sage)}
+  .dc-place{font-size:20px;font-weight:700;color:var(--terra)}
+  .dc-sky{font-size:14px;color:var(--sage);display:flex;flex-wrap:wrap;gap:4px 12px}
+  .dc-sky:empty{display:none}
+  .dc-stay{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;border:none;background:var(--cream-dim);color:var(--ink);font:inherit;text-align:left}
+  .dc-stay-ic{width:38px;height:38px;border-radius:12px;background:var(--paper-hi);display:grid;place-items:center;color:var(--terra);flex-shrink:0}
+  .dc-stay-ic svg{width:20px;height:20px}
+  .dc-stay b{display:block;font-size:15px;font-weight:700}
+  .dc-stay span span{font-size:13px;color:var(--sage)}
+  .dc-body{display:flex;flex-direction:column;gap:10px}
+  .dc-body .cal-item{margin:0}
+  .dc-free{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:160px;border-radius:22px;border:2px dashed var(--line);background:transparent;color:var(--ink);font:inherit}
+  .dc-free b{font-size:19px;font-weight:700}
+  .dc-free span{font-size:15px;font-weight:700;color:var(--red)}
+  .dc-add{align-self:flex-start;border:none;background:transparent;color:var(--red);font:inherit;font-size:15px;font-weight:700;padding:6px 2px}
+  .dcard.ov{background:#2F3A22;border-color:#2F3A22;color:#FDF9F0}
+  .ov-top{display:flex;justify-content:space-between;align-items:center}
+  .ov-k{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#CFC7AE}
+  .ov-when{padding:5px 11px;border-radius:999px;background:#C4901C;color:#2F3A22;font-size:13px;font-weight:800}
+  .ov-title{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+  .ov-dates{font-size:16px;font-weight:600;color:#CFC7AE;margin-top:-6px}
+  .ov-month{margin-top:4px}
+  .ov-mname{font-size:15px;font-weight:700;margin-bottom:6px;color:#F4ECD8}
+  .ov-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));row-gap:4px}
+  .ov-grid .cw{font-size:11px;font-weight:700;color:#9A9C82;text-align:center;padding-bottom:2px}
+  .ov-grid .cd{position:relative;height:38px;display:grid;place-items:center;font-size:15px;font-weight:600;color:rgba(253,249,240,.55);border:none;background:transparent;font-family:inherit;padding:0}
+  .ov-grid .cd.today>span,.ov-grid span.cd.today{text-decoration:underline;text-decoration-color:#D9A436;text-underline-offset:4px}
+  .ov-grid .cd.in{color:#FDF9F0;font-weight:800;cursor:pointer}
+  .ov-grid .cd.in::before{content:"";position:absolute;inset:4px 0;background:rgba(196,144,28,.32)}
+  .ov-grid .cd.in.start::before{left:50%}
+  .ov-grid .cd.in.end::before{right:50%}
+  .ov-grid .cd.in.start.end::before{display:none}
+  .ov-grid .cd.in.wk0::before{left:4px;border-radius:999px 0 0 999px}
+  .ov-grid .cd.in.wk6::before{right:4px;border-radius:0 999px 999px 0}
+  .ov-grid .cd.in.wk0.wk6::before{border-radius:999px}
+  .ov-grid .cd.in>span{position:relative;z-index:1;width:32px;height:32px;display:grid;place-items:center;border-radius:50%}
+  .ov-grid .cd.in.start>span,.ov-grid .cd.in.end>span{background:#C4901C;color:#2F3A22}
+  .ov-grid .cd.in.busy::after{content:"";position:absolute;bottom:2px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#F4ECD8;z-index:1}
+  .ov-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:4px}
+  .ov-stats div{padding:12px;border-radius:16px;background:rgba(253,249,240,.08);display:flex;flex-direction:column;gap:2px}
+  .ov-stats b{font-size:24px;font-weight:800;line-height:1}
+  .ov-stats small{font-size:15px;font-weight:700;color:#CFC7AE}
+  .ov-stats span{font-size:13px;font-weight:600;color:#CFC7AE}
+  .ov-places{display:flex;flex-wrap:wrap;gap:6px}
+  .ov-places span{padding:5px 11px;border-radius:999px;background:rgba(253,249,240,.1);font-size:13px;font-weight:700}
+  .ov-gap{font-size:14px;font-weight:700;color:#F0A08C}
+  .ov-hint{margin-top:auto;font-size:14px;font-weight:700;color:#D9A436;text-align:right}
+  .ov-undated{background:var(--paper-hi);border-radius:18px;padding:4px 12px 10px;color:var(--ink)}
+  .ov-undated .undated{padding:0}
+  #days.days-cards::before,#days.days-empty-wrap::before{display:none}
+  .days-empty{margin:4px 20px}
+  .days-list{padding-top:2px}
+  @media (prefers-reduced-motion:reduce){.day-track{scroll-behavior:auto}}
+
   /* account + sharing */
   .acct{padding:16px;display:flex;flex-direction:column;gap:10px}
   .acct-h{font-size:18px;font-weight:700;color:var(--ink)}
@@ -976,6 +1059,9 @@
   :root[data-theme="dark"] .today-card{background:#2b3125; box-shadow:0 0 0 1px #2C3520}
   :root[data-theme="dark"] img.leaflet-tile{filter:brightness(.75) contrast(1.1)}
   :root[data-theme="dark"] nav{background:rgba(30,33,25,.92)}
+  :root[data-theme="dark"] .dcard.ov{background:#3A4628;border-color:#56653B}
+  :root[data-theme="dark"] .ds-b.on{background:var(--gold);border-color:var(--gold);color:#2F3A22}
+  :root[data-theme="dark"] .ds-b.on span,:root[data-theme="dark"] .ds-b.on svg{color:#2F3A22}
   @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){--olive-ink:#E8D9AE; --sage:#A9AB8C; --sage-soft:#7E8266; --terra:#E3B24C; --gold:#D9A436; --gold-bright:#E3B24C; --gold-soft:rgba(217,164,54,.16);
     --red:#C2432A; --red-soft:rgba(194,67,42,.2); --red-ink:#F0A08C; --flight-soft:rgba(160,180,120,.14); --flight-ink:#C3D09F;
@@ -992,6 +1078,9 @@
   :root:not([data-theme="light"]) .today-card{background:#2b3125; box-shadow:0 0 0 1px #2C3520}
   :root:not([data-theme="light"]) img.leaflet-tile{filter:brightness(.75) contrast(1.1)}
   :root:not([data-theme="light"]) nav{background:rgba(30,33,25,.92)}
+  :root:not([data-theme="light"]) .dcard.ov{background:#3A4628;border-color:#56653B}
+  :root:not([data-theme="light"]) .ds-b.on{background:var(--gold);border-color:var(--gold);color:#2F3A22}
+  :root:not([data-theme="light"]) .ds-b.on span,:root:not([data-theme="light"]) .ds-b.on svg{color:#2F3A22}
   }
 </style>
 </head>
@@ -1090,6 +1179,7 @@
       <div class="magic-status" id="magicStatus"></div>
       <div class="no-key-note" id="noKeyNote">Reading screenshots needs an Anthropic API key. <button onclick="openSettings()">Set it up</button></div>
     </div>
+    <div id="daysBar" class="days-bar"></div>
     <div id="days"></div>
   </section>
 
@@ -1787,17 +1877,39 @@ function renderUndatedPlans(c){
   list.forEach(d=>sec.appendChild(dayPlanEl(d)));
   c.appendChild(sec);
 }
+/* ---------- Days: swipeable cards (default) or the vertical list ---------- */
+const DAYS_VIEW_KEY='ace-days-view';
+let daysView='cards'; try{ daysView=localStorage.getItem(DAYS_VIEW_KEY)||'cards'; }catch(e){}
+let daysIdx=0, daysTripId=null;        // which card is showing (0 = overview), remembered per trip while open
+function setDaysView(v){ daysView=v; try{ localStorage.setItem(DAYS_VIEW_KEY,v); }catch(e){} renderDays(); }
+function renderDaysBar(span){
+  const bar=document.getElementById('daysBar'); if(!bar)return;
+  const cards=daysView!=='list';
+  bar.innerHTML='<div class="dv-toggle" role="group" aria-label="How to show days">'+
+    '<button aria-pressed="'+cards+'" onclick="setDaysView(\'cards\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="13" height="14" rx="3"/><path d="M19 7v10"/></svg><span>Cards</span></button>'+
+    '<button aria-pressed="'+(!cards)+'" onclick="setDaysView(\'list\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg><span>List</span></button></div>'+
+    (cards&&span?'<div class="dv-nav"><button class="circle-btn" aria-label="Previous day" onclick="goToDay(daysIdx-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><button class="circle-btn" aria-label="Next day" onclick="goToDay(daysIdx+1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>':'');
+}
 function renderDays(){
   const c=document.getElementById('days'); if(!c)return; c.innerHTML='';
   const span=timelineSpan();
   const magic=document.querySelector('#view-itinerary .magic');
-  if(magic){ c.before(magic); magic.classList.toggle('has-content',!!span); }
+  if(magic){ document.getElementById('daysBar').before(magic); magic.classList.toggle('has-content',!!span); }
+  renderDaysBar(span);
+  c.className=!span?'days-empty-wrap':daysView==='list'?'days-list':'days-cards';
   if(!span){
-    c.innerHTML='<div class="empty"><div class="mark">Your days appear here.<br>Add a plan, or upload a booking above.</div></div>';
-    const add=document.createElement('button');add.className='add-btn';add.textContent='Add a plan';
+    c.innerHTML='<div class="moment days-empty"><svg class="moment-dog" role="img" aria-label="Audra holding the AS flag"><use href="#audra"/></svg><div class="moment-h">Your days appear here</div><div class="moment-t">Add a plan, or drop in a booking with the + button.</div></div>';
+    const add=document.createElement('button');add.className='red-btn';add.textContent='Add a plan';
     add.onclick=()=>{ const d={id:uid(),title:'',date:'',plan:'',by:meStamp()}; D.days.push(d); dayEditing=d.id; save(); renderDays(); };
-    c.appendChild(add); renderUndatedPlans(c); counts(); renderLodgingSection(); renderExtras(); return;
+    c.querySelector('.moment').appendChild(add); renderUndatedPlans(c); counts(); renderLodgingSection(); renderExtras(); return;
   }
+  if(daysView==='list')renderDaysList(c,span); else renderDaysCards(c,span);
+  counts();
+  loadWeather();
+  renderLodgingSection();
+  renderExtras();
+}
+function renderDaysList(c,span){
   const timeline=buildTimeline();
   const by=baseYear();
   const now=new Date(); const todayKey=new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime();
@@ -1863,12 +1975,105 @@ function renderDays(){
     side = (side==='left')?'right':'left';
   }
   renderUndatedPlans(c);
-  counts();
-  loadWeather();
-  renderLodgingSection();
-  renderExtras();
   // jump to today's row, unless the Today card at the top already covers it
   setTimeout(()=>{const tc=document.getElementById('todayCard');if(tc&&tc.innerHTML)return;const t=document.querySelector('.cal-row.is-today');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});},350);
+}
+
+// one card per day, swiped sideways; the first card is the whole trip at a glance
+function renderDaysCards(c,span){
+  const timeline=buildTimeline(), t0=todayKey(), keys=[];
+  for(let k=span.start;k<=span.end;k+=864e5)keys.push(k);
+  if(daysTripId!==D.id){ daysTripId=D.id; daysIdx=(t0>=span.start&&t0<=span.end)?1+keys.indexOf(t0):0; }
+  daysIdx=Math.max(0,Math.min(daysIdx,keys.length));
+  const strip=document.createElement('div'); strip.className='day-strip';
+  strip.innerHTML='<button class="ds-b ds-all" data-i="0" aria-label="Overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></button>'+keys.map((k,i)=>{ const d=new Date(k);
+    return '<button class="ds-b'+(k===t0?' today':'')+'" data-i="'+(i+1)+'" aria-label="Day '+(i+1)+', '+DOW[d.getDay()]+' '+shortDay(k)+'"><span>'+DOW[d.getDay()].slice(0,3)+'</span><b>'+d.getDate()+'</b></button>'; }).join('');
+  strip.querySelectorAll('.ds-b').forEach(b=>b.onclick=()=>goToDay(+b.dataset.i));
+  const track=document.createElement('div'); track.className='day-track'; track.setAttribute('aria-label','Days of the trip, swipe sideways');
+  track.appendChild(overviewCard(span,keys,timeline));
+  keys.forEach((k,i)=>track.appendChild(dayCard(k,i,keys.length,timeline)));
+  c.appendChild(strip); c.appendChild(track);
+  requestAnimationFrame(()=>{ track.scrollLeft=slideLeft(track,daysIdx); markDay(); });
+  track.addEventListener('scroll',()=>{ clearTimeout(track._t); track._t=setTimeout(()=>{ daysIdx=nearestSlide(track); markDay(); },70); },{passive:true});
+}
+const slideLeft=(track,i)=>{ const el=track.children[i]; return el?el.offsetLeft-(track.clientWidth-el.offsetWidth)/2:0; };
+function nearestSlide(track){ const mid=track.scrollLeft+track.clientWidth/2; let best=0,bd=Infinity;
+  [...track.children].forEach((el,i)=>{ const d=Math.abs(el.offsetLeft+el.offsetWidth/2-mid); if(d<bd){bd=d;best=i;} }); return best; }
+function goToDay(i){
+  const track=document.querySelector('.day-track'); if(!track)return;
+  i=Math.max(0,Math.min(i,track.children.length-1)); daysIdx=i;
+  track.scrollTo({left:slideLeft(track,i),behavior:reducedMotion()?'auto':'smooth'}); markDay();
+}
+function markDay(){
+  const strip=document.querySelector('.day-strip'); if(!strip)return;
+  strip.querySelectorAll('.ds-b').forEach(b=>{ const on=+b.dataset.i===daysIdx; b.classList.toggle('on',on); if(on)b.setAttribute('aria-current','true'); else b.removeAttribute('aria-current'); });
+  const on=strip.querySelector('.ds-b.on'); if(on)strip.scrollTo({left:on.offsetLeft-strip.clientWidth/2+on.offsetWidth/2,behavior:'auto'});
+  document.querySelectorAll('.day-track>.dcard').forEach((el,i)=>el.setAttribute('aria-hidden',i!==daysIdx));
+}
+function overviewCard(span,keys,timeline){
+  const card=document.createElement('section'); card.className='dcard ov'; card.setAttribute('aria-label','Trip overview');
+  const t0=todayKey(), MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const plans=(D.days||[]).filter(d=>d.title||d.plan).length, books=(D.bookings||[]).length, flights=(D.bookings||[]).filter(b=>b.cat==='flight').length;
+  const nights=Math.max(0,keys.length-1), covered=keys.slice(0,-1).filter(k=>lodgingForDayKey(k)).length;
+  const busy=new Set(Object.keys(timeline).map(Number)); (D.days||[]).forEach(d=>{ if(d.title||d.plan){ const k=dayKeyOf(d.date); if(k!=null)busy.add(k); } });
+  const diff=Math.round((span.start-t0)/864e5);
+  const when=diff>1?'In '+diff+' days':diff===1?'Tomorrow':diff===0?'Starts today':t0<=span.end?'Day '+(Math.round((t0-span.start)/864e5)+1)+' of '+keys.length:'Done';
+  let cal='';
+  const first=new Date(span.start), last=new Date(span.end);
+  for(let y=first.getFullYear(),m=first.getMonth(); y<last.getFullYear()||(y===last.getFullYear()&&m<=last.getMonth()); m===11?(y++,m=0):m++){
+    const lead=new Date(y,m,1).getDay(), len=new Date(y,m+1,0).getDate();
+    let cells='<span class="cw">S</span><span class="cw">M</span><span class="cw">T</span><span class="cw">W</span><span class="cw">T</span><span class="cw">F</span><span class="cw">S</span>'+'<span></span>'.repeat(lead);
+    for(let day=1;day<=len;day++){ const k=new Date(y,m,day).getTime(), i=keys.indexOf(k), dow=new Date(k).getDay();
+      if(i<0){ cells+='<span class="cd'+(k===t0?' today':'')+'">'+day+'</span>'; continue; }
+      const cls=['cd','in',i===0?'start':'',i===keys.length-1?'end':'',dow===0?'wk0':'',dow===6?'wk6':'',k===t0?'today':'',busy.has(k)?'busy':''].filter(Boolean).join(' ');
+      cells+='<button class="'+cls+'" data-i="'+(i+1)+'" aria-label="Go to day '+(i+1)+', '+shortDay(k)+'"><span>'+day+'</span></button>'; }
+    cal+='<div class="ov-month"><div class="ov-mname">'+MONTHS[m]+' '+y+'</div><div class="ov-grid">'+cells+'</div></div>';
+  }
+  const stops=getStops().map(x=>x.name).filter(Boolean);
+  card.innerHTML='<div class="ov-top"><span class="ov-k">Overview</span><span class="ov-when">'+when+'</span></div>'+
+    '<div class="ov-title">'+keys.length+' day'+(keys.length>1?'s':'')+(stops.length?' · '+stops.length+' place'+(stops.length>1?'s':''):'')+'</div>'+
+    '<div class="ov-dates">'+esc(spanLabel(span))+'</div>'+cal+
+    '<div class="ov-stats">'+
+      '<div><b>'+covered+'<small>/'+nights+'</small></b><span>nights booked</span></div>'+
+      '<div><b>'+flights+'</b><span>flight'+(flights===1?'':'s')+'</span></div>'+
+      '<div><b>'+(books-flights)+'</b><span>other bookings</span></div>'+
+      '<div><b>'+plans+'</b><span>plan'+(plans===1?'':'s')+'</span></div></div>'+
+    (stops.length?'<div class="ov-places">'+stops.slice(0,8).map(n=>'<span>'+esc(n)+'</span>').join('')+'</div>':'')+
+    (covered<nights?'<div class="ov-gap">'+(nights-covered)+' night'+(nights-covered>1?'s':'')+' without a place to stay yet</div>':'')+
+    '<div class="ov-hint">Swipe for each day →</div>';
+  card.querySelectorAll('.ov-grid button').forEach(b=>b.onclick=()=>goToDay(+b.dataset.i));
+  const und=document.createElement('div'); renderUndatedPlans(und); if(und.children.length){ und.className='ov-undated'; card.appendChild(und); }
+  return card;
+}
+function dayCard(key,i,total,timeline){
+  const d=new Date(key), t0=todayKey(), g=timeline[key], L=lodgingForDayKey(key), prevL=lodgingForDayKey(key-864e5);
+  const plans=(D.days||[]).filter(x=>(x.title||x.plan||x.id===dayEditing)&&dayKeyOf(x.date)===key);
+  let place=''; getStops().forEach(st=>{ const k=dayKeyOf(st.date); if(k!=null&&k<=key) place=st.name; });
+  if(plans.some(x=>(x.title||'').trim().toLowerCase()===place.toLowerCase())) place='';
+  const card=document.createElement('section'); card.className='dcard'+(key===t0?' is-today':'');
+  card.setAttribute('aria-label','Day '+(i+1)+' of '+total+', '+DOW[d.getDay()]+' '+shortDay(key));
+  const MONF=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  card.innerHTML='<div class="dc-top"><span class="dc-k">Day '+(i+1)+' of '+total+'</span>'+(key===t0?'<span class="dc-today">Today</span>':'')+'</div>'+
+    '<div class="dc-date"><span class="dc-num">'+d.getDate()+'</span><span class="dc-rest"><b>'+['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()]+'</b><span>'+MONF[d.getMonth()]+' '+d.getFullYear()+'</span></span></div>'+
+    (place?'<div class="dc-place">'+esc(place)+'</div>':'')+
+    '<div class="cm-sky dc-sky" data-key="'+key+'"></div>';
+  if(L){ const nights=[]; for(let k=key;lodgingForDayKey(k)&&lodgingForDayKey(k).id===L.id;k-=864e5)nights.push(k);
+    const st=document.createElement('button'); st.className='dc-stay';
+    st.innerHTML='<span class="dc-stay-ic">'+TYPES.hotel.icon+'</span><span><b>'+(!prevL||prevL.id!==L.id?'Check in · ':'Staying at ')+esc(L.name||'your stay')+'</b>'+(L.room?'<span>Room '+esc(L.room)+'</span>':'')+'</span>';
+    st.onclick=()=>jumpToLodging(L); card.appendChild(st); }
+  const body=document.createElement('div'); body.className='dc-body';
+  plans.forEach(x=>body.appendChild(dayPlanEl(x)));
+  if(g&&g.items.length)g.items.forEach((it,idx)=>body.appendChild(calItem(it.b,idx<g.items.length-1)));
+  const addPlan=()=>{ let p=(D.days||[]).find(x=>!x.title&&!x.plan&&dayKeyOf(x.date)===key);
+    if(!p){ p={id:uid(),title:'',date:fmtDate(key),plan:'',by:meStamp()}; D.days.push(p); } dayEditing=p.id; save(); renderDays(); };
+  if(!plans.length&&!(g&&g.items.length)){
+    const free=document.createElement('button'); free.className='dc-free';
+    free.innerHTML='<b>'+(L?'A free day':'Nothing planned yet')+'</b><span>+ Add a plan</span>'; free.onclick=addPlan; body.appendChild(free);
+  } else if(!plans.length){
+    const add=document.createElement('button'); add.className='dc-add'; add.textContent='+ Add a plan'; add.onclick=addPlan; body.appendChild(add);
+  }
+  card.appendChild(body);
+  return card;
 }
 // jump to a lodging's booking entry
 function jumpToLodging(L){
