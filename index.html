@@ -48,6 +48,9 @@
   html{-webkit-text-size-adjust:100%;touch-action:pan-x pan-y}   /* it's an app: no pinch or double-tap zoom (the map handles its own) */
   button,a,input,select,textarea,label{touch-action:manipulation}
   html,body{margin:0;padding:0;background:var(--paper);width:100%;max-width:100vw;overflow-x:hidden}
+  /* iOS Home Screen apps under a translucent status bar shrink the screen by the status bar's
+     height when the page is shorter than the screen, lifting the bottom bar; fill it instead */
+  html{min-height:calc(100% + env(safe-area-inset-top,0px));background-color:var(--paper)}
   body{
     font-family:var(--sans); color:var(--ink); font-size:16px; line-height:1.5;
     padding-bottom:calc(96px + var(--safe-bot));
