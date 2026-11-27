@@ -1,5 +1,5 @@
 /* Ace Travel service worker — bulletproof offline */
-const CACHE='ace-travel-v6';
+const CACHE='ace-travel-v7';
 const CORE=[
   './',
   './index.html',
