@@ -941,7 +941,7 @@
   .ds-b.on svg{color:var(--gold-bright)}
   .day-track{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 20px 20px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
   .day-track::-webkit-scrollbar{display:none}
-  .dcard{flex:0 0 calc(100% - 28px);scroll-snap-align:center;scroll-snap-stop:always;height:var(--dc-h,auto);min-height:240px;overflow-y:auto;overscroll-behavior:contain;border-radius:30px;background:var(--paper-hi);border:1px solid var(--line-soft);box-shadow:var(--shadow-md);padding:20px 18px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
+  .dcard{flex:0 0 calc(100% - 28px);scroll-snap-align:center;scroll-snap-stop:always;height:var(--dc-h,auto);min-height:240px;overflow-y:auto;overscroll-behavior:contain;scroll-padding-bottom:var(--dc-under,0px);border-radius:30px;background:var(--paper-hi);border:1px solid var(--line-soft);box-shadow:var(--shadow-md);padding:20px 18px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
   .dcard.is-today{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),var(--shadow-md)}
   .dc-top{display:flex;align-items:center;justify-content:space-between}
   .dc-k{font-size:13px;font-weight:800;color:var(--sage);text-transform:uppercase;letter-spacing:.04em}
@@ -1020,7 +1020,7 @@
   .ds-b{width:44px;height:54px;border-radius:15px}
   .ds-b b{font-size:18px}
   .day-track{padding:4px 20px 0;gap:10px}
-  .dcard{padding:16px 16px 18px;gap:10px;border-radius:28px}
+  .dcard{padding:16px 16px calc(18px + var(--dc-under,0px));gap:10px;border-radius:28px}
   .dc-num{font-size:56px}
   .ov-title{font-size:24px}
   .ov-head{display:flex;flex-direction:column;gap:2px}
@@ -1595,6 +1595,7 @@ function showView(v,btn){
   window.scrollTo(0,0);
   requestAnimationFrame(()=>document.querySelectorAll('#view-'+v+' textarea').forEach(grow));   // sizes are only known once visible
   if(v==='map')renderMap();
+  if(v==='itinerary'&&D)renderDays();   // bookings added elsewhere show on their day straight away
 }
 function grow(el){el.style.height='auto';const h=el.scrollHeight;if(h)el.style.height=h+'px'}   // hidden views report 0: leave it at auto
 function inp(val,cls,ph,cb,label){const i=document.createElement('input');i.className=cls;i.value=val||'';i.placeholder=ph||'';i.setAttribute('aria-label',label||ph||'');i.oninput=e=>cb(e.target.value);return i}
@@ -1955,12 +1956,23 @@ function renderDaysBar(span){
 // size the cards to the room left above the bottom bar, so the page itself never scrolls
 function fitCards(){
   const track=document.querySelector('.day-track'); if(!track||!track.offsetParent)return;
-  const nav=document.querySelector('nav.app-bar'), vh=window.innerHeight;
-  const nr=nav?nav.getBoundingClientRect():null, bottom=nr&&nr.height?nr.top:vh;
+  const nav=document.querySelector('nav.app-bar'), nr=nav?nav.getBoundingClientRect():null;
   const top=track.getBoundingClientRect().top+window.scrollY;
-  track.style.setProperty('--dc-h',Math.max(240,Math.floor(bottom-top-14))+'px');
+  // the card runs down to the bar's bottom edge and tucks under it; its content stops above the bar
+  const bottom=nr&&nr.height?nr.bottom:window.innerHeight-16, under=nr&&nr.height?nr.height+12:0;
+  track.style.setProperty('--dc-h',Math.max(240,Math.floor(bottom-top-12))+'px');
+  track.style.setProperty('--dc-under',under+'px');
   const ov=track.querySelector('.dcard.ov'); if(ov){ ov.classList.remove('tight','tighter','snug'); const over=()=>ov.scrollHeight>ov.clientHeight+1; if(over())ov.classList.add('snug'); if(over())ov.classList.add('tight'); if(over())ov.classList.add('tighter'); }
 }
+// iOS Home Screen apps can lose the status bar's height off the bottom of the screen; if that
+// happens anyway, drop the bar back down to the real bottom
+function fixBarDrop(){
+  const nav=document.querySelector('nav.app-bar'); if(!nav)return;
+  const standalone=navigator.standalone||matchMedia('(display-mode: standalone)').matches;
+  const portrait=innerHeight>innerWidth, gap=standalone&&portrait?screen.height-innerHeight:0;
+  nav.style.marginBottom=gap>20&&gap<80?(-gap)+'px':'';
+}
+addEventListener('resize',fixBarDrop); fixBarDrop();
 addEventListener('resize',()=>fitCards());
 function renderDays(){
   const c=document.getElementById('days'); if(!c)return; c.innerHTML='';
@@ -2656,7 +2668,8 @@ function downloadICS(b){
   const a=document.createElement('a');a.href=url;a.download=(b.title||'event').replace(/[^\w]+/g,'_')+'.ics';
   document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function addBooking(b){D.bookings.push(Object.assign({id:uid(),kind:'',title:'',when:'',details:'',by:meStamp()},b||{}));save();renderBookings()}
+function addBooking(b){D.bookings.push(Object.assign({id:uid(),kind:'',title:'',when:'',details:'',by:meStamp()},b||{}));save();renderBookings();
+  if(document.getElementById('view-itinerary').classList.contains('active'))renderDays();}
 
 function renderPacking(){
   const c=document.getElementById('packing');c.innerHTML='';
