@@ -938,7 +938,7 @@
   .ds-b.on svg{color:var(--gold-bright)}
   .day-track{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 20px 20px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
   .day-track::-webkit-scrollbar{display:none}
-  .dcard{flex:0 0 calc(100% - 28px);scroll-snap-align:center;scroll-snap-stop:always;min-height:440px;border-radius:30px;background:var(--paper-hi);border:1px solid var(--line-soft);box-shadow:var(--shadow-md);padding:20px 18px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
+  .dcard{flex:0 0 calc(100% - 28px);scroll-snap-align:center;scroll-snap-stop:always;height:var(--dc-h,auto);min-height:240px;overflow-y:auto;overscroll-behavior:contain;border-radius:30px;background:var(--paper-hi);border:1px solid var(--line-soft);box-shadow:var(--shadow-md);padding:20px 18px 22px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box}
   .dcard.is-today{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),var(--shadow-md)}
   .dc-top{display:flex;align-items:center;justify-content:space-between}
   .dc-k{font-size:13px;font-weight:800;color:var(--sage);text-transform:uppercase;letter-spacing:.04em}
@@ -997,6 +997,64 @@
   .ov-undated{background:var(--paper-hi);border-radius:18px;padding:4px 12px 10px;color:var(--ink)}
   .ov-undated .undated{padding:0}
   #days.days-cards::before,#days.days-empty-wrap::before{display:none}
+  /* Cards mode: everything fits on one screen */
+  .ask-mini{display:none}
+  .ask-mini span{color:var(--gold);font-size:18px}
+  body.dv-cards[data-view="itinerary"] .ask-mini{display:grid;place-items:center}
+  body.dv-cards[data-view="itinerary"] .trip-top .tt-meta,
+  body.dv-cards[data-view="itinerary"] .trip-top .tt-sub,
+  body.dv-cards[data-view="itinerary"] #todayCard,
+  body.dv-cards[data-view="itinerary"] #warnCard{display:none}
+  body.dv-cards[data-view="itinerary"] .trip-top .trip-name{font-size:28px!important}
+  body.dv-cards[data-view="itinerary"] .trip-top .trip-tabs{margin-top:10px}
+  body.dv-cards[data-view="itinerary"]{padding-bottom:0!important}
+  body.dv-cards[data-view="itinerary"] main{padding-bottom:0!important;min-height:0!important}
+  body.dv-cards[data-view="itinerary"] #view-itinerary{padding-bottom:0!important}
+  .days-bar{margin:8px 20px 6px}
+  .dv-slot{flex:1;min-width:0;margin-left:-20px}
+  .dv-slot .day-strip{padding:2px 0 2px 20px}
+  .dv-toggle button{padding:0 10px}
+  .ds-b{width:44px;height:54px;border-radius:15px}
+  .ds-b b{font-size:18px}
+  .day-track{padding:4px 20px 0;gap:10px}
+  .dcard{padding:16px 16px 18px;gap:10px;border-radius:28px}
+  .dc-num{font-size:56px}
+  .ov-title{font-size:24px}
+  .ov-head{display:flex;flex-direction:column;gap:2px}
+  .ov-dates{margin-top:0;font-size:14px}
+  .ov-mname{font-size:13px;margin-bottom:4px}
+  .ov-grid .cd{height:36px}
+  .ov-grid .cd>i{position:absolute;top:-3px;left:0;right:0;font-style:normal;font-size:9px;font-weight:800;color:#D9A436;text-align:center;line-height:1;z-index:2}
+  .ov-grid .cd.in>span{width:30px;height:30px}
+  .ov-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:2px}
+  .ov-stats div{padding:9px 6px;border-radius:14px;align-items:center;text-align:center}
+  .ov-stats b{font-size:20px}
+  .ov-stats small{font-size:13px}
+  .ov-stats span{font-size:12px}
+  .ov-places{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px}
+  .ov-places::-webkit-scrollbar{display:none}
+  .ov-places span{flex:0 0 auto}
+  .dcard>*{flex-shrink:0}
+  .ov-undated-link{align-self:flex-start;border:none;background:rgba(253,249,240,.1);color:#F4ECD8;font:inherit;font-size:13px;font-weight:700;padding:7px 12px;border-radius:999px}
+  .dcard.ov.tight{gap:8px}
+  .dcard.ov.tight .ov-next,.dcard.ov.tight .ov-places{display:none}
+  .dcard.ov.tight .ov-grid .cd{height:32px}
+  .dcard.ov.tight .ov-stats div{padding:7px 4px}
+  .ov-when2{display:none}
+  .dcard.ov.snug .ov-next{display:none}
+  .dcard.ov.tighter .ov-top{display:none}
+  .dcard.ov.tighter .ov-when2{display:inline;color:#D9A436;font-weight:800}
+  .dcard.ov.tighter .ov-stats{display:flex;flex-wrap:wrap;gap:4px 12px}
+  .dcard.ov.tighter .ov-stats div{flex-direction:row;align-items:baseline;gap:4px;padding:0;background:none}
+  .dcard.ov.tighter .ov-stats b{font-size:16px}
+  .dcard.ov.tighter .ov-grid .cd{height:30px}
+  .dcard.ov.tighter .ov-warn span:nth-child(2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dcard.ov.tighter .ov-warn{padding:6px 10px}
+  .ov-next{font-size:14px;color:#F4ECD8;line-height:1.35}
+  .ov-next b{color:#D9A436;margin-right:4px}
+  .ov-warn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;background:rgba(240,160,140,.14);color:#F6C2B3;font-size:13px;font-weight:600;line-height:1.3}
+  .ov-warn span:nth-child(2){flex:1}
+  .ov-warn button{border:none;background:transparent;color:#F4ECD8;font:inherit;font-size:13px;font-weight:700;padding:4px}
   .days-empty{margin:4px 20px}
   .days-list{padding-top:2px}
   @media (prefers-reduced-motion:reduce){.day-track{scroll-behavior:auto}}
@@ -1146,6 +1204,7 @@
     <div class="tt-actions">
       <button class="pill-btn" id="btnMap" onclick="showView('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6.5v13L9 17l6 3 6-2.5v-13L15 7 9 4zM9 4v13M15 7v13"/></svg>Map</button>
       <button class="pill-btn" id="btnMoney" onclick="showView('budget')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M7 15h3"/></svg>Money</button>
+      <button class="circle-btn ask-mini" onclick="openAsk()" aria-label="Ask about this trip"><span aria-hidden="true">✦</span></button>
       <button class="circle-btn" onclick="openExport()" aria-label="Share trip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
     </div>
   </div>
@@ -1522,6 +1581,7 @@ async function setHeroCity(name){
 const VIEW_TAB={itinerary:'days',wishlist:'ideas',bookings:'bookings',packing:'prep',info:'prep',map:'map',budget:'money'};
 function showView(v,btn){
   if(v==='info')v='packing';
+  document.body.dataset.view=v;
   document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));
   document.getElementById('view-'+v).classList.add('active');
   const tab=VIEW_TAB[v]||v;
@@ -1885,11 +1945,20 @@ function setDaysView(v){ daysView=v; try{ localStorage.setItem(DAYS_VIEW_KEY,v);
 function renderDaysBar(span){
   const bar=document.getElementById('daysBar'); if(!bar)return;
   const cards=daysView!=='list';
-  bar.innerHTML='<div class="dv-toggle" role="group" aria-label="How to show days">'+
-    '<button aria-pressed="'+cards+'" onclick="setDaysView(\'cards\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="13" height="14" rx="3"/><path d="M19 7v10"/></svg><span>Cards</span></button>'+
-    '<button aria-pressed="'+(!cards)+'" onclick="setDaysView(\'list\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg><span>List</span></button></div>'+
-    (cards&&span?'<div class="dv-nav"><button class="circle-btn" aria-label="Previous day" onclick="goToDay(daysIdx-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><button class="circle-btn" aria-label="Next day" onclick="goToDay(daysIdx+1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></div>':'');
+  bar.innerHTML=(cards&&span?'<div class="dv-slot"></div>':'')+'<div class="dv-toggle" role="group" aria-label="How to show days">'+
+    '<button aria-pressed="'+cards+'" aria-label="Cards" title="Cards" onclick="setDaysView(\'cards\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="13" height="14" rx="3"/><path d="M19 7v10"/></svg></button>'+
+    '<button aria-pressed="'+(!cards)+'" aria-label="List" title="List" onclick="setDaysView(\'list\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></button></div>';
 }
+// size the cards to the room left above the bottom bar, so the page itself never scrolls
+function fitCards(){
+  const track=document.querySelector('.day-track'); if(!track||!track.offsetParent)return;
+  const nav=document.querySelector('nav.app-bar'), vh=window.innerHeight;
+  const nr=nav?nav.getBoundingClientRect():null, bottom=nr&&nr.height?nr.top:vh;
+  const top=track.getBoundingClientRect().top+window.scrollY;
+  track.style.setProperty('--dc-h',Math.max(240,Math.floor(bottom-top-14))+'px');
+  const ov=track.querySelector('.dcard.ov'); if(ov){ ov.classList.remove('tight','tighter','snug'); const over=()=>ov.scrollHeight>ov.clientHeight+1; if(over())ov.classList.add('snug'); if(over())ov.classList.add('tight'); if(over())ov.classList.add('tighter'); }
+}
+addEventListener('resize',()=>fitCards());
 function renderDays(){
   const c=document.getElementById('days'); if(!c)return; c.innerHTML='';
   const span=timelineSpan();
@@ -1897,6 +1966,7 @@ function renderDays(){
   if(magic){ document.getElementById('daysBar').before(magic); magic.classList.toggle('has-content',!!span); }
   renderDaysBar(span);
   c.className=!span?'days-empty-wrap':daysView==='list'?'days-list':'days-cards';
+  document.body.classList.toggle('dv-cards',daysView!=='list'&&!!span);
   if(!span){
     c.innerHTML='<div class="moment days-empty"><svg class="moment-dog" role="img" aria-label="Audra holding the AS flag"><use href="#audra"/></svg><div class="moment-h">Your days appear here</div><div class="moment-t">Add a plan, or drop in a booking with the + button.</div></div>';
     const add=document.createElement('button');add.className='red-btn';add.textContent='Add a plan';
@@ -1992,8 +2062,8 @@ function renderDaysCards(c,span){
   const track=document.createElement('div'); track.className='day-track'; track.setAttribute('aria-label','Days of the trip, swipe sideways');
   track.appendChild(overviewCard(span,keys,timeline));
   keys.forEach((k,i)=>track.appendChild(dayCard(k,i,keys.length,timeline)));
-  c.appendChild(strip); c.appendChild(track);
-  requestAnimationFrame(()=>{ track.scrollLeft=slideLeft(track,daysIdx); markDay(); });
+  const slot=document.querySelector('#daysBar .dv-slot'); (slot||c).appendChild(strip); c.appendChild(track);
+  requestAnimationFrame(()=>{ fitCards(); track.scrollLeft=slideLeft(track,daysIdx); markDay(); });
   track.addEventListener('scroll',()=>{ clearTimeout(track._t); track._t=setTimeout(()=>{ daysIdx=nearestSlide(track); markDay(); },70); },{passive:true});
 }
 const slideLeft=(track,i)=>{ const el=track.children[i]; return el?el.offsetLeft-(track.clientWidth-el.offsetWidth)/2:0; };
@@ -2018,31 +2088,42 @@ function overviewCard(span,keys,timeline){
   const busy=new Set(Object.keys(timeline).map(Number)); (D.days||[]).forEach(d=>{ if(d.title||d.plan){ const k=dayKeyOf(d.date); if(k!=null)busy.add(k); } });
   const diff=Math.round((span.start-t0)/864e5);
   const when=diff>1?'In '+diff+' days':diff===1?'Tomorrow':diff===0?'Starts today':t0<=span.end?'Day '+(Math.round((t0-span.start)/864e5)+1)+' of '+keys.length:'Done';
-  let cal='';
-  const first=new Date(span.start), last=new Date(span.end);
-  for(let y=first.getFullYear(),m=first.getMonth(); y<last.getFullYear()||(y===last.getFullYear()&&m<=last.getMonth()); m===11?(y++,m=0):m++){
-    const lead=new Date(y,m,1).getDay(), len=new Date(y,m+1,0).getDate();
-    let cells='<span class="cw">S</span><span class="cw">M</span><span class="cw">T</span><span class="cw">W</span><span class="cw">T</span><span class="cw">F</span><span class="cw">S</span>'+'<span></span>'.repeat(lead);
-    for(let day=1;day<=len;day++){ const k=new Date(y,m,day).getTime(), i=keys.indexOf(k), dow=new Date(k).getDay();
-      if(i<0){ cells+='<span class="cd'+(k===t0?' today':'')+'">'+day+'</span>'; continue; }
-      const cls=['cd','in',i===0?'start':'',i===keys.length-1?'end':'',dow===0?'wk0':'',dow===6?'wk6':'',k===t0?'today':'',busy.has(k)?'busy':''].filter(Boolean).join(' ');
-      cells+='<button class="'+cls+'" data-i="'+(i+1)+'" aria-label="Go to day '+(i+1)+', '+shortDay(k)+'"><span>'+day+'</span></button>'; }
-    cal+='<div class="ov-month"><div class="ov-mname">'+MONTHS[m]+' '+y+'</div><div class="ov-grid">'+cells+'</div></div>';
+  // only the weeks the trip touches, Sunday first
+  const MON3=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const sd=new Date(span.start); let k0=new Date(sd.getFullYear(),sd.getMonth(),sd.getDate()-sd.getDay()).getTime();
+  const ed=new Date(span.end); const k1=new Date(ed.getFullYear(),ed.getMonth(),ed.getDate()+6-ed.getDay()).getTime();
+  let cells='<span class="cw">S</span><span class="cw">M</span><span class="cw">T</span><span class="cw">W</span><span class="cw">T</span><span class="cw">F</span><span class="cw">S</span>';
+  for(let k=k0;k<=k1;k=new Date(new Date(k).getFullYear(),new Date(k).getMonth(),new Date(k).getDate()+1).getTime()){
+    const dt=new Date(k), day=dt.getDate(), dow=dt.getDay(), i=keys.indexOf(k);
+    const lab=day===1?'<i>'+MON3[dt.getMonth()]+'</i>':'';
+    if(i<0){ cells+='<span class="cd'+(k===t0?' today':'')+'">'+lab+'<span>'+day+'</span></span>'; continue; }
+    const cls=['cd','in',i===0?'start':'',i===keys.length-1?'end':'',dow===0?'wk0':'',dow===6?'wk6':'',k===t0?'today':'',busy.has(k)?'busy':''].filter(Boolean).join(' ');
+    cells+='<button class="'+cls+'" data-i="'+(i+1)+'" aria-label="Go to day '+(i+1)+', '+shortDay(k)+'">'+lab+'<span>'+day+'</span></button>';
   }
+  const m0=MONTHS[sd.getMonth()]+(sd.getFullYear()!==ed.getFullYear()?' '+sd.getFullYear():''), m1=MONTHS[ed.getMonth()]+' '+ed.getFullYear();
+  const cal='<div class="ov-month"><div class="ov-mname">'+(m0===MONTHS[ed.getMonth()]?m1:m0+' – '+m1)+'</div><div class="ov-grid">'+cells+'</div></div>';
   const stops=getStops().map(x=>x.name).filter(Boolean);
+  const ws=typeof tripWarnings==='function'?tripWarnings():[];
+  const nx=document.getElementById('tripNext'), nextTxt=nx?nx.textContent.replace(/^Next\s*/,'').trim():'';
   card.innerHTML='<div class="ov-top"><span class="ov-k">Overview</span><span class="ov-when">'+when+'</span></div>'+
-    '<div class="ov-title">'+keys.length+' day'+(keys.length>1?'s':'')+(stops.length?' · '+stops.length+' place'+(stops.length>1?'s':''):'')+'</div>'+
-    '<div class="ov-dates">'+esc(spanLabel(span))+'</div>'+cal+
+    '<div class="ov-head"><div class="ov-title">'+keys.length+' day'+(keys.length>1?'s':'')+(stops.length?' · '+stops.length+' place'+(stops.length>1?'s':''):'')+'</div>'+
+    '<div class="ov-dates">'+esc(spanLabel(span))+'<span class="ov-when2"> · '+when+'</span></div></div>'+cal+
     '<div class="ov-stats">'+
-      '<div><b>'+covered+'<small>/'+nights+'</small></b><span>nights booked</span></div>'+
+      '<div><b>'+covered+'<small>/'+nights+'</small></b><span>nights</span></div>'+
       '<div><b>'+flights+'</b><span>flight'+(flights===1?'':'s')+'</span></div>'+
-      '<div><b>'+(books-flights)+'</b><span>other bookings</span></div>'+
+      '<div><b>'+(books-flights)+'</b><span>other</span></div>'+
       '<div><b>'+plans+'</b><span>plan'+(plans===1?'':'s')+'</span></div></div>'+
-    (stops.length?'<div class="ov-places">'+stops.slice(0,8).map(n=>'<span>'+esc(n)+'</span>').join('')+'</div>':'')+
-    (covered<nights?'<div class="ov-gap">'+(nights-covered)+' night'+(nights-covered>1?'s':'')+' without a place to stay yet</div>':'')+
-    '<div class="ov-hint">Swipe for each day →</div>';
+    (stops.length?'<div class="ov-places">'+stops.map(n=>'<span>'+esc(n)+'</span>').join('')+'</div>':'')+
+    (nextTxt?'<div class="ov-next"><b>Next</b> '+esc(nextTxt)+'</div>':'')+
+    ws.map(w=>'<div class="ov-warn"><span aria-hidden="true">⚠︎</span><span>'+w.text+'</span><button data-k="'+esc(w.key)+'">Got it</button></div>').join('');
+  card.querySelectorAll('.ov-warn button').forEach(b=>b.onclick=()=>{ D.dismissedWarnings=(D.dismissedWarnings||[]).concat(b.dataset.k); save(); renderDays(); });
   card.querySelectorAll('.ov-grid button').forEach(b=>b.onclick=()=>goToDay(+b.dataset.i));
-  const und=document.createElement('div'); renderUndatedPlans(und); if(und.children.length){ und.className='ov-undated'; card.appendChild(und); }
+  const undated=(D.days||[]).filter(d=>(d.title||d.plan||d.id===dayEditing)&&dayKeyOf(d.date)==null);
+  if(undated.some(d=>d.id===dayEditing)){ const und=document.createElement('div'); renderUndatedPlans(und); und.className='ov-undated'; card.appendChild(und); }
+  else if(undated.length){ const b=document.createElement('button'); b.className='ov-undated-link';
+    b.textContent=undated.length+' plan'+(undated.length>1?'s':'')+' not on a date yet ›';
+    b.onclick=()=>{ setDaysView('list'); setTimeout(()=>{ const u=document.querySelector('#days .undated'); if(u)u.scrollIntoView({behavior:'smooth',block:'start'}); },60); };
+    card.appendChild(b); }
   return card;
 }
 function dayCard(key,i,total,timeline){
